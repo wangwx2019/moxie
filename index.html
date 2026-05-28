@@ -294,7 +294,12 @@
             <button class="cute-btn-sm" @click="exportData">导出 data.json</button>
             <button class="cute-btn-sm" @click="importData">导入 JSON</button>
             <input type="file" ref="importFile" style="display:none" accept=".json" @change="handleImport">
-            <div class="text-small">将 data.json 上传到 GitHub 仓库即可自动同步</div>
+            <hr style="margin:10px 0;border:none;border-top:1px dashed #ddd;">
+            <div class="flex-between"><span>🐙 GitHub Token</span></div>
+            <input type="text" v-model="githubToken" placeholder="ghp_xxx 或 github_pat_xxx" style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; margin-top:6px; box-sizing:border-box;">
+            <button class="cute-btn primary" style="width:100%; margin-top:10px; padding:14px 0; font-size:1rem; font-weight:700;" @click="syncToGitHub" :disabled="!githubToken">{{ syncing ? '同步中...' : '☁️ 同步到 GitHub' }}</button>
+            <div v-if="githubSyncTime" class="text-small" style="margin-top:6px;">上次同步：{{ githubSyncTime }}</div>
+            <div class="text-small">将数据同步到 GitHub 仓库 wangwx2019/moxie 的 data.json</div>
         </div>
         <button class="cute-btn" @click="confirmResetData">重置演示数据</button>
     </div>
@@ -373,6 +378,9 @@
                 baiduAccounts: [{ name: '账号1', token: '', used: 0 }],
                 baiduActiveIdx: 0,
                 baiduResetMonth: '',
+                githubToken: '',
+                githubSyncTime: '',
+                syncing: false,
             }
         },
         computed: {
@@ -478,7 +486,7 @@
             formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
             currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
         },
-        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData' },
+        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData' },
         mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); },
         methods: {
             async fetchRemoteData() {
@@ -530,7 +538,7 @@
             },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; } this.baiduResetMonth = d.baiduResetMonth || ''; } 
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; } this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; } 
                 // 月初重置百度账号用量
                 const now = new Date();
                 const thisMonth = now.getFullYear() + '-' + (now.getMonth()+1);
@@ -543,7 +551,7 @@
                 this.saveData(); 
             },
             saveData() { 
-                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth };
+                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
             },
             // ---- 127 辅助方法 ----
@@ -1008,7 +1016,7 @@
                 });
             },
             exportData(){
-                const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx };
+                const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime };
                 const json = JSON.stringify(fullData, null, 2);
                 const blob = new Blob([json], {type: 'application/json'});
                 const url = URL.createObjectURL(blob);
@@ -1035,6 +1043,8 @@
                         if(imported.parentPassword) this.parentPassword = imported.parentPassword;
                         if(imported.useBaiduOCR !== undefined) this.useBaiduOCR = imported.useBaiduOCR;
                         if(imported.baiduAccounts && imported.baiduAccounts.length) { this.baiduAccounts = imported.baiduAccounts; this.baiduActiveIdx = imported.baiduActiveIdx || 0; }
+                        if(imported.githubToken !== undefined) this.githubToken = imported.githubToken;
+                        if(imported.githubSyncTime !== undefined) this.githubSyncTime = imported.githubSyncTime;
                         this.saveData();
                         this.generateTodayPlan();
                         this.showAlert('成功', '数据导入成功');
@@ -1042,6 +1052,42 @@
                 };
                 reader.readAsText(file);
                 e.target.value = '';
+            },
+            async syncToGitHub() {
+                if(!this.githubToken) return;
+                this.syncing = true;
+                try {
+                    // 构造要上传的数据
+                    const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx };
+                    const content = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2))));
+                    // 获取当前文件 SHA（更新时需要）
+                    const getRes = await fetch('https://api.github.com/repos/wangwx2019/moxie/contents/data.json', {
+                        headers: { 'Authorization': 'Bearer ' + this.githubToken }
+                    });
+                    let sha = '';
+                    if(getRes.ok) {
+                        const existing = await getRes.json();
+                        sha = existing.sha;
+                    }
+                    // 上传/更新文件
+                    const putRes = await fetch('https://api.github.com/repos/wangwx2019/moxie/contents/data.json', {
+                        method: 'PUT',
+                        headers: { 'Authorization': 'Bearer ' + this.githubToken, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: '平板同步 ' + new Date().toLocaleString('zh-CN'), content: content, sha: sha || undefined })
+                    });
+                    if(putRes.ok) {
+                        const now = new Date().toLocaleString('zh-CN');
+                        this.githubSyncTime = now;
+                        this.saveData();
+                        this.showAlert('同步成功', 'data.json 已更新 ✅');
+                    } else {
+                        const err = await putRes.json();
+                        this.showAlert('同步失败', err.message || '请检查 Token 是否有写入权限');
+                    }
+                } catch(e) {
+                    this.showAlert('同步失败', '网络错误：' + (e.message || e));
+                }
+                this.syncing = false;
             },
         }
     }).mount('#app');
