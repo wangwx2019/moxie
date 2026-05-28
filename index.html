@@ -33,7 +33,6 @@
         .text-small { font-size: 0.7rem; color: #a16207; }
         .badge { background: #ffedd5; padding: 2px 12px; border-radius: 30px; font-size: 0.7rem; }
         .word-badge { font-size: 0.65rem; background: #fee2e2; color: #b91c1c; border-radius: 30px; padding: 2px 10px; margin-left: 8px; }
-        /* 自定义弹窗 */
         .modal-mask {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
@@ -77,10 +76,6 @@
         }
         .stat-number { font-size: 1.8rem; font-weight: 800; color: #f97316; }
         .stat-label { font-size: 0.75rem; color: #b45309; }
-        .correct-badge {
-            background: #dcfce7; color: #15803d; border-radius: 30px; padding: 2px 12px;
-            font-size: 0.7rem; display: inline-block; margin-left: 8px;
-        }
     </style>
 </head>
 <body>
@@ -160,13 +155,12 @@
         <div style="max-height: 55vh; overflow-y: auto;"><div v-for="word in filteredWordBank" :key="word.id" class="word-list-item"><div><span style="font-weight:700;">{{ word.word }}</span><span class="word-badge" v-if="word.errorCount >= 5">顽固</span><span class="word-badge" v-else-if="word.errorCount >= 3">难点</span><span class="word-badge" v-else-if="word.errorCount === 1">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="background:#dcfce7;">已掌握</span><div class="text-small">{{ word.pinyin }} · 错{{ word.errorCount || 0 }}次</div></div><div><button class="cute-btn-sm" style="padding:2px 12px; margin-right:6px;" @click.stop="editWord(word)">✏️</button><button class="cute-btn-sm" style="padding:2px 12px; background:#ef4444;" @click.stop="confirmDeleteWord(word)">🗑️</button></div></div></div>
     </div>
 
-    <!-- 复核默写页面 (完全按图片样式) -->
+    <!-- 复核默写页面 -->
     <div v-if="currentView === 'reviewParent'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
         <h3>📋 复核默写</h3>
         <div class="text-small" style="margin-bottom: 12px;">家长复核说明：默认接受系统判定结果。如果系统判错了，点「纠正」按钮即可翻转。确认无误后点击底部提交。</div>
         
-        <!-- 统计卡片 -->
         <div class="review-stats">
             <div class="stat-card"><div class="stat-number">{{ reviewStats.total }}</div><div class="stat-label">今日总数</div></div>
             <div class="stat-card"><div class="stat-number">{{ reviewStats.firstCheck }}</div><div class="stat-label">首次核对</div></div>
@@ -179,7 +173,7 @@
             <div v-for="(item, idx) in reviewList" :key="idx" class="review-item-card">
                 <div class="flex-between">
                     <div><strong>{{ item.word.word }}</strong> <span class="text-small">({{ item.word.pinyin }})</span></div>
-                    <button class="cute-btn-sm" @click="toggleFlip(item)">{{ item.isFlipped ? '✅ 已纠正' : '纠正' }}</button>
+                    <button class="cute-btn-sm" @click="toggleReviewFlip(item)">{{ item.isFlipped ? '✅ 已纠正' : '纠正' }}</button>
                 </div>
                 <div class="handwriting-preview">
                     <div v-for="(imgSrc, cidx) in item.handwritingImages" :key="cidx">
@@ -275,7 +269,7 @@
     function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
     function generateExample(word, pinyinStr) { return `天气${pinyinStr}，我们要注意保暖。`; }
 
-    const STORAGE_KEY = 'handwrite_dict_v21';
+    const STORAGE_KEY = 'handwrite_dict_v22';
     const REVIEW_INTERVALS = [1, 3, 5, 7, 9, 15, 30];
     let defaultWords = [
         { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', errorCount:0, status:'learning', reviewDates:[] },
@@ -305,7 +299,6 @@
                 parentTimeoutMin: 5,
                 tempTimeout: 5,
                 wordBankFilter: 'all',
-                pendingReviewList: [],
                 wizardStep: 1,
                 rawWordsInput: '',
                 pendingWords: [],
@@ -326,12 +319,21 @@
             difficultWordsCount() { return this.words.filter(w => w.errorCount >= 3 && w.errorCount < 5 && w.status !== 'mastered').length; },
             stubbornCount() { return this.words.filter(w => w.errorCount >= 5 && w.status !== 'mastered').length; },
             pendingReviewCount() { return this.words.filter(w => w.pendingReview === true && w.handwritingData).length; },
-            pendingReviewList() { return this.words.filter(w => w.pendingReview === true && w.handwritingData).map(w => ({ word: w, handwritingImages: w.handwritingData, isFlipped: false })); },
-            reviewList() { return this.pendingReviewList; },
+            // 待复核列表（所有标记 pendingReview 且 handwritingData 存在的词）
+            reviewList() { 
+                return this.words.filter(w => w.pendingReview === true && w.handwritingData).map(w => ({ 
+                    word: w, 
+                    handwritingImages: w.handwritingData, 
+                    isFlipped: false 
+                }));
+            },
             reviewStats() {
                 const total = this.reviewList.length;
+                // 首次核对：错误次数为 1 的词（不论是否已纠正）
                 const firstCheck = this.reviewList.filter(r => r.word.errorCount === 1).length;
-                const firstMistake = this.reviewList.filter(r => r.word.errorCount === 1 && !r.isFlipped).length;
+                // 首次默错：错误次数为 1 且尚未被纠正（即 isFlipped 为 false，但这里 isFlipped 只是临时UI状态，应以词库中是否有纠正记录为准？简单起见，我们用 errorCount === 1 且尚未提交复核，但用户要求“首次默错”应该是 AI 判错后家长尚未纠正的。我们直接用 pendingReview 且 errorCount === 1 且 未被家长纠正（纠正后会清除 pendingReview）。所以这里 firstMistake 就是 errorCount === 1 的待复核词数。
+                const firstMistake = this.reviewList.filter(r => r.word.errorCount === 1).length;
+                // 多次尝试：错误次数 >= 2
                 const multipleAttempt = this.reviewList.filter(r => r.word.errorCount >= 2).length;
                 return { total, firstCheck, firstMistake, multipleAttempt };
             },
@@ -436,7 +438,7 @@
                 let s = localStorage.getItem(STORAGE_KEY); 
                 if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.parentTimeoutMin = d.parentTimeoutMin !== undefined ? d.parentTimeoutMin : 5; this.useBaiduOCR = d.useBaiduOCR || false; this.baiduApiKey = d.baiduApiKey || ''; this.baiduSecretKey = d.baiduSecretKey || ''; } 
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
-                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; }); 
+                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(!w.pendingReview) w.pendingReview=false; }); 
                 this.saveData(); 
             },
             saveData() { 
@@ -479,12 +481,25 @@
                 }
                 this.saveData();
             },
-            recordErrorAndSchedule(wordObj, recognizedText) {
+            // 记录错误（写错时调用，生成复习计划，并标记待复核，移出今日队列）
+            recordErrorAndSchedule(wordObj, recognizedText, keepInToday = false) {
                 wordObj.errorCount = (wordObj.errorCount || 0) + 1;
                 wordObj.lastWrittenAnswer = recognizedText;
                 if(wordObj.status === 'mastered') wordObj.status = 'learning';
                 this.regenerateReviewDates(wordObj);
+                wordObj.pendingReview = true;  // 进入待复核队列
+                wordObj.handwritingData = this.getCurrentHandwritingImages(); // 保存当前手写图片
                 this.saveData();
+            },
+            getCurrentHandwritingImages() {
+                let word = this.currentSessionWord;
+                if(!word) return [];
+                let imgs = [];
+                for(let i=0;i<word.word.length;i++){
+                    let canvas = document.getElementById(`tg_${i}`);
+                    if(canvas) imgs.push(canvas.toDataURL());
+                }
+                return imgs;
             },
             startHandwriteSession() { 
                 if(this.todayPlanWords.length===0){ this.showAlert('提示', '暂无今日计划，请家长录入词语'); return; } 
@@ -606,6 +621,7 @@
                 };
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
                 if(isCorrect) {
+                    // 正确：从队列中移除，更新词库（错误次数减1或设为掌握）
                     this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                     this.handleCorrect(wordObj);
                     this.sessionCorrectCount++; 
@@ -617,11 +633,15 @@
                         else this.moveToNext();
                     });
                 } else {
+                    // 错误：记录错误、生成复习计划、标记待复核，然后从队列中移除（不再重试今天）
                     const mergedCanvas = this.getMergedCanvas();
                     wordObj.handwritingData = [mergedCanvas.toDataURL()];
                     wordObj.pendingReview = true;
-                    this.recordErrorAndSchedule(wordObj, recognized);
-                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
+                    wordObj.errorCount = (wordObj.errorCount || 0) + 1;
+                    if(wordObj.status === 'mastered') wordObj.status = 'learning';
+                    this.regenerateReviewDates(wordObj);
+                    this.saveData();
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1); // 移除当前词（不留在今天）
                     this.showResultModal(false, currentInfo.word, currentInfo.pinyin, currentInfo.context, `识别为“${recognized}”，已加入复习计划。`, "下一个 >", () => { 
                         if(this.sessionTaskList.length === 0) this.finishSession();
                         else this.moveToNext();
@@ -629,11 +649,20 @@
                 }
             },
             handleDontKnow() {
+                // 不会：记录错误、生成复习计划、标记待复核，同时将当前词追加到队列末尾（继续练习）
                 const currentInfo = {
                     word: this.currentSessionWord.word,
                     pinyin: this.currentSessionWord.pinyin,
                     context: this.currentSessionWord.context
                 };
+                const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
+                const mergedCanvas = this.getMergedCanvas();
+                wordObj.handwritingData = [mergedCanvas.toDataURL()];
+                wordObj.pendingReview = true;
+                wordObj.errorCount = (wordObj.errorCount || 0) + 1;
+                if(wordObj.status === 'mastered') wordObj.status = 'learning';
+                this.regenerateReviewDates(wordObj);
+                this.saveData();
                 const currentWordCopy = JSON.parse(JSON.stringify(this.currentSessionWord));
                 this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                 this.sessionTaskList.push(currentWordCopy);
@@ -664,11 +693,12 @@
             openWordBankView(){ this.wordBankFilter='all'; this.currentView='wordBank'; },
             openReviewParentView(){ this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
-            toggleFlip(item){ item.isFlipped = !item.isFlipped; },
+            toggleReviewFlip(item){ item.isFlipped = !item.isFlipped; },
             commitParentReview(){
-                for(let rev of this.pendingReviewList){
+                for(let rev of this.reviewList){
                     let orig = this.words.find(w=>w.id===rev.word.id);
                     if(orig && rev.isFlipped){
+                        // 家长纠正：减少错误次数
                         orig.errorCount = Math.max(0, (orig.errorCount || 0) - 1);
                         if(orig.errorCount === 0){
                             orig.status = 'mastered';
@@ -677,6 +707,7 @@
                             this.regenerateReviewDates(orig);
                         }
                     }
+                    // 清除待复核标记
                     orig.pendingReview = false;
                     delete orig.handwritingData;
                 }
