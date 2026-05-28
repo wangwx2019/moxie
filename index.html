@@ -40,7 +40,7 @@
         }
         .modal-container {
             background: #fffef5; width: 90%; max-width: 520px; border-radius: 64px;
-            text-align: center; padding: 2rem 1.8rem; border: 2px solid #ffca9a;
+            text-align: center; padding: 2.5rem 2rem; border: 2px solid #ffca9a;
             box-shadow: 0 30px 40px rgba(0,0,0,0.25);
         }
         .detail-container {
@@ -58,7 +58,7 @@
         .modal-message { font-size: 1rem; font-weight: 500; margin: 8px 0; color: #a16207; }
         .modal-input { width: 100%; padding: 12px; border-radius: 60px; border: 1px solid #ffca9a; font-size: 1rem; margin: 12px 0; text-align: center; background: white; }
         .modal-buttons { display: flex; gap: 12px; margin-top: 16px; }
-        .modal-btn { flex: 1; background: #f97316; color: white; border: none; padding: 12px 0; border-radius: 60px; font-weight: 600; cursor: pointer; }
+        .modal-btn { flex: 1; background: #f97316; color: white; border: none; padding: 18px 0; border-radius: 60px; font-weight: 700; font-size: 1.2rem; cursor: pointer; }
         .modal-btn.cancel { background: #e2e8f0; color: #b45309; }
         hr { margin: 12px 0; border-color: #ffe2cc; }
         .category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #ffdec2; padding-bottom: 12px; }
@@ -139,8 +139,8 @@
             <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
         </div>
         <div v-if="sessionFinished" class="dictate-main-card" style="text-align:center;">
-            🎉 今日默写完成！错词已进入复习队列<br>
-            <button class="cute-btn primary" style="margin-top:16px;" @click="finishAndGoHome">返回首页</button>
+            <div style="font-size:1.3rem;">🎉 今日默写完成！错词已进入复习队列</div>
+            <button class="cute-btn primary" style="width:100%; margin-top:20px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="finishAndGoHome">返回首页</button>
         </div>
     </div>
 
@@ -246,13 +246,16 @@
     <!-- 录入词语向导 -->
     <div v-if="currentView === 'addWizard'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
-        <div v-if="wizardStep === 1"><div class="card-white"><label>✏️ 输入词语（空格或逗号分隔）</label><textarea rows="4" v-model="rawWordsInput" placeholder="例如：原因 块头 捧花" style="width:100%; border-radius:28px;"></textarea><button class="cute-btn primary" @click="parseToStep2">下一步：确认词语 →</button></div></div>
+        <div v-if="wizardStep === 1"><div class="card-white"><label>✏️ 输入词语（空格或逗号分隔）</label><textarea rows="4" v-model="rawWordsInput" placeholder="输入词语" style="width:100%; border-radius:28px; padding:14px; box-sizing:border-box;"></textarea><button class="cute-btn primary" style="width:100%; margin-top:16px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="parseToStep2">下一步：确认词语</button></div></div>
         <div v-else><div class="flex-between"><h3>📝 共 {{ pendingWords.length }} 个词语</h3><span class="cute-btn-sm" @click="wizardStep=1">重新输入</span></div><div style="max-height: 50vh; overflow: auto;"><div v-for="(item, idx) in pendingWords" :key="idx" class="word-list-item" style="flex-direction:column; align-items:start;">
             <strong>{{ item.word }}  {{ item.pinyin }}</strong>
             <div style="width:100%; margin-top:6px;">
-                <input v-model="item.example" placeholder="输入语境句子（用拼音代替该词，孩子看不到答案）" style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.85rem; background:#fffef7;">
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input v-model="item.example" placeholder="输入语境句子（用拼音代替该词，孩子看不到答案）" style="flex:1; border-radius:40px; border:1px solid #ffca9a; padding:10px 16px; font-size:0.85rem; background:#fffef7; box-sizing:border-box;">
+                    <span class="cute-btn-sm" style="white-space:nowrap; font-size:0.75rem; padding:6px 10px;" @click="fillPinyin(item)">🔊 拼音</span>
+                </div>
             </div>
-        </div></div><button class="cute-btn primary" style="margin-top:16px;" @click="confirmAddWords">✅ 确认录入</button></div>
+        </div></div><button class="cute-btn primary" style="width:100%; margin-top:16px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="confirmAddWords">✅ 确认录入</button></div>
     </div>
 
     <!-- 设置页面（移除超时时间配置） -->
@@ -269,10 +272,10 @@
             <div v-if="useBaiduOCR">
                 <div class="flex-between"><span>百度 API Key</span><input type="text" v-model="baiduApiKey" placeholder="API Key"></div>
                 <div class="flex-between"><span>百度 Secret Key</span><input type="text" v-model="baiduSecretKey" placeholder="Secret Key"></div>
-                <button class="cute-btn-sm" @click="testBaiduOCR">测试</button>
+                <button class="cute-btn-sm" @click="testBaiduOCR">测试 Key 是否有效</button>
                 <hr style="margin:8px 0;border:none;border-top:1px dashed #ddd;">
-                <div class="flex-between"><span>Access Token（可选）</span><input type="text" v-model="baiduDirectToken" placeholder="直接粘贴 access_token，跳过 Key 换取" style="font-size:11px;"></div>
-                <div class="text-small">填了 Token 则直接使用，不再走 Key 换取流程（Token 有效期30天，过期需更新）</div>
+                <div class="flex-between"><span>Access Token（必填）</span><input type="text" v-model="baiduDirectToken" placeholder="粘贴 access_token" style="font-size:11px;"></div>
+                <div class="text-small">⚠️ 浏览器无法用 Key 自动换取 Token（跨域限制），必须直接填入 Token。有效期30天。</div>
             </div>
         </div>
         <div class="card-white">
@@ -306,7 +309,7 @@
             <div class="modal-pinyin">{{ resultModalData.pinyin }}</div>
             <div class="modal-context">{{ resultModalData.context }}</div>
             <div class="modal-message">{{ resultModalData.message }}</div>
-            <button class="modal-btn" @click="closeResultModal">{{ resultModalData.nextText }}</button>
+            <button class="modal-btn" style="width:100%;" @click="closeResultModal">{{ resultModalData.nextText }}</button>
         </div>
     </div>
 </div>
@@ -728,22 +731,8 @@
                 try {
                     const mergedCanvas = this.getMergedCanvas();
                     const base64 = mergedCanvas.toDataURL('image/png').split(',')[1];
-                    if(this.useBaiduOCR && (this.baiduDirectToken || (this.baiduApiKey && this.baiduSecretKey))) {
-                        // 优先用直接填的 access_token，否则用 Key 换取并缓存
-                        if(this.baiduDirectToken) {
-                            this.baiduAccessToken = this.baiduDirectToken;
-                        } else if(!this.baiduAccessToken || Date.now() > this.baiduTokenExpire) {
-                            const tokenRes = await fetch('https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=' + this.baiduApiKey + '&client_secret=' + this.baiduSecretKey);
-                            const tokenData = await tokenRes.json();
-                            if(tokenData.access_token) {
-                                this.baiduAccessToken = tokenData.access_token;
-                                this.baiduTokenExpire = Date.now() + (tokenData.expires_in - 60) * 1000;
-                            } else {
-                                this.showAlert('百度OCR', '获取凭证失败：' + (tokenData.error_description || '请检查 API Key'));
-                                this.ocrBusy = false;
-                                return;
-                            }
-                        }
+                    if(this.useBaiduOCR && this.baiduDirectToken) {
+                        this.baiduAccessToken = this.baiduDirectToken;
                         // 调用百度手写识别
                         const body = new URLSearchParams({ image: base64 });
                         const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + this.baiduAccessToken, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
@@ -759,7 +748,12 @@
                     }
                     if(!recognized) recognized = '';
                 } catch(e) {
-                    this.showAlert('识别错误', '识别失败，请确保网络通畅');
+                    const msg = e.message || e;
+                    if(msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+                        this.showAlert('识别错误', '网络请求被浏览器拦截：百度 OAuth 接口不支持前端跨域请求。\n请改用「直接填 Access Token」方式，在设置页的 Access Token 输入框中粘贴已保存的 token。');
+                    } else {
+                        this.showAlert('识别错误', '识别失败：' + msg);
+                    }
                     this.ocrBusy = false;
                     return;
                 }
@@ -914,6 +908,10 @@
                 this.saveData();
                 this.currentView='parentHome';
                 this.showAlert('完成', '复核已处理');
+            },
+            fillPinyin(item){
+                if(!item.example) { item.example = item.pinyin; return; }
+                item.example = item.example.split(item.word).join(item.pinyin);
             },
             openAddWizard(){ this.wizardStep=1; this.rawWordsInput=''; this.pendingWords=[]; this.currentView='addWizard'; },
             parseToStep2(){ let raw=this.rawWordsInput.trim(); if(!raw) { this.showAlert('提示', '请输入词语'); return; } let arr=raw.split(/[ ,，、\s]+/).filter(w=>w); this.pendingWords=arr.map(w=>({ word:w, pinyin:toPinyinWithTone(w), example:'' })); this.wizardStep=2; },
