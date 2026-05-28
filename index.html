@@ -33,7 +33,6 @@
         .text-small { font-size: 0.7rem; color: #a16207; }
         .badge { background: #ffedd5; padding: 2px 12px; border-radius: 30px; font-size: 0.7rem; }
         .word-badge { font-size: 0.65rem; background: #fee2e2; color: #b91c1c; border-radius: 30px; padding: 2px 10px; margin-left: 8px; }
-        /* 自定义弹窗 */
         .modal-mask {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
@@ -199,16 +198,12 @@
             <div class="api-status" v-else-if="!useBaiduOCR">✅ 本地 Tesseract 已就绪</div>
         </div>
         <div class="card-white">
-            <div class="flex-between"><span>📦 数据备份与恢复</span></div>
-            <button class="cute-btn-sm" @click="exportData">导出数据 (.json)</button>
-            <button class="cute-btn-sm" @click="importData">导入数据</button>
+            <div class="flex-between"><span>📦 数据同步 (GitHub Pages)</span></div>
+            <div class="text-small">网页会自动加载同目录下的 <strong>data.json</strong> 文件。导出后请将文件重命名为 data.json 并上传到 GitHub 仓库覆盖原文件。</div>
+            <button class="cute-btn-sm" @click="exportData">导出数据 (data.json)</button>
+            <button class="cute-btn-sm" @click="importData">从本地上传 JSON 恢复</button>
             <input type="file" ref="importFile" style="display:none" accept=".json" @change="handleImport">
-            <hr>
-            <div class="flex-between"><span>☁️ 备份到 GitHub</span></div>
-            <input type="text" v-model="githubToken" placeholder="GitHub Personal Access Token" style="width:100%; margin-bottom:8px;">
-            <input type="text" v-model="githubRepo" placeholder="用户名/仓库名 (例如: yourname/dictation)" style="width:100%; margin-bottom:8px;">
-            <button class="cute-btn-sm" @click="backupToGitHub">立即备份到 GitHub</button>
-            <div class="text-small">需创建 token (repo 权限)，数据将保存为 dictation_backup.json</div>
+            <div class="text-small" style="margin-top:8px;">💡 提示：每次刷新页面会自动拉取最新的 data.json，实现多设备数据同步。</div>
         </div>
         <button class="cute-btn" @click="confirmResetData">重置演示数据</button>
     </div>
@@ -245,7 +240,7 @@
     function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
     function generateExample(word, pinyinStr) { return `天气${pinyinStr}，我们要注意保暖。`; }
 
-    // 百度OCR类 (简化)
+    // 百度OCR类
     class BaiduOCR {
         constructor(apiKey, secretKey) {
             this.apiKey = apiKey;
@@ -281,7 +276,7 @@
         }
     }
 
-    const STORAGE_KEY = 'handwrite_dict_final_v17';
+    const STORAGE_KEY = 'handwrite_dict_final_v19';
     const REVIEW_INTERVALS = [1, 3, 5, 7, 9, 15, 30];
     let defaultWords = [
         { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', errorCount:0, status:'learning', reviewDates:[] },
@@ -309,7 +304,6 @@
                 sessionPendingQueue: [],
                 parentPassword: '8899',
                 parentTimeoutMin: 5,
-                tempPassword: '',
                 tempTimeout: 5,
                 wordBankFilter: 'all',
                 pendingReviewList: [],
@@ -324,8 +318,6 @@
                 useBaiduOCR: false,
                 baiduApiKey: '',
                 baiduSecretKey: '',
-                githubToken: '',
-                githubRepo: '',
                 baiduOCR: null,
             }
         },
@@ -391,10 +383,37 @@
             formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
             currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
         },
-        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', parentTimeoutMin:'saveData', useBaiduOCR:'saveData', baiduApiKey:'saveData', baiduSecretKey:'saveData', githubToken:'saveData', githubRepo:'saveData' },
-        mounted() { this.loadData(); this.generateTodayPlan(); },
+        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', parentTimeoutMin:'saveData', useBaiduOCR:'saveData', baiduApiKey:'saveData', baiduSecretKey:'saveData' },
+        mounted() { 
+            this.loadData(); 
+            this.generateTodayPlan();
+            // 尝试从 GitHub Pages 目录下的 data.json 拉取最新数据（不覆盖本地编辑中的临时状态，但优先使用远程数据）
+            this.fetchRemoteData();
+        },
         methods: {
-            // 自定义弹窗
+            // 从同目录下的 data.json 拉取数据（GitHub Pages 自动托管）
+            async fetchRemoteData() {
+                try {
+                    const res = await fetch('./data.json?' + Date.now()); // 避免缓存
+                    if(!res.ok) throw new Error('no data.json');
+                    const remote = await res.json();
+                    if(remote.words && Array.isArray(remote.words)) {
+                        // 合并远程数据到当前
+                        this.words = remote.words;
+                        if(remote.checkinDays !== undefined) this.checkinDays = remote.checkinDays;
+                        if(remote.parentPassword) this.parentPassword = remote.parentPassword;
+                        if(remote.parentTimeoutMin !== undefined) this.parentTimeoutMin = remote.parentTimeoutMin;
+                        if(remote.useBaiduOCR !== undefined) this.useBaiduOCR = remote.useBaiduOCR;
+                        if(remote.baiduApiKey) this.baiduApiKey = remote.baiduApiKey;
+                        if(remote.baiduSecretKey) this.baiduSecretKey = remote.baiduSecretKey;
+                        this.saveData();
+                        this.generateTodayPlan();
+                        this.showAlert('同步成功', '已从 data.json 加载最新数据');
+                    }
+                } catch(e) {
+                    console.log('无远程 data.json 或加载失败，使用本地数据');
+                }
+            },
             showAlert(title, message, callback) {
                 this.customModal = {
                     visible: true, title, message, inputType: false, showCancel: false,
@@ -428,7 +447,16 @@
             },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR=d.useBaiduOCR||false; this.baiduApiKey=d.baiduApiKey||''; this.baiduSecretKey=d.baiduSecretKey||''; this.githubToken=d.githubToken||''; this.githubRepo=d.githubRepo||''; } 
+                if(s){ 
+                    let d=JSON.parse(s); 
+                    this.words=d.words; 
+                    this.checkinDays=d.checkinDays; 
+                    this.parentPassword=d.parentPassword;
+                    this.parentTimeoutMin = d.parentTimeoutMin !== undefined ? d.parentTimeoutMin : 5;
+                    this.useBaiduOCR = d.useBaiduOCR || false; 
+                    this.baiduApiKey = d.baiduApiKey || ''; 
+                    this.baiduSecretKey = d.baiduSecretKey || ''; 
+                } 
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
                 this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; }); 
                 if(this.useBaiduOCR && this.baiduApiKey && this.baiduSecretKey) this.baiduOCR = new BaiduOCR(this.baiduApiKey, this.baiduSecretKey);
@@ -439,11 +467,10 @@
                     words: this.words,
                     checkinDays: this.checkinDays,
                     parentPassword: this.parentPassword,
+                    parentTimeoutMin: this.parentTimeoutMin,
                     useBaiduOCR: this.useBaiduOCR,
                     baiduApiKey: this.baiduApiKey,
-                    baiduSecretKey: this.baiduSecretKey,
-                    githubToken: this.githubToken,
-                    githubRepo: this.githubRepo
+                    baiduSecretKey: this.baiduSecretKey
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
             },
@@ -618,7 +645,6 @@
                     const currentWordCopy = JSON.parse(JSON.stringify(this.currentSessionWord));
                     this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                     this.sessionTaskList.push(currentWordCopy);
-                    // 记录笔迹供复核
                     const mergedCanvas = this.getMergedCanvas();
                     wordObj.handwritingData = [mergedCanvas.toDataURL()];
                     wordObj.pendingReview = true;
@@ -718,7 +744,7 @@
                     this.showAlert('提示', '所有词语都已存在');
                 }
             },
-            openSettingsView(){ this.tempPassword=''; this.currentView='settingsView'; },
+            openSettingsView(){ this.currentView='settingsView'; },
             changePassword(){
                 this.showPrompt('修改密码', '请输入新密码', '新密码', (newPwd) => {
                     if(newPwd && newPwd.trim()) {
@@ -728,12 +754,16 @@
                     } else this.showAlert('提示', '密码不能为空');
                 });
             },
-            saveTimeout(){ if(this.tempTimeout>0) this.parentTimeoutMin=this.tempTimeout; this.showAlert('成功', '超时时间已更新'); },
+            saveTimeout(){ if(this.tempTimeout>0) this.parentTimeoutMin=this.tempTimeout; this.saveData(); this.showAlert('成功', '超时时间已更新'); },
             confirmResetData(){
                 this.showConfirm('重置数据', '重置所有数据后，所有自定义词语和进度将丢失。确定重置吗？', () => {
                     this.words=JSON.parse(JSON.stringify(defaultWords));
                     this.checkinDays=1;
                     this.parentPassword='8899';
+                    this.parentTimeoutMin=5;
+                    this.useBaiduOCR=false;
+                    this.baiduApiKey='';
+                    this.baiduSecretKey='';
                     this.saveData();
                     this.generateTodayPlan();
                     this.currentView='parentHome';
@@ -760,18 +790,25 @@
                     this.showAlert('完成', '词语已删除');
                 });
             },
-            // 数据导入导出
             exportData(){
-                const data = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword };
-                const json = JSON.stringify(data, null, 2);
+                const fullData = {
+                    words: this.words,
+                    checkinDays: this.checkinDays,
+                    parentPassword: this.parentPassword,
+                    parentTimeoutMin: this.parentTimeoutMin,
+                    useBaiduOCR: this.useBaiduOCR,
+                    baiduApiKey: this.baiduApiKey,
+                    baiduSecretKey: this.baiduSecretKey
+                };
+                const json = JSON.stringify(fullData, null, 2);
                 const blob = new Blob([json], {type: 'application/json'});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'dictation_backup.json';
+                a.download = 'data.json';
                 a.click();
                 URL.revokeObjectURL(url);
-                this.showAlert('成功', '数据已导出');
+                this.showAlert('成功', '数据已导出为 data.json，请将此文件上传到 GitHub 仓库覆盖原文件');
             },
             importData(){
                 this.$refs.importFile.click();
@@ -784,8 +821,12 @@
                     try {
                         const imported = JSON.parse(ev.target.result);
                         if(imported.words) this.words = imported.words;
-                        if(imported.checkinDays) this.checkinDays = imported.checkinDays;
+                        if(imported.checkinDays !== undefined) this.checkinDays = imported.checkinDays;
                         if(imported.parentPassword) this.parentPassword = imported.parentPassword;
+                        if(imported.parentTimeoutMin !== undefined) this.parentTimeoutMin = imported.parentTimeoutMin;
+                        if(imported.useBaiduOCR !== undefined) this.useBaiduOCR = imported.useBaiduOCR;
+                        if(imported.baiduApiKey !== undefined) this.baiduApiKey = imported.baiduApiKey;
+                        if(imported.baiduSecretKey !== undefined) this.baiduSecretKey = imported.baiduSecretKey;
                         this.saveData();
                         this.generateTodayPlan();
                         this.showAlert('成功', '数据导入成功');
@@ -793,30 +834,6 @@
                 };
                 reader.readAsText(file);
                 e.target.value = '';
-            },
-            async backupToGitHub(){
-                if(!this.githubToken || !this.githubRepo){
-                    this.showAlert('提示', '请先配置 GitHub Token 和仓库名');
-                    return;
-                }
-                const data = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, backupTime: new Date().toISOString() };
-                const json = JSON.stringify(data, null, 2);
-                const url = `https://api.github.com/repos/${this.githubRepo}/contents/dictation_backup.json`;
-                try {
-                    let sha = '';
-                    const getRes = await fetch(url, { headers: { 'Authorization': `token ${this.githubToken}` } });
-                    if(getRes.ok) {
-                        const existing = await getRes.json();
-                        sha = existing.sha;
-                    }
-                    const res = await fetch(url, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `token ${this.githubToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: '备份数据', content: btoa(unescape(encodeURIComponent(json))), sha: sha })
-                    });
-                    if(res.ok) this.showAlert('成功', '数据已备份到 GitHub');
-                    else this.showAlert('错误', '备份失败，请检查 token 权限');
-                } catch(e){ this.showAlert('错误', '网络错误'); }
             },
             testBaiduOCR(){
                 if(this.baiduApiKey && this.baiduSecretKey){
