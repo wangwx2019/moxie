@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>墨趣听写 · 双引擎智能批改</title>
+    <script src="https://unpkg.com/pinyin-pro@3.19.6/dist/index.js"></script>
+    <script src="https://unpkg.com/vue@3.4.27/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: #fef5e8; padding: 16px; font-family: system-ui, 'Segoe UI', 'Quicksand', 'PingFang SC', sans-serif; }
+        #app { margin: 0 auto; background: white; border-radius: 48px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); overflow: hidden; width: 100%; max-width: 800px; }
+        @media (min-width: 768px) { body { padding: 24px; } #app { max-width: 900px; border-radius: 56px; } .page-container { padding: 1.8rem; } .canvas-tg { width: 120px; height: 120px; } }
+        .app-header { padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; background: #fffaef; border-bottom: 3px solid #ffd9b5; }
+        .logo { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, #f59e0b, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .parent-btn { background: #fff0e0; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 600; color: #d97706; cursor: pointer; font-size: 0.85rem; }
+        .page-container { padding: 1.5rem; background: #ffffff; }
+        .nav-back { display: inline-flex; align-items: center; gap: 6px; background: #fff2e6; padding: 6px 14px; border-radius: 40px; font-weight: 500; cursor: pointer; color: #f97316; margin-bottom: 20px; }
+        .card-white { background: #fffef7; border-radius: 32px; padding: 1rem 1.2rem; margin-bottom: 1rem; border: 1px solid #ffe2cc; }
+        .tian-ge-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; margin: 20px 0; }
+        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); cursor: crosshair; width: 120px; height: 120px; }
+        .dictate-header-stats { background: #ffefe2; padding: 10px 18px; border-radius: 48px; margin: 8px 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 700; }
+        .stat-chip { background: white; padding: 4px 16px; border-radius: 40px; font-size: 0.8rem; }
+        .timer { background: #fbbf24; color: white; padding: 4px 14px; border-radius: 40px; }
+        .dictate-main-card { background: white; margin: 0 16px 20px; border-radius: 48px; padding: 24px 20px; border: 1px solid #ffd8bd; }
+        .pinyin-big { font-size: 2rem; font-weight: 800; color: #f97316; text-align: center; background: #fff1e6; display: inline-block; padding: 6px 24px; border-radius: 60px; margin-bottom: 12px; }
+        .context-illustration { background: #fef5e8; border-radius: 24px; padding: 14px; margin: 16px 0; border-left: 6px solid #fbbf24; }
+        .action-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .cute-btn { flex: 1; background: #fff0e0; border: none; padding: 12px 0; border-radius: 60px; font-weight: 600; color: #b45309; cursor: pointer; }
+        .cute-btn.primary { background: #f97316; color: white; box-shadow: 0 3px 0 #b45309; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-small { font-size: 0.7rem; color: #a16207; }
+        .badge { background: #ffedd5; padding: 2px 12px; border-radius: 30px; font-size: 0.7rem; }
+        .word-badge { font-size: 0.65rem; background: #fee2e2; color: #b91c1c; border-radius: 30px; padding: 2px 10px; margin-left: 8px; }
+        /* 自定义弹窗 */
+        .modal-mask {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 1000; backdrop-filter: blur(6px);
+        }
+        .modal-container {
+            background: #fffef5; width: 90%; max-width: 480px; border-radius: 64px;
+            text-align: center; padding: 2rem 1.8rem; border: 2px solid #ffca9a;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.25);
+        }
+        .modal-icon { font-size: 3.5rem; margin-bottom: 12px; }
+        .modal-word { font-size: 2rem; font-weight: 800; color: #f97316; margin: 8px 0; }
+        .modal-pinyin { font-size: 1.2rem; color: #b45309; margin-bottom: 12px; }
+        .modal-context { background: #fef5e8; border-radius: 32px; padding: 12px; font-size: 1rem; color: #7c2d12; margin: 12px 0; }
+        .modal-message { font-size: 1rem; font-weight: 500; margin: 8px 0; color: #a16207; }
+        .modal-input { width: 100%; padding: 12px; border-radius: 60px; border: 1px solid #ffca9a; font-size: 1rem; margin: 12px 0; text-align: center; background: white; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 16px; }
+        .modal-btn { flex: 1; background: #f97316; color: white; border: none; padding: 12px 0; border-radius: 60px; font-weight: 600; cursor: pointer; }
+        .modal-btn.cancel { background: #e2e8f0; color: #b45309; }
+        hr { margin: 12px 0; border-color: #ffe2cc; }
+        .category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #ffdec2; padding-bottom: 12px; }
+        .cat-item { background: #fff1e6; padding: 6px 14px; border-radius: 40px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+        .cat-item.active { background: #f97316; color: white; }
+        .word-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0e4d8; }
+        .review-item-card { background: #fefaf5; border-radius: 28px; padding: 14px; margin-bottom: 14px; border: 1px solid #ffdec2; }
+        .cute-btn-sm { background: #f97316; color: white; border: none; padding: 6px 16px; border-radius: 40px; font-weight: 500; cursor: pointer; }
+        .handwriting-preview { background: #fef3e9; border-radius: 20px; padding: 8px; margin: 8px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .plan-date { background: #fff0e0; border-radius: 28px; padding: 12px; margin-bottom: 16px; }
+        .plan-date-header { font-weight: 700; font-size: 1rem; color: #b45309; margin-bottom: 8px; }
+        .word-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip-word { background: #ffedd5; padding: 4px 12px; border-radius: 30px; font-size: 0.75rem; }
+        .api-status { font-size: 0.7rem; color: #16a34a; margin-top: 4px; }
+        .fallback-input { width: 100%; padding: 14px; border-radius: 60px; border: 1px solid #ffca9a; font-size: 1rem; margin-top: 12px; text-align: center; background: #fffef7; }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="app-header">
+        <span class="logo">✍️ 墨趣听写</span>
+        <button class="parent-btn" @click="showParentPasswordModal">📖 家长端</button>
+    </div>
+
+    <!-- 孩子端首页 -->
+    <div v-if="currentView === 'childHome'" class="page-container">
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+            <div class="card-white" style="flex:1; text-align:center;"><div style="font-size:2rem; font-weight:800;">{{ totalWords }}</div><div class="text-small">📚 总词库</div></div>
+            <div class="card-white" style="flex:1; text-align:center;"><div style="font-size:2rem; font-weight:800;">{{ masteredCount }}</div><div class="text-small">✅ 已掌握</div></div>
+            <div class="card-white" style="flex:1; text-align:center;"><div style="font-size:2rem; font-weight:800;">{{ todayPlanWords.length }}</div><div class="text-small">📅 今日计划</div></div>
+        </div>
+        <div class="card-white">
+            <div class="flex-between"><strong>📖 今日默写计划</strong><span class="badge">{{ todayPlanWords.length }} 个</span></div>
+            <div style="margin: 10px 0;">✨ 已完成: {{ todayCompletedCount }} / {{ todayPlanWords.length }}</div>
+            <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession">✍️ 田字格手写默写</button>
+        </div>
+    </div>
+
+    <!-- 手写默写界面 -->
+    <div v-if="currentView === 'dictateView'" class="dictate-session">
+        <div style="padding: 12px 16px 0;"><div class="nav-back" @click="abortDictate">🐣 返回首页</div></div>
+        <div class="dictate-header-stats">
+            <span>📝 {{ sessionCorrectCount }}/{{ sessionTotalCount }}</span>
+            <span class="timer">⏱️ {{ formattedTimer }}</span>
+            <span>✨ 余{{ sessionRemainCount }}</span>
+            <span>💾 待复核 {{ sessionPendingCount }}</span>
+        </div>
+        <div class="dictate-main-card" v-if="currentSessionWord">
+            <div style="text-align: center;">
+                <div class="pinyin-big">🔊 {{ currentSessionWord.pinyin }}</div>
+                <div class="context-illustration">📖 {{ currentSessionWord.context }}</div>
+            </div>
+            <div class="tian-ge-grid">
+                <div v-for="(char, idx) in currentSessionWord.word.split('')" :key="idx" class="tian-ge-cell">
+                    <canvas :id="'tg_' + idx" class="canvas-tg" width="120" height="120" style="width:120px; height:120px;"></canvas>
+                </div>
+            </div>
+            <div class="action-row">
+                <button class="cute-btn" @click="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" @click="clearCurrentCanvas">🧽 橡皮擦</button>
+                <button class="cute-btn" @click="clearAllCanvas">🗑️ 清除</button>
+                <button class="cute-btn primary" @click="recognizeAndSubmit" :disabled="ocrBusy">✨ {{ ocrBusy ? '识别中...' : 'AI提交批改' }}</button>
+            </div>
+            <div class="text-small" style="text-align:center; margin-top:10px;">✏️ 在田字格里书写，AI自动识别。写错或不会的词会重新排队，直到写对。</div>
+            <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
+        </div>
+        <div v-if="sessionFinished" class="dictate-main-card" style="text-align:center;">
+            🎉 今日默写完成！错词已进入复习队列<br>
+            <button class="cute-btn primary" style="margin-top:16px;" @click="finishAndGoHome">返回首页</button>
+        </div>
+    </div>
+
+    <!-- 家长端主菜单 -->
+    <div v-if="currentView === 'parentHome'" class="page-container">
+        <div class="flex-between"><span class="nav-back" @click="currentView='childHome'">← 孩子端</span><span style="font-weight:800;">🐱 家长中心</span><div></div></div>
+        <div style="display: flex; gap: 12px; flex-wrap:wrap; margin:16px 0;">
+            <div class="card-white" style="flex:1; text-align:center;"><div class="stat-number-lg">{{ totalWords }}</div><div class="text-small">总词数</div></div>
+            <div class="card-white" style="flex:1; text-align:center;"><div class="stat-number-lg">{{ masteredCount }}</div><div class="text-small">已掌握</div></div>
+            <div class="card-white" style="flex:1; text-align:center;"><div class="stat-number-lg">{{ difficultWordsCount }}</div><div class="text-small">难点</div></div>
+            <div class="card-white" style="flex:1; text-align:center;"><div class="stat-number-lg">{{ stubbornCount }}</div><div class="text-small">顽固</div></div>
+        </div>
+        <div class="card-white" @click="openWordBankView" style="cursor:pointer;"><div class="flex-between"><span>📚 词库管理 & 复习周期</span><span>→</span></div></div>
+        <div class="card-white" @click="openReviewParentView" style="cursor:pointer;"><div class="flex-between"><span>📋 复核默写 (手写笔迹)</span><span>待复核 {{ pendingReviewList.length }} →</span></div></div>
+        <div class="card-white" @click="openPlanCalendarView" style="cursor:pointer;"><div class="flex-between"><span>📅 复习计划看板</span><span>查看每日计划 →</span></div></div>
+        <div class="card-white" @click="openAddWizard" style="cursor:pointer;"><div class="flex-between"><span>🎤 录入词语</span><span>批量/语音</span></div></div>
+        <div class="card-white" @click="openSettingsView" style="cursor:pointer;"><div class="flex-between"><span>⚙️ 设置</span><span>密码/识别引擎/数据</span></div></div>
+    </div>
+
+    <!-- 词库管理 -->
+    <div v-if="currentView === 'wordBank'" class="page-container">
+        <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
+        <h3>📖 词库管理</h3>
+        <div class="category-tabs"><div v-for="cat in categoryStats" :key="cat.key" class="cat-item" :class="{active: wordBankFilter === cat.key}" @click="wordBankFilter = cat.key">{{ cat.label }}({{ cat.count }})</div></div>
+        <div style="max-height: 55vh; overflow-y: auto;"><div v-for="word in filteredWordBank" :key="word.id" class="word-list-item"><div><span style="font-weight:700;">{{ word.word }}</span><span class="word-badge" v-if="word.errorCount >= 5">顽固</span><span class="word-badge" v-else-if="word.errorCount >= 3">难点</span><span class="word-badge" v-else-if="word.errorCount === 1">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="background:#dcfce7;">已掌握</span><div class="text-small">{{ word.pinyin }} · 错{{ word.errorCount || 0 }}次 · 复习计划: {{ word.reviewDates ? word.reviewDates.join(', ') : '无' }}</div></div><div><button class="cute-btn-sm" style="padding:2px 12px; margin-right:6px;" @click.stop="editWord(word)">✏️</button><button class="cute-btn-sm" style="padding:2px 12px; background:#ef4444;" @click.stop="confirmDeleteWord(word)">🗑️</button></div></div></div>
+    </div>
+
+    <!-- 复核默写页面 -->
+    <div v-if="currentView === 'reviewParent'" class="page-container">
+        <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
+        <h3>📋 复核默写 (AI初判)</h3>
+        <div class="text-small" style="margin-bottom: 12px;">下方为孩子手写笔迹，如系统判错实际正确，点击「纠正」翻转，错误次数减1，复习计划自动调整。</div>
+        <div style="max-height: 60vh; overflow-y: auto;"><div v-for="(item, idx) in pendingReviewList" :key="idx" class="review-item-card"><div class="flex-between"><strong>{{ item.word.word }} ({{ item.word.pinyin }})</strong><span class="badge">AI初判: ❌错误</span></div><div class="handwriting-preview"><div v-for="(imgSrc, cidx) in item.handwritingImages" :key="cidx"><img :src="imgSrc" width="70" height="70" style="border:1px solid #fbc48d; border-radius:12px;" /></div></div><button class="cute-btn-sm" style="margin-top:8px;" @click="toggleReviewFlip(item)">{{ item.isFlipped ? '✅ 已纠正 (家长认为正确)' : '🔄 纠正 (系统误判，实际正确)' }}</button><div v-if="item.isFlipped" class="text-small" style="color:#16a34a; margin-top:6px;">已将【错】纠正为【对】</div></div><div v-if="pendingReviewList.length === 0" class="card-white">✨ 暂无待复核</div></div>
+        <button class="cute-btn primary" style="margin-top: 20px;" @click="commitParentReview">✅ 确认复核 (应用纠正，更新复习计划)</button>
+    </div>
+
+    <!-- 复习计划看板 -->
+    <div v-if="currentView === 'planCalendar'" class="page-container">
+        <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
+        <h3>📅 复习计划看板 (全周期)</h3>
+        <div class="text-small" style="margin-bottom: 12px;">基于错词复习间隔 (1/3/5/7/9/15/30天) 自动生成所有日期</div>
+        <div style="max-height: 65vh; overflow-y: auto;">
+            <div v-for="plan in allReviewPlans" :key="plan.date" class="plan-date">
+                <div class="plan-date-header">{{ plan.date }} ({{ plan.weekday }}) · {{ plan.words.length }}个词语</div>
+                <div class="word-chips"><span v-for="w in plan.words" :key="w.id" class="chip-word">{{ w.word }}</span></div>
+            </div>
+            <div v-if="allReviewPlans.length === 0" class="card-white">暂无复习计划，请先完成默写并复核</div>
+        </div>
+    </div>
+
+    <!-- 录入词语向导 -->
+    <div v-if="currentView === 'addWizard'" class="page-container">
+        <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
+        <div v-if="wizardStep === 1"><div class="card-white"><label>✏️ 输入词语（空格或逗号分隔）</label><textarea rows="4" v-model="rawWordsInput" placeholder="例如：原因 块头 捧花" style="width:100%; border-radius:28px;"></textarea><button class="cute-btn primary" @click="parseToStep2">下一步：确认词语 →</button></div></div>
+        <div v-else><div class="flex-between"><h3>📝 共 {{ pendingWords.length }} 个词语</h3><span class="cute-btn-sm" @click="wizardStep=1">重新输入</span></div><div style="max-height: 50vh; overflow: auto;"><div v-for="(item, idx) in pendingWords" :key="idx" class="word-list-item" style="flex-direction:column; align-items:start;"><strong>{{ item.word }}  {{ item.pinyin }}</strong><div class="flex-between" style="width:100%;"><span class="text-small">{{ item.example }}</span><button class="cute-btn-sm" style="padding:2px 12px;" @click="refreshExample(idx)">换一句</button></div></div></div><button class="cute-btn primary" style="margin-top:16px;" @click="confirmAddWords">✅ 确认录入</button></div>
+    </div>
+
+    <!-- 设置页面 -->
+    <div v-if="currentView === 'settingsView'" class="page-container">
+        <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
+        <div class="card-white"><div class="flex-between"><span>🔐 家长密码</span><button class="cute-btn-sm" @click="changePassword">修改密码</button></div></div>
+        <div class="card-white"><div class="flex-between"><span>⏱️ 超时时间(分钟)</span><input type="number" v-model.number="tempTimeout" style="width:80px;"><button class="cute-btn-sm" @click="saveTimeout">保存</button></div></div>
+        <div class="card-white">
+            <div class="flex-between"><span>🤖 手写识别引擎</span>
+                <select v-model="useBaiduOCR" class="cute-btn-sm" style="background:#f97316;">
+                    <option :value="false">本地 Tesseract</option>
+                    <option :value="true">百度智能云 (需配置Key)</option>
+                </select>
+            </div>
+            <div v-if="useBaiduOCR">
+                <div class="flex-between"><span>百度 API Key</span><input type="text" v-model="baiduApiKey" placeholder="API Key" style="width:150px;"></div>
+                <div class="flex-between"><span>百度 Secret Key</span><input type="text" v-model="baiduSecretKey" placeholder="Secret Key" style="width:150px;"></div>
+                <button class="cute-btn-sm" @click="testBaiduOCR">测试连接</button>
+            </div>
+            <div class="api-status" v-if="useBaiduOCR && baiduApiKey && baiduSecretKey">✅ 百度OCR已配置，将优先使用</div>
+            <div class="api-status" v-else-if="!useBaiduOCR">✅ 本地 Tesseract 已就绪</div>
+        </div>
+        <div class="card-white">
+            <div class="flex-between"><span>📦 数据备份与恢复</span></div>
+            <button class="cute-btn-sm" @click="exportData">导出数据 (.json)</button>
+            <button class="cute-btn-sm" @click="importData">导入数据</button>
+            <input type="file" ref="importFile" style="display:none" accept=".json" @change="handleImport">
+            <hr>
+            <div class="flex-between"><span>☁️ 备份到 GitHub</span></div>
+            <input type="text" v-model="githubToken" placeholder="GitHub Personal Access Token" style="width:100%; margin-bottom:8px;">
+            <input type="text" v-model="githubRepo" placeholder="用户名/仓库名 (例如: yourname/dictation)" style="width:100%; margin-bottom:8px;">
+            <button class="cute-btn-sm" @click="backupToGitHub">立即备份到 GitHub</button>
+            <div class="text-small">需创建 token (repo 权限)，数据将保存为 dictation_backup.json</div>
+        </div>
+        <button class="cute-btn" @click="confirmResetData">重置演示数据</button>
+    </div>
+
+    <!-- 自定义弹窗组件 -->
+    <div v-if="customModal.visible" class="modal-mask" @click.self="customModal.visible=false">
+        <div class="modal-container">
+            <div class="modal-icon">{{ customModal.icon || '📌' }}</div>
+            <div class="modal-word">{{ customModal.title || '提示' }}</div>
+            <div class="modal-message">{{ customModal.message }}</div>
+            <input v-if="customModal.inputType" v-model="customModal.inputValue" class="modal-input" :placeholder="customModal.placeholder || ''" type="text">
+            <div class="modal-buttons">
+                <button v-if="customModal.showCancel" class="modal-btn cancel" @click="customModal.onCancel?.()">取消</button>
+                <button class="modal-btn" @click="customModal.onConfirm?.()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果弹窗 -->
+    <div v-if="resultModalVisible" class="modal-mask" @click.self="resultModalVisible=false">
+        <div class="modal-container">
+            <div class="modal-icon">{{ resultModalData.correct ? '🎉✅' : '😢❌' }}</div>
+            <div class="modal-word">{{ resultModalData.word }}</div>
+            <div class="modal-pinyin">{{ resultModalData.pinyin }}</div>
+            <div class="modal-context">{{ resultModalData.context }}</div>
+            <div class="modal-message">{{ resultModalData.message }}</div>
+            <button class="modal-btn" @click="closeResultModal">{{ resultModalData.nextText }}</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const { pinyin } = window.pinyinPro || {};
+    function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
+    function generateExample(word, pinyinStr) { return `天气${pinyinStr}，我们要注意保暖。`; }
+
+    // 百度OCR类 (简化)
+    class BaiduOCR {
+        constructor(apiKey, secretKey) {
+            this.apiKey = apiKey;
+            this.secretKey = secretKey;
+            this.accessToken = null;
+            this.expire = 0;
+        }
+        async getToken() {
+            if (this.accessToken && Date.now() < this.expire) return this.accessToken;
+            const url = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${this.apiKey}&client_secret=${this.secretKey}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.access_token) {
+                this.accessToken = data.access_token;
+                this.expire = Date.now() + (data.expires_in - 60) * 1000;
+                return this.accessToken;
+            }
+            throw new Error('获取百度token失败');
+        }
+        async recognize(base64Image) {
+            const token = await this.getToken();
+            const url = `https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=${token}`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `image=${encodeURIComponent(base64Image)}`
+            });
+            const result = await res.json();
+            if (result.words_result && result.words_result.length) {
+                return result.words_result.map(w => w.words).join('');
+            }
+            return '';
+        }
+    }
+
+    const STORAGE_KEY = 'handwrite_dict_final_v17';
+    const REVIEW_INTERVALS = [1, 3, 5, 7, 9, 15, 30];
+    let defaultWords = [
+        { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', errorCount:0, status:'learning', reviewDates:[] },
+        { id:'2', word:'块头', pinyin:'kuài tóu', context:'他的块头很大。', errorCount:0, status:'learning', reviewDates:[] },
+        { id:'3', word:'捧花', pinyin:'pěng huā', context:'新娘拿着捧花。', errorCount:0, status:'learning', reviewDates:[] }
+    ];
+
+    let app = Vue.createApp({
+        data() {
+            return {
+                currentView: 'childHome',
+                words: [],
+                checkinDays: 1,
+                lastCheckinDate: '',
+                totalDictateTimes: 0,
+                todayPlanWords: [],
+                todayCompletedCount: 0,
+                sessionTaskList: [],
+                sessionCurrentIdx: 0,
+                sessionCorrectCount: 0,
+                sessionTimerSeconds: 0,
+                timerInterval: null,
+                sessionFinished: false,
+                sessionAnswer: '',
+                sessionPendingQueue: [],
+                parentPassword: '8899',
+                parentTimeoutMin: 5,
+                tempPassword: '',
+                tempTimeout: 5,
+                wordBankFilter: 'all',
+                pendingReviewList: [],
+                wizardStep: 1,
+                rawWordsInput: '',
+                pendingWords: [],
+                customModal: { visible: false, title: '', message: '', inputType: false, inputValue: '', placeholder: '', showCancel: false, onConfirm: null, onCancel: null },
+                resultModalVisible: false,
+                resultModalData: { correct: false, word: '', pinyin: '', context: '', message: '', nextText: '下一个 >' },
+                resultModalCallback: null,
+                ocrBusy: false,
+                useBaiduOCR: false,
+                baiduApiKey: '',
+                baiduSecretKey: '',
+                githubToken: '',
+                githubRepo: '',
+                baiduOCR: null,
+            }
+        },
+        computed: {
+            totalWords() { return this.words.length; },
+            masteredCount() { return this.words.filter(w => w.status === 'mastered').length; },
+            difficultWordsCount() { return this.words.filter(w => w.errorCount >= 3 && w.errorCount < 5 && w.status !== 'mastered').length; },
+            stubbornCount() { return this.words.filter(w => w.errorCount >= 5 && w.status !== 'mastered').length; },
+            pendingReviewList() { return this.words.filter(w => w.pendingReview === true && w.handwritingData).map(w => ({ word: w, handwritingImages: w.handwritingData, isFlipped: false })); },
+            categoryStats() {
+                const all = this.words.length;
+                const stubborn = this.words.filter(w => w.errorCount >= 5 && w.status !== 'mastered').length;
+                const difficult = this.words.filter(w => w.errorCount >= 3 && w.errorCount < 5 && w.status !== 'mastered').length;
+                const learning = this.words.filter(w => w.status === 'learning' && w.errorCount > 0 && w.errorCount < 3).length;
+                const initial = this.words.filter(w => w.errorCount === 1 && w.status !== 'mastered').length;
+                const mastered = this.masteredCount;
+                return [
+                    { key:'all', label:'全部', count:all },
+                    { key:'stubborn', label:'顽固', count:stubborn },
+                    { key:'difficult', label:'难点', count:difficult },
+                    { key:'learning', label:'在学', count:learning },
+                    { key:'initial', label:'初次', count:initial },
+                    { key:'mastered', label:'已掌握', count:mastered }
+                ];
+            },
+            filteredWordBank() {
+                if(this.wordBankFilter === 'all') return this.words;
+                if(this.wordBankFilter === 'stubborn') return this.words.filter(w => w.errorCount >= 5 && w.status !== 'mastered');
+                if(this.wordBankFilter === 'difficult') return this.words.filter(w => w.errorCount >= 3 && w.errorCount < 5 && w.status !== 'mastered');
+                if(this.wordBankFilter === 'learning') return this.words.filter(w => w.status === 'learning' && w.errorCount > 0 && w.errorCount < 3);
+                if(this.wordBankFilter === 'initial') return this.words.filter(w => w.errorCount === 1 && w.status !== 'mastered');
+                if(this.wordBankFilter === 'mastered') return this.words.filter(w => w.status === 'mastered');
+                return this.words;
+            },
+            allReviewPlans() {
+                let plansMap = new Map();
+                for(let word of this.words) {
+                    if(word.status === 'mastered') continue;
+                    if(word.reviewDates && word.reviewDates.length) {
+                        for(let dateStr of word.reviewDates) {
+                            if(!plansMap.has(dateStr)) plansMap.set(dateStr, new Set());
+                            plansMap.get(dateStr).add(word.id);
+                        }
+                    }
+                }
+                let result = [];
+                let dates = Array.from(plansMap.keys()).sort();
+                for(let dateStr of dates) {
+                    let date = new Date(dateStr);
+                    let wordIds = plansMap.get(dateStr);
+                    let words = this.words.filter(w => wordIds.has(w.id));
+                    result.push({
+                        date: `${date.getMonth()+1}/${date.getDate()}`,
+                        weekday: ['日','一','二','三','四','五','六'][date.getDay()],
+                        words: words
+                    });
+                }
+                return result;
+            },
+            sessionTotalCount() { return this.sessionTaskList.length; },
+            sessionRemainCount() { return this.sessionTotalCount - this.sessionCurrentIdx; },
+            sessionPendingCount() { return this.sessionPendingQueue.length; },
+            formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
+            currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
+        },
+        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', parentTimeoutMin:'saveData', useBaiduOCR:'saveData', baiduApiKey:'saveData', baiduSecretKey:'saveData', githubToken:'saveData', githubRepo:'saveData' },
+        mounted() { this.loadData(); this.generateTodayPlan(); },
+        methods: {
+            // 自定义弹窗
+            showAlert(title, message, callback) {
+                this.customModal = {
+                    visible: true, title, message, inputType: false, showCancel: false,
+                    onConfirm: () => { this.customModal.visible = false; if(callback) callback(); },
+                    onCancel: null
+                };
+            },
+            showConfirm(title, message, onConfirm, onCancel) {
+                this.customModal = {
+                    visible: true, title, message, inputType: false, showCancel: true,
+                    onConfirm: () => { this.customModal.visible = false; onConfirm?.(); },
+                    onCancel: () => { this.customModal.visible = false; onCancel?.(); }
+                };
+            },
+            showPrompt(title, message, placeholder, onConfirm) {
+                this.customModal = {
+                    visible: true, title, message, inputType: true, inputValue: '', placeholder, showCancel: true,
+                    onConfirm: () => { let val = this.customModal.inputValue; this.customModal.visible = false; onConfirm(val); },
+                    onCancel: () => { this.customModal.visible = false; }
+                };
+            },
+            showResultModal(correct, word, pinyin, context, msg, nextText, callback) {
+                this.resultModalData = { correct, word, pinyin, context, message: msg, nextText };
+                this.resultModalVisible = true;
+                this.resultModalCallback = callback;
+            },
+            closeResultModal() {
+                this.resultModalVisible = false;
+                if(this.resultModalCallback) this.resultModalCallback();
+                this.resultModalCallback = null;
+            },
+            loadData() { 
+                let s = localStorage.getItem(STORAGE_KEY); 
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR=d.useBaiduOCR||false; this.baiduApiKey=d.baiduApiKey||''; this.baiduSecretKey=d.baiduSecretKey||''; this.githubToken=d.githubToken||''; this.githubRepo=d.githubRepo||''; } 
+                if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
+                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; }); 
+                if(this.useBaiduOCR && this.baiduApiKey && this.baiduSecretKey) this.baiduOCR = new BaiduOCR(this.baiduApiKey, this.baiduSecretKey);
+                this.saveData(); 
+            },
+            saveData() { 
+                let toSave = {
+                    words: this.words,
+                    checkinDays: this.checkinDays,
+                    parentPassword: this.parentPassword,
+                    useBaiduOCR: this.useBaiduOCR,
+                    baiduApiKey: this.baiduApiKey,
+                    baiduSecretKey: this.baiduSecretKey,
+                    githubToken: this.githubToken,
+                    githubRepo: this.githubRepo
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
+            },
+            generateTodayPlan() {
+                const today = new Date().toISOString().slice(0,10);
+                let needReview = this.words.filter(w => w.reviewDates && w.reviewDates.includes(today) && w.status !== 'mastered');
+                let newWords = this.words.filter(w => w.errorCount === 0 && w.status === 'learning' && (!w.reviewDates || w.reviewDates.length === 0));
+                let combined = [...needReview, ...newWords];
+                combined = [...new Map(combined.map(w=>[w.id,w])).values()];
+                if(combined.length < 3) combined = combined.concat(this.words.filter(w=>w.status==='learning' && w.errorCount>0).slice(0,6));
+                this.todayPlanWords = combined.slice(0,18);
+                this.todayCompletedCount = 0;
+            },
+            generateReviewDates(wordObj) {
+                if(wordObj.status === 'mastered') { wordObj.reviewDates = []; return; }
+                let today = new Date();
+                today.setHours(0,0,0,0);
+                let dates = [];
+                for(let days of REVIEW_INTERVALS) {
+                    let date = new Date(today);
+                    date.setDate(today.getDate() + days);
+                    dates.push(date.toISOString().slice(0,10));
+                }
+                wordObj.reviewDates = dates;
+            },
+            regenerateReviewDates(wordObj) {
+                this.generateReviewDates(wordObj);
+                this.saveData();
+                this.generateTodayPlan();
+            },
+            handleCorrect(wordObj) {
+                wordObj.errorCount = Math.max(0, (wordObj.errorCount || 0) - 1);
+                if(wordObj.errorCount === 0) {
+                    wordObj.status = 'mastered';
+                    wordObj.reviewDates = [];
+                } else {
+                    this.regenerateReviewDates(wordObj);
+                }
+                this.saveData();
+            },
+            startHandwriteSession() { 
+                if(this.todayPlanWords.length===0){ this.showAlert('提示', '暂无今日计划，请家长录入词语'); return; } 
+                this.sessionTaskList = JSON.parse(JSON.stringify(this.todayPlanWords)); 
+                this.sessionCurrentIdx=0; 
+                this.sessionCorrectCount=0; 
+                this.sessionTimerSeconds=0; 
+                this.sessionFinished=false; 
+                this.sessionAnswer=''; 
+                this.sessionPendingQueue=[]; 
+                if(this.timerInterval) clearInterval(this.timerInterval); 
+                this.timerInterval = setInterval(()=>{ if(!this.sessionFinished) this.sessionTimerSeconds++; },1000); 
+                this.currentView='dictateView'; 
+                this.$nextTick(()=>{ this.initCanvasForCurrent(); }); 
+            },
+            initCanvasForCurrent() { 
+                let word = this.currentSessionWord; if(!word) return; 
+                word.word.split('').forEach((_,idx)=>{ 
+                    let canvas = document.getElementById(`tg_${idx}`); 
+                    if(canvas){ 
+                        let ctx = canvas.getContext('2d'); 
+                        ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,120,120); 
+                        ctx.strokeStyle="#fbc48d"; ctx.lineWidth=1.5; ctx.strokeRect(0,0,120,120); 
+                        ctx.beginPath(); ctx.moveTo(60,0); ctx.lineTo(60,120); ctx.stroke(); 
+                        ctx.moveTo(0,60); ctx.lineTo(120,60); ctx.stroke(); 
+                        this.enableDrawing(canvas); 
+                    } 
+                }); 
+            },
+            enableDrawing(canvas) { 
+                let ctx = canvas.getContext('2d');
+                ctx.strokeStyle = '#000000'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+                let drawing = false;
+                let lastX, lastY;
+                const getCoord = (e, rect) => { 
+                    let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    let x = (clientX - rect.left) * canvas.width / rect.width;
+                    let y = (clientY - rect.top) * canvas.height / rect.height;
+                    return {x,y};
+                };
+                const start = (e) => { 
+                    e.preventDefault(); drawing=true; 
+                    let rect=canvas.getBoundingClientRect(); 
+                    let {x,y}=getCoord(e, rect); 
+                    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+1,y+1); ctx.stroke(); 
+                    lastX=x; lastY=y;
+                };
+                const draw = (e) => { 
+                    if(!drawing) return; e.preventDefault(); 
+                    let rect=canvas.getBoundingClientRect(); 
+                    let {x,y}=getCoord(e, rect); 
+                    ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); 
+                };
+                const end = () => { drawing=false; };
+                canvas.addEventListener('touchstart', start); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', end);
+                canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', end);
+            },
+            clearCurrentCanvas() { 
+                let word = this.currentSessionWord;
+                if(word) word.word.split('').forEach((_,idx)=>this.clearCanvasCell(idx));
+            },
+            clearAllCanvas() { 
+                let word = this.currentSessionWord;
+                if(word) word.word.split('').forEach((_,idx)=>this.clearCanvasCell(idx));
+            },
+            clearCanvasCell(idx) { 
+                let canvas = document.getElementById(`tg_${idx}`); 
+                if(canvas){ 
+                    let ctx = canvas.getContext('2d'); 
+                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,120,120); 
+                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=1.5; ctx.strokeRect(0,0,120,120); 
+                    ctx.beginPath(); ctx.moveTo(60,0); ctx.lineTo(60,120); ctx.stroke(); 
+                    ctx.moveTo(0,60); ctx.lineTo(120,60); ctx.stroke();
+                } 
+            },
+            getMergedCanvas() {
+                let word = this.currentSessionWord;
+                let canvases = [];
+                for(let i=0;i<word.word.length;i++){ let c=document.getElementById(`tg_${i}`); if(c) canvases.push(c); }
+                const totalWidth = canvases.length * 120;
+                const merged = document.createElement('canvas');
+                merged.width = totalWidth;
+                merged.height = 120;
+                const ctx = merged.getContext('2d');
+                for(let i=0;i<canvases.length;i++) ctx.drawImage(canvases[i], i*120, 0);
+                return merged;
+            },
+            async recognizeAndSubmit() {
+                this.ocrBusy = true;
+                let recognized = '';
+                try {
+                    const mergedCanvas = this.getMergedCanvas();
+                    const base64 = mergedCanvas.toDataURL('image/png').split(',')[1];
+                    if(this.useBaiduOCR && this.baiduApiKey && this.baiduSecretKey) {
+                        if(!this.baiduOCR) this.baiduOCR = new BaiduOCR(this.baiduApiKey, this.baiduSecretKey);
+                        recognized = await this.baiduOCR.recognize(base64);
+                    } else {
+                        const { data: { text } } = await Tesseract.recognize(mergedCanvas, 'chi_sim', { logger: m => console.log(m) });
+                        recognized = text.trim().replace(/\s/g, '');
+                    }
+                    if(!recognized) recognized = '';
+                } catch(e) {
+                    console.error(e);
+                    this.showAlert('识别错误', '识别失败，请确保网络通畅或使用手动模式');
+                    this.ocrBusy = false;
+                    return;
+                }
+                this.ocrBusy = false;
+                this.processAnswer(recognized);
+            },
+            processAnswer(recognized) {
+                let isCorrect = (recognized === this.currentSessionWord.word);
+                let reasonMsg = isCorrect ? 'AI识别正确！' : `AI识别为“${recognized}”，正确是“${this.currentSessionWord.word}”`;
+                const currentInfo = {
+                    word: this.currentSessionWord.word,
+                    pinyin: this.currentSessionWord.pinyin,
+                    context: this.currentSessionWord.context
+                };
+                const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
+                if(isCorrect) {
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
+                    this.handleCorrect(wordObj);
+                    this.sessionCorrectCount++; 
+                    this.todayCompletedCount++; 
+                    this.totalDictateTimes++;
+                    this.saveData();
+                    this.showResultModal(true, currentInfo.word, currentInfo.pinyin, currentInfo.context, "回答正确！", "下一个 >", () => { 
+                        if(this.sessionTaskList.length === 0) this.finishSession();
+                        else this.moveToNext();
+                    });
+                } else {
+                    const currentWordCopy = JSON.parse(JSON.stringify(this.currentSessionWord));
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
+                    this.sessionTaskList.push(currentWordCopy);
+                    // 记录笔迹供复核
+                    const mergedCanvas = this.getMergedCanvas();
+                    wordObj.handwritingData = [mergedCanvas.toDataURL()];
+                    wordObj.pendingReview = true;
+                    wordObj.errorCount = (wordObj.errorCount||0)+1;
+                    if(wordObj.status === 'mastered') wordObj.status = 'learning';
+                    this.regenerateReviewDates(wordObj);
+                    this.saveData();
+                    this.showResultModal(false, currentInfo.word, currentInfo.pinyin, currentInfo.context, reasonMsg, "下一个 >", () => { 
+                        if(this.sessionTaskList.length === 0) this.finishSession();
+                        else this.moveToNext();
+                    });
+                }
+            },
+            handleDontKnow() {
+                const currentInfo = {
+                    word: this.currentSessionWord.word,
+                    pinyin: this.currentSessionWord.pinyin,
+                    context: this.currentSessionWord.context
+                };
+                const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
+                const mergedCanvas = this.getMergedCanvas();
+                wordObj.handwritingData = [mergedCanvas.toDataURL()];
+                wordObj.pendingReview = true;
+                wordObj.errorCount = (wordObj.errorCount||0)+1;
+                if(wordObj.status === 'mastered') wordObj.status = 'learning';
+                this.regenerateReviewDates(wordObj);
+                this.saveData();
+                const currentWordCopy = JSON.parse(JSON.stringify(this.currentSessionWord));
+                this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
+                this.sessionTaskList.push(currentWordCopy);
+                this.showResultModal(false, currentInfo.word, currentInfo.pinyin, currentInfo.context, "不会也没关系，再试一次。", "下一个 >", () => { 
+                    if(this.sessionTaskList.length === 0) this.finishSession();
+                    else this.moveToNext();
+                });
+            },
+            moveToNext() { 
+                this.$nextTick(()=>{ this.initCanvasForCurrent(); }); 
+            },
+            finishSession() { 
+                if(this.timerInterval) clearInterval(this.timerInterval); 
+                this.sessionFinished=true; 
+                this.generateTodayPlan(); 
+            },
+            finishAndGoHome() { this.currentView='childHome'; this.sessionFinished=false; this.generateTodayPlan(); },
+            abortDictate() { if(this.timerInterval) clearInterval(this.timerInterval); this.currentView='childHome'; },
+            showParentPasswordModal() {
+                this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
+                    if(pwd === this.parentPassword) {
+                        this.currentView='parentHome';
+                        this.startParentTimer();
+                    } else {
+                        this.showAlert('错误', '密码错误，请重试');
+                    }
+                });
+            },
+            startParentTimer(){ if(this.timerId)clearTimeout(this.timerId); if(this.parentTimeoutMin>0) this.timerId=setTimeout(()=>{ if(this.currentView !=='childHome'){ this.showAlert('提示', '超时返回孩子端'); this.currentView='childHome'; } }, this.parentTimeoutMin*60*1000); },
+            openWordBankView(){ this.wordBankFilter='all'; this.currentView='wordBank'; },
+            openReviewParentView(){ this.currentView='reviewParent'; },
+            openPlanCalendarView(){ this.currentView='planCalendar'; },
+            toggleReviewFlip(item){ item.isFlipped=!item.isFlipped; },
+            commitParentReview(){
+                for(let rev of this.pendingReviewList){
+                    let orig = this.words.find(w=>w.id===rev.word.id);
+                    if(orig && rev.isFlipped){
+                        orig.errorCount = Math.max(0, (orig.errorCount || 0) - 1);
+                        if(orig.errorCount === 0){
+                            orig.status = 'mastered';
+                            orig.reviewDates = [];
+                        } else {
+                            this.regenerateReviewDates(orig);
+                        }
+                    }
+                    orig.pendingReview = false;
+                    delete orig.handwritingData;
+                }
+                this.saveData();
+                this.generateTodayPlan();
+                this.currentView='parentHome';
+                this.showAlert('完成', '复核完成，复习计划已更新');
+            },
+            openAddWizard(){ this.wizardStep=1; this.rawWordsInput=''; this.pendingWords=[]; this.currentView='addWizard'; },
+            parseToStep2(){ let raw=this.rawWordsInput.trim(); if(!raw) { this.showAlert('提示', '请输入词语'); return; } let arr=raw.split(/[ ,，、\s]+/).filter(w=>w); this.pendingWords=arr.map(w=>({ word:w, pinyin:toPinyinWithTone(w), example:generateExample(w,toPinyinWithTone(w)) })); this.wizardStep=2; },
+            refreshExample(idx){ this.pendingWords[idx].example=generateExample(this.pendingWords[idx].word, this.pendingWords[idx].pinyin); },
+            confirmAddWords(){
+                let added=0, exists=[];
+                for(let it of this.pendingWords){
+                    if(!this.words.some(w=>w.word===it.word)){
+                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', errorCount:0, reviewDates:[] });
+                        added++;
+                    } else exists.push(it.word);
+                }
+                if(added){
+                    this.saveData(); this.generateTodayPlan();
+                    this.showAlert('成功', `成功添加 ${added} 个词语${exists.length ? `，重复：${exists.join(', ')}` : ''}`);
+                    this.currentView='parentHome';
+                } else {
+                    this.showAlert('提示', '所有词语都已存在');
+                }
+            },
+            openSettingsView(){ this.tempPassword=''; this.currentView='settingsView'; },
+            changePassword(){
+                this.showPrompt('修改密码', '请输入新密码', '新密码', (newPwd) => {
+                    if(newPwd && newPwd.trim()) {
+                        this.parentPassword = newPwd.trim();
+                        this.saveData();
+                        this.showAlert('成功', '密码已更新');
+                    } else this.showAlert('提示', '密码不能为空');
+                });
+            },
+            saveTimeout(){ if(this.tempTimeout>0) this.parentTimeoutMin=this.tempTimeout; this.showAlert('成功', '超时时间已更新'); },
+            confirmResetData(){
+                this.showConfirm('重置数据', '重置所有数据后，所有自定义词语和进度将丢失。确定重置吗？', () => {
+                    this.words=JSON.parse(JSON.stringify(defaultWords));
+                    this.checkinDays=1;
+                    this.parentPassword='8899';
+                    this.saveData();
+                    this.generateTodayPlan();
+                    this.currentView='parentHome';
+                    this.showAlert('完成', '数据已重置');
+                });
+            },
+            editWord(word){
+                this.showPrompt('编辑词语', `编辑“${word.word}”的状态 (mastered/learning/difficult/initial)`, '状态', (newStatus) => {
+                    if(newStatus && ['mastered','learning','difficult','initial'].includes(newStatus)) word.status = newStatus;
+                    this.showPrompt('编辑例句', `编辑“${word.word}”的例句`, '例句', (newContext) => {
+                        if(newContext) word.context = newContext;
+                        this.regenerateReviewDates(word);
+                        this.saveData();
+                        this.generateTodayPlan();
+                        this.showAlert('成功', '词语已更新');
+                    });
+                });
+            },
+            confirmDeleteWord(word){
+                this.showConfirm('删除词语', `确定要删除“${word.word}”吗？所有相关记录将丢失。`, () => {
+                    this.words = this.words.filter(w=>w.id !== word.id);
+                    this.saveData();
+                    this.generateTodayPlan();
+                    this.showAlert('完成', '词语已删除');
+                });
+            },
+            // 数据导入导出
+            exportData(){
+                const data = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword };
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'dictation_backup.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                this.showAlert('成功', '数据已导出');
+            },
+            importData(){
+                this.$refs.importFile.click();
+            },
+            handleImport(e){
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        if(imported.words) this.words = imported.words;
+                        if(imported.checkinDays) this.checkinDays = imported.checkinDays;
+                        if(imported.parentPassword) this.parentPassword = imported.parentPassword;
+                        this.saveData();
+                        this.generateTodayPlan();
+                        this.showAlert('成功', '数据导入成功');
+                    } catch(e){ this.showAlert('错误', '文件解析失败'); }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            },
+            async backupToGitHub(){
+                if(!this.githubToken || !this.githubRepo){
+                    this.showAlert('提示', '请先配置 GitHub Token 和仓库名');
+                    return;
+                }
+                const data = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, backupTime: new Date().toISOString() };
+                const json = JSON.stringify(data, null, 2);
+                const url = `https://api.github.com/repos/${this.githubRepo}/contents/dictation_backup.json`;
+                try {
+                    let sha = '';
+                    const getRes = await fetch(url, { headers: { 'Authorization': `token ${this.githubToken}` } });
+                    if(getRes.ok) {
+                        const existing = await getRes.json();
+                        sha = existing.sha;
+                    }
+                    const res = await fetch(url, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `token ${this.githubToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: '备份数据', content: btoa(unescape(encodeURIComponent(json))), sha: sha })
+                    });
+                    if(res.ok) this.showAlert('成功', '数据已备份到 GitHub');
+                    else this.showAlert('错误', '备份失败，请检查 token 权限');
+                } catch(e){ this.showAlert('错误', '网络错误'); }
+            },
+            testBaiduOCR(){
+                if(this.baiduApiKey && this.baiduSecretKey){
+                    this.baiduOCR = new BaiduOCR(this.baiduApiKey, this.baiduSecretKey);
+                    this.showAlert('测试', '配置已保存，可在默写时自动使用百度OCR');
+                } else this.showAlert('提示', '请填写完整的 Key');
+            }
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
