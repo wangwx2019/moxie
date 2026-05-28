@@ -270,12 +270,23 @@
                 </select>
             </div>
             <div v-if="useBaiduOCR">
-                <div class="flex-between"><span>百度 API Key</span><input type="text" v-model="baiduApiKey" placeholder="API Key"></div>
-                <div class="flex-between"><span>百度 Secret Key</span><input type="text" v-model="baiduSecretKey" placeholder="Secret Key"></div>
-                <button class="cute-btn-sm" @click="testBaiduOCR">测试 Key 是否有效</button>
-                <hr style="margin:8px 0;border:none;border-top:1px dashed #ddd;">
-                <div class="flex-between"><span>Access Token（必填）</span><input type="text" v-model="baiduDirectToken" placeholder="粘贴 access_token" style="font-size:11px;"></div>
-                <div class="text-small">⚠️ 浏览器无法用 Key 自动换取 Token（跨域限制），必须直接填入 Token。有效期30天。</div>
+                <div class="text-small" style="margin-bottom:8px;">选择当前使用的账号，用完手动切换到下一个</div>
+                <div v-for="(acc, i) in baiduAccounts" :key="i" style="background:#fef5e8; border-radius:20px; padding:10px 12px; margin-bottom:8px;">
+                    <div class="flex-between">
+                        <span style="display:flex; align-items:center; gap:6px;">
+                            <span v-if="baiduActiveIdx===i" style="color:#f97316; font-size:1.2rem;">◉</span>
+                            <span v-else @click="baiduActiveIdx=i" style="color:#bbb; font-size:1.2rem; cursor:pointer;">○</span>
+                            <input type="text" v-model="acc.name" style="border:none; background:transparent; font-weight:600; width:80px; font-size:0.85rem;">
+                        </span>
+                        <span style="font-size:0.75rem; color:#a16207;">{{ acc.used }}/500 次</span>
+                        <button v-if="baiduAccounts.length>1" class="cute-btn-sm" style="background:#eee; color:#999; padding:2px 10px; font-size:0.7rem;" @click="removeAccount(i)">✕</button>
+                    </div>
+                    <input type="text" v-model="acc.token" placeholder="粘贴 access_token" style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; margin-top:6px; box-sizing:border-box;">
+                    <div style="margin-top:6px; height:6px; background:#f0e4d0; border-radius:3px; overflow:hidden;">
+                        <div :style="'height:100%; width:' + Math.min(acc.used*100/500,100) + '%; background:' + (acc.used>=500?'#ef4444':'#f97316') + '; border-radius:3px;'"></div>
+                    </div>
+                </div>
+                <button class="cute-btn-sm" style="width:100%;" @click="addAccount">+ 添加账号</button>
             </div>
         </div>
         <div class="card-white">
@@ -359,11 +370,9 @@
                 resultModalCallback: null,
                 ocrBusy: false,
                 useBaiduOCR: false,
-                baiduApiKey: '',
-                baiduSecretKey: '',
-                baiduAccessToken: null,
-                baiduTokenExpire: 0,
-                baiduDirectToken: '',
+                baiduAccounts: [{ name: '账号1', token: '', used: 0 }],
+                baiduActiveIdx: 0,
+                baiduResetMonth: '',
             }
         },
         computed: {
@@ -469,7 +478,7 @@
             formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
             currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
         },
-        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduApiKey:'saveData', baiduSecretKey:'saveData', baiduDirectToken:'saveData' },
+        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData' },
         mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); },
         methods: {
             async fetchRemoteData() {
@@ -484,9 +493,7 @@
                         if(remote.checkinDays !== undefined) this.checkinDays = remote.checkinDays;
                         if(remote.parentPassword) this.parentPassword = remote.parentPassword;
                         if(remote.useBaiduOCR !== undefined) this.useBaiduOCR = remote.useBaiduOCR;
-                        if(remote.baiduApiKey) this.baiduApiKey = remote.baiduApiKey;
-                        if(remote.baiduSecretKey) this.baiduSecretKey = remote.baiduSecretKey;
-                        if(remote.baiduDirectToken !== undefined) this.baiduDirectToken = remote.baiduDirectToken;
+                        if(remote.baiduAccounts && remote.baiduAccounts.length) { this.baiduAccounts = remote.baiduAccounts; this.baiduActiveIdx = remote.baiduActiveIdx || 0; }
                         this.saveData();
                         this.generateTodayPlan();
                         this.showAlert('同步成功', '已从 data.json 加载最新数据');
@@ -512,15 +519,31 @@
                 if(this.resultModalCallback) this.resultModalCallback();
                 this.resultModalCallback = null;
             },
+            addAccount() {
+                const n = this.baiduAccounts.length + 1;
+                this.baiduAccounts.push({ name: '账号' + n, token: '', used: 0 });
+            },
+            removeAccount(i) {
+                if(this.baiduAccounts.length <= 1) return;
+                this.baiduAccounts.splice(i, 1);
+                if(this.baiduActiveIdx >= this.baiduAccounts.length) this.baiduActiveIdx = this.baiduAccounts.length - 1;
+            },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; this.baiduApiKey = d.baiduApiKey || ''; this.baiduSecretKey = d.baiduSecretKey || ''; this.baiduDirectToken = d.baiduDirectToken || ''; } 
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; } this.baiduResetMonth = d.baiduResetMonth || ''; } 
+                // 月初重置百度账号用量
+                const now = new Date();
+                const thisMonth = now.getFullYear() + '-' + (now.getMonth()+1);
+                if(this.baiduResetMonth !== thisMonth) {
+                    this.baiduAccounts.forEach(a => a.used = 0);
+                    this.baiduResetMonth = thisMonth;
+                }
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
                 this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; }); 
                 this.saveData(); 
             },
             saveData() { 
-                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduApiKey: this.baiduApiKey, baiduSecretKey: this.baiduSecretKey, baiduDirectToken: this.baiduDirectToken };
+                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
             },
             // ---- 127 辅助方法 ----
@@ -682,6 +705,7 @@
                     e.preventDefault(); drawing=true; 
                     let rect=canvas.getBoundingClientRect(); 
                     let {x,y}=getCoord(e, rect); 
+                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 12; ctx.lineCap = 'round';
                     ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+1,y+1); ctx.stroke(); 
                     lastX=x; lastY=y;
                 };
@@ -731,29 +755,42 @@
                 try {
                     const mergedCanvas = this.getMergedCanvas();
                     const base64 = mergedCanvas.toDataURL('image/png').split(',')[1];
-                    if(this.useBaiduOCR && this.baiduDirectToken) {
-                        this.baiduAccessToken = this.baiduDirectToken;
-                        // 调用百度手写识别
-                        const body = new URLSearchParams({ image: base64 });
-                        const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + this.baiduAccessToken, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                        const ocrData = await ocrRes.json();
-                        if(ocrData.words_result && ocrData.words_result.length > 0) {
-                            recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, '');
-                        } else {
-                            recognized = '';
+                    // 找到一个有额度的账号
+                    let useTesseract = true;
+                    if(this.useBaiduOCR) {
+                        for(let attempt=0; attempt<this.baiduAccounts.length; attempt++) {
+                            const idx = this.baiduActiveIdx;
+                            const acc = this.baiduAccounts[idx];
+                            if(acc && acc.token && acc.used < 500) {
+                                const body = new URLSearchParams({ image: base64 });
+                                const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                const ocrData = await ocrRes.json();
+                                acc.used++;
+                                this.saveData();
+                                if(ocrData.error_code === 17 || ocrData.error_code === 110) {
+                                    // 额度用尽，自动切换到下一个
+                                    acc.used = 500;
+                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                                    continue; // 尝试下一个账号
+                                }
+                                if(ocrData.words_result && ocrData.words_result.length > 0) {
+                                    recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, '');
+                                }
+                                useTesseract = false;
+                                break;
+                            } else {
+                                // 当前账号无额度，切到下一个
+                                this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                            }
                         }
-                    } else {
+                    }
+                    if(useTesseract) {
                         const { data: { text } } = await Tesseract.recognize(mergedCanvas, 'chi_sim', { logger: m => console.log(m) });
                         recognized = text.trim().replace(/\s/g, '');
                     }
                     if(!recognized) recognized = '';
                 } catch(e) {
-                    const msg = e.message || e;
-                    if(msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-                        this.showAlert('识别错误', '网络请求被浏览器拦截：百度 OAuth 接口不支持前端跨域请求。\n请改用「直接填 Access Token」方式，在设置页的 Access Token 输入框中粘贴已保存的 token。');
-                    } else {
-                        this.showAlert('识别错误', '识别失败：' + msg);
-                    }
+                    this.showAlert('识别错误', '识别失败：' + (e.message || e));
                     this.ocrBusy = false;
                     return;
                 }
@@ -942,8 +979,8 @@
                     this.checkinDays=1;
                     this.parentPassword='8899';
                     this.useBaiduOCR=false;
-                    this.baiduApiKey='';
-                    this.baiduSecretKey='';
+                    this.baiduAccounts = [{ name:'账号1', token:'', used:0 }];
+                    this.baiduActiveIdx = 0;
                     this.saveData();
                     this.generateTodayPlan();
                     this.currentView='parentHome';
@@ -971,7 +1008,7 @@
                 });
             },
             exportData(){
-                const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduApiKey: this.baiduApiKey, baiduSecretKey: this.baiduSecretKey, baiduDirectToken: this.baiduDirectToken };
+                const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx };
                 const json = JSON.stringify(fullData, null, 2);
                 const blob = new Blob([json], {type: 'application/json'});
                 const url = URL.createObjectURL(blob);
@@ -997,9 +1034,7 @@
                         if(imported.checkinDays !== undefined) this.checkinDays = imported.checkinDays;
                         if(imported.parentPassword) this.parentPassword = imported.parentPassword;
                         if(imported.useBaiduOCR !== undefined) this.useBaiduOCR = imported.useBaiduOCR;
-                        if(imported.baiduApiKey !== undefined) this.baiduApiKey = imported.baiduApiKey;
-                        if(imported.baiduSecretKey !== undefined) this.baiduSecretKey = imported.baiduSecretKey;
-                        if(imported.baiduDirectToken !== undefined) this.baiduDirectToken = imported.baiduDirectToken;
+                        if(imported.baiduAccounts && imported.baiduAccounts.length) { this.baiduAccounts = imported.baiduAccounts; this.baiduActiveIdx = imported.baiduActiveIdx || 0; }
                         this.saveData();
                         this.generateTodayPlan();
                         this.showAlert('成功', '数据导入成功');
@@ -1008,23 +1043,6 @@
                 reader.readAsText(file);
                 e.target.value = '';
             },
-            async testBaiduOCR(){
-                if(!this.baiduApiKey || !this.baiduSecretKey) {
-                    this.showAlert('测试', '请先填写 API Key 和 Secret Key');
-                    return;
-                }
-                try {
-                    const res = await fetch('https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=' + this.baiduApiKey + '&client_secret=' + this.baiduSecretKey);
-                    const data = await res.json();
-                    if(data.access_token) {
-                        this.showAlert('测试成功', '百度OCR连接正常 ✅');
-                    } else {
-                        this.showAlert('测试失败', data.error_description || '请检查 API Key/Secret Key');
-                    }
-                } catch(e) {
-                    this.showAlert('测试失败', '网络错误，请检查网络连接');
-                }
-            }
         }
     }).mount('#app');
 </script>
