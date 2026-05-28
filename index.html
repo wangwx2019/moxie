@@ -161,16 +161,16 @@
         </div>
     </div>
 
-    <!-- 复核默写页面 (增强版) -->
+    <!-- 复核默写页面 -->
     <div v-if="currentView === 'reviewParent'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
         <h3>📋 复核默写</h3>
-        <div class="text-small" style="margin-bottom: 12px;">家长复核说明：默认接受系统判定结果。如果系统判错了，点「纠正」按钮即可翻转。确认无误后点击底部提交。</div>
+        <div class="text-small" style="margin-bottom: 12px;">家长复核说明：如果系统判错实际正确，点击「纠正」按钮可更正。纠正后首次默错/多次尝试的统计会自动更新。</div>
         
         <div class="review-stats">
             <div class="stat-card"><div class="stat-number">{{ reviewStats.total }}</div><div class="stat-label">今日总数</div></div>
-            <div class="stat-card"><div class="stat-number">{{ reviewStats.firstCheck }}</div><div class="stat-label">首次核对</div></div>
-            <div class="stat-card"><div class="stat-number">{{ reviewStats.firstMistake }}</div><div class="stat-label">首次默错</div></div>
+            <div class="stat-card"><div class="stat-number">{{ reviewStats.firstCorrect }}</div><div class="stat-label">首次默对</div></div>
+            <div class="stat-card"><div class="stat-number">{{ reviewStats.firstWrong }}</div><div class="stat-label">首次默错</div></div>
             <div class="stat-card"><div class="stat-number">{{ reviewStats.multipleAttempt }}</div><div class="stat-label">多次尝试</div></div>
         </div>
 
@@ -221,11 +221,10 @@
         <div v-else><div class="flex-between"><h3>📝 共 {{ pendingWords.length }} 个词语</h3><span class="cute-btn-sm" @click="wizardStep=1">重新输入</span></div><div style="max-height: 50vh; overflow: auto;"><div v-for="(item, idx) in pendingWords" :key="idx" class="word-list-item" style="flex-direction:column; align-items:start;"><strong>{{ item.word }}  {{ item.pinyin }}</strong><div class="flex-between" style="width:100%;"><span class="text-small">{{ item.example }}</span><button class="cute-btn-sm" style="padding:2px 12px;" @click="refreshExample(idx)">换一句</button></div></div></div><button class="cute-btn primary" style="margin-top:16px;" @click="confirmAddWords">✅ 确认录入</button></div>
     </div>
 
-    <!-- 设置页面 -->
+    <!-- 设置页面（移除超时时间配置） -->
     <div v-if="currentView === 'settingsView'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
         <div class="card-white"><div class="flex-between"><span>🔐 家长密码</span><button class="cute-btn-sm" @click="changePassword">修改密码</button></div></div>
-        <div class="card-white"><div class="flex-between"><span>⏱️ 超时时间(分钟)</span><input type="number" v-model.number="tempTimeout" style="width:80px;"><button class="cute-btn-sm" @click="saveTimeout">保存</button></div></div>
         <div class="card-white">
             <div class="flex-between"><span>🤖 手写识别引擎</span>
                 <select v-model="useBaiduOCR" class="cute-btn-sm" style="background:#f97316;">
@@ -281,12 +280,12 @@
     function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
     function generateExample(word, pinyinStr) { return `天气${pinyinStr}，我们要注意保暖。`; }
 
-    const STORAGE_KEY = 'handwrite_dict_v23';
+    const STORAGE_KEY = 'handwrite_dict_v24';
     const REVIEW_INTERVALS = [1, 3, 5, 7, 9, 15, 30];
     let defaultWords = [
-        { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', correctCount:0, wrongCount:0, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null },
-        { id:'2', word:'块头', pinyin:'kuài tóu', context:'他的块头很大。', correctCount:0, wrongCount:0, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null },
-        { id:'3', word:'捧花', pinyin:'pěng huā', context:'新娘拿着捧花。', correctCount:0, wrongCount:0, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null }
+        { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', correctCount:0, wrongCount:0, firstWrong:false, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null },
+        { id:'2', word:'块头', pinyin:'kuài tóu', context:'他的块头很大。', correctCount:0, wrongCount:0, firstWrong:false, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null },
+        { id:'3', word:'捧花', pinyin:'pěng huā', context:'新娘拿着捧花。', correctCount:0, wrongCount:0, firstWrong:false, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null }
     ];
 
     let app = Vue.createApp({
@@ -308,8 +307,6 @@
                 sessionAnswer: '',
                 sessionPendingQueue: [],
                 parentPassword: '8899',
-                parentTimeoutMin: 5,
-                tempTimeout: 5,
                 wordBankFilter: 'all',
                 wizardStep: 1,
                 rawWordsInput: '',
@@ -340,11 +337,23 @@
                 }));
             },
             reviewStats() {
-                const total = this.reviewList.length;
-                const firstCheck = this.reviewList.filter(r => r.word.wrongCount === 1).length;
-                const firstMistake = this.reviewList.filter(r => r.word.wrongCount === 1).length;
-                const multipleAttempt = this.reviewList.filter(r => r.word.wrongCount >= 2).length;
-                return { total, firstCheck, firstMistake, multipleAttempt };
+                const total = this.todayPlanWords.length; // 今日计划中的词总数
+                let firstCorrect = 0;
+                let firstWrong = 0;
+                let multipleAttempt = 0;
+                for(let w of this.words) {
+                    // 只考虑今日计划中的词（即今天安排过的词）
+                    if(this.todayPlanWords.some(pw => pw.id === w.id)) {
+                        if(w.firstWrong === false && w.wrongCount === 0) {
+                            firstCorrect++;
+                        } else if(w.firstWrong === true && w.wrongCount > 0) {
+                            firstWrong++;
+                        } else if(w.firstWrong === true && w.wrongCount === 0) {
+                            multipleAttempt++;
+                        }
+                    }
+                }
+                return { total, firstCorrect, firstWrong, multipleAttempt };
             },
             categoryStats() {
                 const all = this.words.length;
@@ -402,7 +411,7 @@
             formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
             currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
         },
-        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', parentTimeoutMin:'saveData', useBaiduOCR:'saveData', baiduApiKey:'saveData', baiduSecretKey:'saveData' },
+        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduApiKey:'saveData', baiduSecretKey:'saveData' },
         mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); },
         methods: {
             async fetchRemoteData() {
@@ -414,7 +423,6 @@
                         this.words = remote.words;
                         if(remote.checkinDays !== undefined) this.checkinDays = remote.checkinDays;
                         if(remote.parentPassword) this.parentPassword = remote.parentPassword;
-                        if(remote.parentTimeoutMin !== undefined) this.parentTimeoutMin = remote.parentTimeoutMin;
                         if(remote.useBaiduOCR !== undefined) this.useBaiduOCR = remote.useBaiduOCR;
                         if(remote.baiduApiKey) this.baiduApiKey = remote.baiduApiKey;
                         if(remote.baiduSecretKey) this.baiduSecretKey = remote.baiduSecretKey;
@@ -445,13 +453,13 @@
             },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.parentTimeoutMin = d.parentTimeoutMin !== undefined ? d.parentTimeoutMin : 5; this.useBaiduOCR = d.useBaiduOCR || false; this.baiduApiKey = d.baiduApiKey || ''; this.baiduSecretKey = d.baiduSecretKey || ''; } 
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; this.baiduApiKey = d.baiduApiKey || ''; this.baiduSecretKey = d.baiduSecretKey || ''; } 
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
-                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.pendingReview === undefined) w.pendingReview=false; }); 
+                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; }); 
                 this.saveData(); 
             },
             saveData() { 
-                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, parentTimeoutMin: this.parentTimeoutMin, useBaiduOCR: this.useBaiduOCR, baiduApiKey: this.baiduApiKey, baiduSecretKey: this.baiduSecretKey };
+                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduApiKey: this.baiduApiKey, baiduSecretKey: this.baiduSecretKey };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
             },
             generateTodayPlan() {
@@ -484,7 +492,7 @@
             correctWord(wordObj) {
                 if(wordObj.wrongCount > 0) {
                     wordObj.wrongCount--;
-                    wordObj.correctCount++; // 相当于把一次错误转为正确
+                    wordObj.correctCount++;
                     if(wordObj.wrongCount === 0) {
                         wordObj.status = 'mastered';
                         wordObj.reviewDates = [];
@@ -625,7 +633,6 @@
                 if(isCorrect) {
                     wordObj.correctCount = (wordObj.correctCount || 0) + 1;
                     this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
-                    // 正确时，如果之前有错误次数，可减少一次？但通常正确不应该减少错误，保持独立统计
                     this.sessionCorrectCount++; 
                     this.todayCompletedCount++; 
                     this.totalDictateTimes++;
@@ -635,6 +642,10 @@
                         else this.moveToNext();
                     });
                 } else {
+                    // 第一次错误时设置 firstWrong 标志
+                    if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
+                        wordObj.firstWrong = true;
+                    }
                     wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
                     const mergedCanvas = this.getMergedCanvas();
                     wordObj.handwritingData = [mergedCanvas.toDataURL()];
@@ -656,6 +667,10 @@
                     context: this.currentSessionWord.context
                 };
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
+                // 第一次错误时设置 firstWrong 标志
+                if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
+                    wordObj.firstWrong = true;
+                }
                 const mergedCanvas = this.getMergedCanvas();
                 wordObj.handwritingData = [mergedCanvas.toDataURL()];
                 wordObj.pendingReview = true;
@@ -685,16 +700,13 @@
                 this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
                     if(pwd === this.parentPassword) {
                         this.currentView='parentHome';
-                        this.startParentTimer();
                     } else this.showAlert('错误', '密码错误');
                 });
             },
-            startParentTimer(){ if(this.timerId)clearTimeout(this.timerId); if(this.parentTimeoutMin>0) this.timerId=setTimeout(()=>{ if(this.currentView !=='childHome'){ this.showAlert('提示', '超时返回孩子端'); this.currentView='childHome'; } }, this.parentTimeoutMin*60*1000); },
             openWordBankView(){ this.wordBankFilter='all'; this.currentView='wordBank'; },
             openReviewParentView(){ this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
             commitParentReview(){
-                // 这里不需要额外操作，因为单个纠正已经处理了。保留按钮以防家长需要批量确认，但本次纠正已独立生效。
                 this.currentView='parentHome';
                 this.showAlert('完成', '复核已处理');
             },
@@ -705,7 +717,7 @@
                 let added=0, exists=[];
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
-                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', correctCount:0, wrongCount:0, reviewDates:[], pendingReview:false });
+                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false });
                         added++;
                     } else exists.push(it.word);
                 }
@@ -722,13 +734,11 @@
                     else this.showAlert('提示', '密码不能为空');
                 });
             },
-            saveTimeout(){ if(this.tempTimeout>0) this.parentTimeoutMin=this.tempTimeout; this.saveData(); this.showAlert('成功', '超时时间已更新'); },
             confirmResetData(){
                 this.showConfirm('重置数据', '重置所有数据后，所有自定义词语和进度将丢失。确定重置吗？', () => {
                     this.words=JSON.parse(JSON.stringify(defaultWords));
                     this.checkinDays=1;
                     this.parentPassword='8899';
-                    this.parentTimeoutMin=5;
                     this.useBaiduOCR=false;
                     this.baiduApiKey='';
                     this.baiduSecretKey='';
@@ -759,7 +769,7 @@
                 });
             },
             exportData(){
-                const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, parentTimeoutMin: this.parentTimeoutMin, useBaiduOCR: this.useBaiduOCR, baiduApiKey: this.baiduApiKey, baiduSecretKey: this.baiduSecretKey };
+                const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduApiKey: this.baiduApiKey, baiduSecretKey: this.baiduSecretKey };
                 const json = JSON.stringify(fullData, null, 2);
                 const blob = new Blob([json], {type: 'application/json'});
                 const url = URL.createObjectURL(blob);
@@ -781,7 +791,6 @@
                         if(imported.words) this.words = imported.words;
                         if(imported.checkinDays !== undefined) this.checkinDays = imported.checkinDays;
                         if(imported.parentPassword) this.parentPassword = imported.parentPassword;
-                        if(imported.parentTimeoutMin !== undefined) this.parentTimeoutMin = imported.parentTimeoutMin;
                         if(imported.useBaiduOCR !== undefined) this.useBaiduOCR = imported.useBaiduOCR;
                         if(imported.baiduApiKey !== undefined) this.baiduApiKey = imported.baiduApiKey;
                         if(imported.baiduSecretKey !== undefined) this.baiduSecretKey = imported.baiduSecretKey;
