@@ -29,9 +29,9 @@
     }
   ],
   "checkinDays": 1,
-  "parentPassword": "8899",
-  "parentTimeoutMin": 10000,
-  "useBaiduOCR": true,
+  "parentPassword": "8",
+  "parentTimeoutMin": 100000,
+  "useBaiduOCR": false,
   "baiduApiKey": "HzC9ACSpL9QF4TodXcQOvL5O",
   "baiduSecretKey": "EmEjVU5ZnSD0Q8SX7UyyUPwhgWehTkeN"
 }
