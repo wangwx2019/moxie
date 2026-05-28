@@ -83,22 +83,12 @@
     }
   ],
   "checkinDays": 1,
-  "parentPassword": "8899",
+  "parentPassword": "8",
   "useBaiduOCR": true,
   "baiduAccounts": [
     {
       "name": "账号1",
       "token": "24.50851ff5a0f0384e97d9eb7d0a566d6b.2592000.1782568772.282335-123506560",
-      "used": 0
-    },
-    {
-      "name": "账号2",
-      "token": "",
-      "used": 0
-    },
-    {
-      "name": "账号3",
-      "token": "",
       "used": 0
     }
   ],
