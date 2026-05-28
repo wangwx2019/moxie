@@ -57,16 +57,17 @@
         .cat-item { background: #fff1e6; padding: 6px 14px; border-radius: 40px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
         .cat-item.active { background: #f97316; color: white; }
         .word-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0e4d8; }
-        .review-item-card { background: #fefaf5; border-radius: 28px; padding: 14px; margin-bottom: 14px; border: 1px solid #ffdec2; }
+        .review-item-card { background: #fefaf5; border-radius: 28px; padding: 14px; margin-bottom: 14px; border: 1px solid #ffdec2; position: relative; }
         .handwriting-preview { background: #fef3e9; border-radius: 20px; padding: 8px; margin: 8px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .preview-img { border: 1px solid #ffcd9c; border-radius: 12px; background: white; max-width: 80px; max-height: 80px; }
+        .preview-img { border: 1px solid #ffcd9c; border-radius: 12px; background: white; max-width: 70px; max-height: 70px; }
         .cute-btn-sm { background: #f97316; color: white; border: none; padding: 6px 16px; border-radius: 40px; font-weight: 500; cursor: pointer; }
+        .stats-row-inline { display: flex; gap: 12px; align-items: center; margin-top: 8px; font-size: 0.85rem; }
+        .correction-hint { color: #16a34a; font-size: 0.7rem; margin-top: 6px; }
         .plan-date { background: #fff0e0; border-radius: 28px; padding: 12px; margin-bottom: 16px; }
         .plan-date-header { font-weight: 700; font-size: 1rem; color: #b45309; margin-bottom: 8px; }
         .word-chips { display: flex; flex-wrap: wrap; gap: 8px; }
         .chip-word { background: #ffedd5; padding: 4px 12px; border-radius: 30px; font-size: 0.75rem; }
         .api-status { font-size: 0.7rem; color: #16a34a; margin-top: 4px; }
-        /* 复核页面统计卡片 */
         .review-stats {
             display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
         }
@@ -152,10 +153,15 @@
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
         <h3>📖 词库管理</h3>
         <div class="category-tabs"><div v-for="cat in categoryStats" :key="cat.key" class="cat-item" :class="{active: wordBankFilter === cat.key}" @click="wordBankFilter = cat.key">{{ cat.label }}({{ cat.count }})</div></div>
-        <div style="max-height: 55vh; overflow-y: auto;"><div v-for="word in filteredWordBank" :key="word.id" class="word-list-item"><div><span style="font-weight:700;">{{ word.word }}</span><span class="word-badge" v-if="word.errorCount >= 5">顽固</span><span class="word-badge" v-else-if="word.errorCount >= 3">难点</span><span class="word-badge" v-else-if="word.errorCount === 1">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="background:#dcfce7;">已掌握</span><div class="text-small">{{ word.pinyin }} · 错{{ word.errorCount || 0 }}次</div></div><div><button class="cute-btn-sm" style="padding:2px 12px; margin-right:6px;" @click.stop="editWord(word)">✏️</button><button class="cute-btn-sm" style="padding:2px 12px; background:#ef4444;" @click.stop="confirmDeleteWord(word)">🗑️</button></div></div></div>
+        <div style="max-height: 55vh; overflow-y: auto;">
+            <div v-for="word in filteredWordBank" :key="word.id" class="word-list-item">
+                <div><span style="font-weight:700;">{{ word.word }}</span><span class="word-badge" v-if="word.wrongCount >= 5">顽固</span><span class="word-badge" v-else-if="word.wrongCount >= 3">难点</span><span class="word-badge" v-else-if="word.wrongCount === 1">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="background:#dcfce7;">已掌握</span><div class="text-small">{{ word.pinyin }} · 错{{ word.wrongCount || 0 }}次</div></div>
+                <div><button class="cute-btn-sm" style="padding:2px 12px; margin-right:6px;" @click.stop="editWord(word)">✏️</button><button class="cute-btn-sm" style="padding:2px 12px; background:#ef4444;" @click.stop="confirmDeleteWord(word)">🗑️</button></div>
+            </div>
+        </div>
     </div>
 
-    <!-- 复核默写页面 -->
+    <!-- 复核默写页面 (增强版) -->
     <div v-if="currentView === 'reviewParent'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
         <h3>📋 复核默写</h3>
@@ -172,16 +178,22 @@
         <div style="max-height: 60vh; overflow-y: auto;">
             <div v-for="(item, idx) in reviewList" :key="idx" class="review-item-card">
                 <div class="flex-between">
-                    <div><strong>{{ item.word.word }}</strong> <span class="text-small">({{ item.word.pinyin }})</span></div>
-                    <button class="cute-btn-sm" @click="toggleReviewFlip(item)">{{ item.isFlipped ? '✅ 已纠正' : '纠正' }}</button>
+                    <div>
+                        <span class="word-status-emoji">{{ item.word.wrongCount > 0 ? '❌' : '✅' }}</span>
+                        <strong>{{ item.word.word }}</strong> <span class="text-small">({{ item.word.pinyin }})</span>
+                    </div>
+                    <button class="cute-btn-sm" @click="correctWord(item.word)">纠正</button>
+                </div>
+                <div class="stats-row-inline">
+                    <span>✅ 对 {{ item.word.correctCount || 0 }}</span>
+                    <span>❌ 错 {{ item.word.wrongCount || 0 }}</span>
                 </div>
                 <div class="handwriting-preview">
                     <div v-for="(imgSrc, cidx) in item.handwritingImages" :key="cidx">
                         <img :src="imgSrc" class="preview-img" width="70" height="70" />
                     </div>
                 </div>
-                <div v-if="item.isFlipped" class="text-small" style="color:#16a34a; margin-top:6px;">已将【错】纠正为【对】</div>
-                <div v-else class="text-small" style="color:#a16207;">{{ item.word.word }}</div>
+                <div v-if="item.showCorrectionHint" class="correction-hint">已将【错】纠正为【对】</div>
             </div>
             <div v-if="reviewList.length === 0" class="card-white">✨ 暂无待复核</div>
         </div>
@@ -269,12 +281,12 @@
     function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
     function generateExample(word, pinyinStr) { return `天气${pinyinStr}，我们要注意保暖。`; }
 
-    const STORAGE_KEY = 'handwrite_dict_v22';
+    const STORAGE_KEY = 'handwrite_dict_v23';
     const REVIEW_INTERVALS = [1, 3, 5, 7, 9, 15, 30];
     let defaultWords = [
-        { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', errorCount:0, status:'learning', reviewDates:[] },
-        { id:'2', word:'块头', pinyin:'kuài tóu', context:'他的块头很大。', errorCount:0, status:'learning', reviewDates:[] },
-        { id:'3', word:'捧花', pinyin:'pěng huā', context:'新娘拿着捧花。', errorCount:0, status:'learning', reviewDates:[] }
+        { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', correctCount:0, wrongCount:0, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null },
+        { id:'2', word:'块头', pinyin:'kuài tóu', context:'他的块头很大。', correctCount:0, wrongCount:0, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null },
+        { id:'3', word:'捧花', pinyin:'pěng huā', context:'新娘拿着捧花。', correctCount:0, wrongCount:0, status:'learning', reviewDates:[], pendingReview:false, handwritingData:null }
     ];
 
     let app = Vue.createApp({
@@ -316,33 +328,30 @@
         computed: {
             totalWords() { return this.words.length; },
             masteredCount() { return this.words.filter(w => w.status === 'mastered').length; },
-            difficultWordsCount() { return this.words.filter(w => w.errorCount >= 3 && w.errorCount < 5 && w.status !== 'mastered').length; },
-            stubbornCount() { return this.words.filter(w => w.errorCount >= 5 && w.status !== 'mastered').length; },
+            difficultWordsCount() { return this.words.filter(w => w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered').length; },
+            stubbornCount() { return this.words.filter(w => w.wrongCount >= 5 && w.status !== 'mastered').length; },
             pendingReviewCount() { return this.words.filter(w => w.pendingReview === true && w.handwritingData).length; },
             // 待复核列表（所有标记 pendingReview 且 handwritingData 存在的词）
             reviewList() { 
                 return this.words.filter(w => w.pendingReview === true && w.handwritingData).map(w => ({ 
                     word: w, 
                     handwritingImages: w.handwritingData, 
-                    isFlipped: false 
+                    showCorrectionHint: false
                 }));
             },
             reviewStats() {
                 const total = this.reviewList.length;
-                // 首次核对：错误次数为 1 的词（不论是否已纠正）
-                const firstCheck = this.reviewList.filter(r => r.word.errorCount === 1).length;
-                // 首次默错：错误次数为 1 且尚未被纠正（即 isFlipped 为 false，但这里 isFlipped 只是临时UI状态，应以词库中是否有纠正记录为准？简单起见，我们用 errorCount === 1 且尚未提交复核，但用户要求“首次默错”应该是 AI 判错后家长尚未纠正的。我们直接用 pendingReview 且 errorCount === 1 且 未被家长纠正（纠正后会清除 pendingReview）。所以这里 firstMistake 就是 errorCount === 1 的待复核词数。
-                const firstMistake = this.reviewList.filter(r => r.word.errorCount === 1).length;
-                // 多次尝试：错误次数 >= 2
-                const multipleAttempt = this.reviewList.filter(r => r.word.errorCount >= 2).length;
+                const firstCheck = this.reviewList.filter(r => r.word.wrongCount === 1).length;
+                const firstMistake = this.reviewList.filter(r => r.word.wrongCount === 1).length;
+                const multipleAttempt = this.reviewList.filter(r => r.word.wrongCount >= 2).length;
                 return { total, firstCheck, firstMistake, multipleAttempt };
             },
             categoryStats() {
                 const all = this.words.length;
-                const stubborn = this.words.filter(w => w.errorCount >= 5 && w.status !== 'mastered').length;
-                const difficult = this.words.filter(w => w.errorCount >= 3 && w.errorCount < 5 && w.status !== 'mastered').length;
-                const learning = this.words.filter(w => w.status === 'learning' && w.errorCount > 0 && w.errorCount < 3).length;
-                const initial = this.words.filter(w => w.errorCount === 1 && w.status !== 'mastered').length;
+                const stubborn = this.words.filter(w => w.wrongCount >= 5 && w.status !== 'mastered').length;
+                const difficult = this.words.filter(w => w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered').length;
+                const learning = this.words.filter(w => w.status === 'learning' && w.wrongCount > 0 && w.wrongCount < 3).length;
+                const initial = this.words.filter(w => w.wrongCount === 1 && w.status !== 'mastered').length;
                 const mastered = this.masteredCount;
                 return [
                     { key:'all', label:'全部', count:all },
@@ -355,10 +364,10 @@
             },
             filteredWordBank() {
                 if(this.wordBankFilter === 'all') return this.words;
-                if(this.wordBankFilter === 'stubborn') return this.words.filter(w => w.errorCount >= 5 && w.status !== 'mastered');
-                if(this.wordBankFilter === 'difficult') return this.words.filter(w => w.errorCount >= 3 && w.errorCount < 5 && w.status !== 'mastered');
-                if(this.wordBankFilter === 'learning') return this.words.filter(w => w.status === 'learning' && w.errorCount > 0 && w.errorCount < 3);
-                if(this.wordBankFilter === 'initial') return this.words.filter(w => w.errorCount === 1 && w.status !== 'mastered');
+                if(this.wordBankFilter === 'stubborn') return this.words.filter(w => w.wrongCount >= 5 && w.status !== 'mastered');
+                if(this.wordBankFilter === 'difficult') return this.words.filter(w => w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered');
+                if(this.wordBankFilter === 'learning') return this.words.filter(w => w.status === 'learning' && w.wrongCount > 0 && w.wrongCount < 3);
+                if(this.wordBankFilter === 'initial') return this.words.filter(w => w.wrongCount === 1 && w.status !== 'mastered');
                 if(this.wordBankFilter === 'mastered') return this.words.filter(w => w.status === 'mastered');
                 return this.words;
             },
@@ -438,7 +447,7 @@
                 let s = localStorage.getItem(STORAGE_KEY); 
                 if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.parentTimeoutMin = d.parentTimeoutMin !== undefined ? d.parentTimeoutMin : 5; this.useBaiduOCR = d.useBaiduOCR || false; this.baiduApiKey = d.baiduApiKey || ''; this.baiduSecretKey = d.baiduSecretKey || ''; } 
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
-                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(!w.pendingReview) w.pendingReview=false; }); 
+                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.pendingReview === undefined) w.pendingReview=false; }); 
                 this.saveData(); 
             },
             saveData() { 
@@ -448,10 +457,10 @@
             generateTodayPlan() {
                 const today = new Date().toISOString().slice(0,10);
                 let needReview = this.words.filter(w => w.reviewDates && w.reviewDates.includes(today) && w.status !== 'mastered');
-                let newWords = this.words.filter(w => w.errorCount === 0 && w.status === 'learning' && (!w.reviewDates || w.reviewDates.length === 0));
+                let newWords = this.words.filter(w => w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning' && (!w.reviewDates || w.reviewDates.length === 0));
                 let combined = [...needReview, ...newWords];
                 combined = [...new Map(combined.map(w=>[w.id,w])).values()];
-                if(combined.length < 3) combined = combined.concat(this.words.filter(w=>w.status==='learning' && w.errorCount>0).slice(0,6));
+                if(combined.length < 3) combined = combined.concat(this.words.filter(w=>w.status==='learning' && (w.wrongCount > 0 || w.correctCount > 0)).slice(0,6));
                 this.todayPlanWords = combined.slice(0,18);
                 this.todayCompletedCount = 0;
             },
@@ -471,35 +480,29 @@
                 this.saveData();
                 this.generateTodayPlan();
             },
-            handleCorrect(wordObj) {
-                wordObj.errorCount = Math.max(0, (wordObj.errorCount || 0) - 1);
-                if(wordObj.errorCount === 0) {
-                    wordObj.status = 'mastered';
-                    wordObj.reviewDates = [];
-                } else {
-                    this.regenerateReviewDates(wordObj);
+            // 家长纠正单个词
+            correctWord(wordObj) {
+                if(wordObj.wrongCount > 0) {
+                    wordObj.wrongCount--;
+                    wordObj.correctCount++; // 相当于把一次错误转为正确
+                    if(wordObj.wrongCount === 0) {
+                        wordObj.status = 'mastered';
+                        wordObj.reviewDates = [];
+                    } else {
+                        this.regenerateReviewDates(wordObj);
+                    }
+                    wordObj.pendingReview = false;
+                    wordObj.handwritingData = null;
+                    this.saveData();
+                    // 在UI中显示提示
+                    const reviewItem = this.reviewList.find(r => r.word.id === wordObj.id);
+                    if(reviewItem) reviewItem.showCorrectionHint = true;
+                    setTimeout(() => {
+                        if(reviewItem) reviewItem.showCorrectionHint = false;
+                        this.$forceUpdate();
+                    }, 2000);
+                    this.$forceUpdate();
                 }
-                this.saveData();
-            },
-            // 记录错误（写错时调用，生成复习计划，并标记待复核，移出今日队列）
-            recordErrorAndSchedule(wordObj, recognizedText, keepInToday = false) {
-                wordObj.errorCount = (wordObj.errorCount || 0) + 1;
-                wordObj.lastWrittenAnswer = recognizedText;
-                if(wordObj.status === 'mastered') wordObj.status = 'learning';
-                this.regenerateReviewDates(wordObj);
-                wordObj.pendingReview = true;  // 进入待复核队列
-                wordObj.handwritingData = this.getCurrentHandwritingImages(); // 保存当前手写图片
-                this.saveData();
-            },
-            getCurrentHandwritingImages() {
-                let word = this.currentSessionWord;
-                if(!word) return [];
-                let imgs = [];
-                for(let i=0;i<word.word.length;i++){
-                    let canvas = document.getElementById(`tg_${i}`);
-                    if(canvas) imgs.push(canvas.toDataURL());
-                }
-                return imgs;
             },
             startHandwriteSession() { 
                 if(this.todayPlanWords.length===0){ this.showAlert('提示', '暂无今日计划，请家长录入词语'); return; } 
@@ -595,7 +598,6 @@
                     const mergedCanvas = this.getMergedCanvas();
                     const base64 = mergedCanvas.toDataURL('image/png').split(',')[1];
                     if(this.useBaiduOCR && this.baiduApiKey && this.baiduSecretKey) {
-                        // 简单模拟，实际百度不支持前端直接调用，给出提示
                         this.showAlert('提示', '百度OCR不支持纯前端调用，请切换至本地引擎');
                         this.ocrBusy = false;
                         return;
@@ -621,9 +623,9 @@
                 };
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
                 if(isCorrect) {
-                    // 正确：从队列中移除，更新词库（错误次数减1或设为掌握）
+                    wordObj.correctCount = (wordObj.correctCount || 0) + 1;
                     this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
-                    this.handleCorrect(wordObj);
+                    // 正确时，如果之前有错误次数，可减少一次？但通常正确不应该减少错误，保持独立统计
                     this.sessionCorrectCount++; 
                     this.todayCompletedCount++; 
                     this.totalDictateTimes++;
@@ -633,15 +635,14 @@
                         else this.moveToNext();
                     });
                 } else {
-                    // 错误：记录错误、生成复习计划、标记待复核，然后从队列中移除（不再重试今天）
+                    wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
                     const mergedCanvas = this.getMergedCanvas();
                     wordObj.handwritingData = [mergedCanvas.toDataURL()];
                     wordObj.pendingReview = true;
-                    wordObj.errorCount = (wordObj.errorCount || 0) + 1;
                     if(wordObj.status === 'mastered') wordObj.status = 'learning';
                     this.regenerateReviewDates(wordObj);
                     this.saveData();
-                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1); // 移除当前词（不留在今天）
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                     this.showResultModal(false, currentInfo.word, currentInfo.pinyin, currentInfo.context, `识别为“${recognized}”，已加入复习计划。`, "下一个 >", () => { 
                         if(this.sessionTaskList.length === 0) this.finishSession();
                         else this.moveToNext();
@@ -649,7 +650,6 @@
                 }
             },
             handleDontKnow() {
-                // 不会：记录错误、生成复习计划、标记待复核，同时将当前词追加到队列末尾（继续练习）
                 const currentInfo = {
                     word: this.currentSessionWord.word,
                     pinyin: this.currentSessionWord.pinyin,
@@ -659,7 +659,7 @@
                 const mergedCanvas = this.getMergedCanvas();
                 wordObj.handwritingData = [mergedCanvas.toDataURL()];
                 wordObj.pendingReview = true;
-                wordObj.errorCount = (wordObj.errorCount || 0) + 1;
+                wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
                 if(wordObj.status === 'mastered') wordObj.status = 'learning';
                 this.regenerateReviewDates(wordObj);
                 this.saveData();
@@ -693,28 +693,10 @@
             openWordBankView(){ this.wordBankFilter='all'; this.currentView='wordBank'; },
             openReviewParentView(){ this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
-            toggleReviewFlip(item){ item.isFlipped = !item.isFlipped; },
             commitParentReview(){
-                for(let rev of this.reviewList){
-                    let orig = this.words.find(w=>w.id===rev.word.id);
-                    if(orig && rev.isFlipped){
-                        // 家长纠正：减少错误次数
-                        orig.errorCount = Math.max(0, (orig.errorCount || 0) - 1);
-                        if(orig.errorCount === 0){
-                            orig.status = 'mastered';
-                            orig.reviewDates = [];
-                        } else {
-                            this.regenerateReviewDates(orig);
-                        }
-                    }
-                    // 清除待复核标记
-                    orig.pendingReview = false;
-                    delete orig.handwritingData;
-                }
-                this.saveData();
-                this.generateTodayPlan();
+                // 这里不需要额外操作，因为单个纠正已经处理了。保留按钮以防家长需要批量确认，但本次纠正已独立生效。
                 this.currentView='parentHome';
-                this.showAlert('完成', '复核完成，复习计划已更新');
+                this.showAlert('完成', '复核已处理');
             },
             openAddWizard(){ this.wizardStep=1; this.rawWordsInput=''; this.pendingWords=[]; this.currentView='addWizard'; },
             parseToStep2(){ let raw=this.rawWordsInput.trim(); if(!raw) { this.showAlert('提示', '请输入词语'); return; } let arr=raw.split(/[ ,，、\s]+/).filter(w=>w); this.pendingWords=arr.map(w=>({ word:w, pinyin:toPinyinWithTone(w), example:generateExample(w,toPinyinWithTone(w)) })); this.wizardStep=2; },
@@ -723,7 +705,7 @@
                 let added=0, exists=[];
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
-                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', errorCount:0, reviewDates:[] });
+                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', correctCount:0, wrongCount:0, reviewDates:[], pendingReview:false });
                         added++;
                     } else exists.push(it.word);
                 }
