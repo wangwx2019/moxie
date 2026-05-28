@@ -10,24 +10,24 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #fef5e8; padding: 16px; font-family: system-ui, 'Segoe UI', 'Quicksand', 'PingFang SC', sans-serif; }
-        #app { margin: 0 auto; background: white; border-radius: 48px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); overflow: hidden; width: 100%; max-width: 800px; }
-        @media (min-width: 768px) { body { padding: 24px; } #app { max-width: 900px; border-radius: 56px; } .page-container { padding: 1.8rem; } .canvas-tg { width: 120px; height: 120px; } }
+        #app { margin: 0 auto; background: white; border-radius: 48px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); overflow: hidden; width: 100%; max-width: 1000px; }
+        @media (min-width: 768px) { body { padding: 24px; } #app { max-width: 1100px; border-radius: 56px; } .page-container { padding: 1.8rem; } .canvas-tg { width: 240px; height: 240px; } }
         .app-header { padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; background: #fffaef; border-bottom: 3px solid #ffd9b5; }
         .logo { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, #f59e0b, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .parent-btn { background: #fff0e0; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 600; color: #d97706; cursor: pointer; font-size: 0.85rem; }
-        .page-container { padding: 1.5rem; background: #ffffff; }
+        .page-container { padding: 1.5rem; background: #ffffff; overflow-x: auto; }
         .nav-back { display: inline-flex; align-items: center; gap: 6px; background: #fff2e6; padding: 6px 14px; border-radius: 40px; font-weight: 500; cursor: pointer; color: #f97316; margin-bottom: 20px; }
         .card-white { background: #fffef7; border-radius: 32px; padding: 1rem 1.2rem; margin-bottom: 1rem; border: 1px solid #ffe2cc; }
-        .tian-ge-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; margin: 20px 0; }
-        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 16px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); cursor: crosshair; width: 120px; height: 120px; }
+        .tian-ge-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin: 20px 0; }
+        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 24px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); cursor: crosshair; width: 240px; height: 240px; }
         .dictate-header-stats { background: #ffefe2; padding: 10px 18px; border-radius: 48px; margin: 8px 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 700; }
         .stat-chip { background: white; padding: 4px 16px; border-radius: 40px; font-size: 0.8rem; }
         .timer { background: #fbbf24; color: white; padding: 4px 14px; border-radius: 40px; }
-        .dictate-main-card { background: white; margin: 0 16px 20px; border-radius: 48px; padding: 24px 20px; border: 1px solid #ffd8bd; }
-        .pinyin-big { font-size: 2rem; font-weight: 800; color: #f97316; text-align: center; background: #fff1e6; display: inline-block; padding: 6px 24px; border-radius: 60px; margin-bottom: 12px; }
-        .context-illustration { background: #fef5e8; border-radius: 24px; padding: 14px; margin: 16px 0; border-left: 6px solid #fbbf24; }
+        .dictate-main-card { background: white; margin: 0 16px 20px; border-radius: 48px; padding: 24px 20px; border: 1px solid #ffd8bd; overflow-x: auto; }
+        .pinyin-big { font-size: 2.5rem; font-weight: 800; color: #f97316; text-align: center; background: #fff1e6; display: inline-block; padding: 8px 32px; border-radius: 80px; margin-bottom: 16px; }
+        .context-illustration { background: #fef5e8; border-radius: 32px; padding: 16px; margin: 16px 0; border-left: 8px solid #fbbf24; font-size: 1.2rem; }
         .action-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-        .cute-btn { flex: 1; background: #fff0e0; border: none; padding: 12px 0; border-radius: 60px; font-weight: 600; color: #b45309; cursor: pointer; }
+        .cute-btn { flex: 1; background: #fff0e0; border: none; padding: 14px 0; border-radius: 60px; font-weight: 600; font-size: 1rem; color: #b45309; cursor: pointer; }
         .cute-btn.primary { background: #f97316; color: white; box-shadow: 0 3px 0 #b45309; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         .text-small { font-size: 0.7rem; color: #a16207; }
@@ -39,14 +39,14 @@
             z-index: 1000; backdrop-filter: blur(6px);
         }
         .modal-container {
-            background: #fffef5; width: 90%; max-width: 480px; border-radius: 64px;
+            background: #fffef5; width: 90%; max-width: 520px; border-radius: 64px;
             text-align: center; padding: 2rem 1.8rem; border: 2px solid #ffca9a;
             box-shadow: 0 30px 40px rgba(0,0,0,0.25);
         }
         .modal-icon { font-size: 3.5rem; margin-bottom: 12px; }
-        .modal-word { font-size: 2rem; font-weight: 800; color: #f97316; margin: 8px 0; }
-        .modal-pinyin { font-size: 1.2rem; color: #b45309; margin-bottom: 12px; }
-        .modal-context { background: #fef5e8; border-radius: 32px; padding: 12px; font-size: 1rem; color: #7c2d12; margin: 12px 0; }
+        .modal-word { font-size: 2.2rem; font-weight: 800; color: #f97316; margin: 8px 0; }
+        .modal-pinyin { font-size: 1.4rem; color: #b45309; margin-bottom: 12px; }
+        .modal-context { background: #fef5e8; border-radius: 32px; padding: 14px; font-size: 1.1rem; color: #7c2d12; margin: 12px 0; }
         .modal-message { font-size: 1rem; font-weight: 500; margin: 8px 0; color: #a16207; }
         .modal-input { width: 100%; padding: 12px; border-radius: 60px; border: 1px solid #ffca9a; font-size: 1rem; margin: 12px 0; text-align: center; background: white; }
         .modal-buttons { display: flex; gap: 12px; margin-top: 16px; }
@@ -105,7 +105,7 @@
             </div>
             <div class="tian-ge-grid">
                 <div v-for="(char, idx) in currentSessionWord.word.split('')" :key="idx" class="tian-ge-cell">
-                    <canvas :id="'tg_' + idx" class="canvas-tg" width="120" height="120" style="width:120px; height:120px;"></canvas>
+                    <canvas :id="'tg_' + idx" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;"></canvas>
                 </div>
             </div>
             <div class="action-row">
@@ -114,7 +114,7 @@
                 <button class="cute-btn" @click="clearAllCanvas">🗑️ 清除</button>
                 <button class="cute-btn primary" @click="recognizeAndSubmit" :disabled="ocrBusy">✨ {{ ocrBusy ? '识别中...' : 'AI提交批改' }}</button>
             </div>
-            <div class="text-small" style="text-align:center; margin-top:10px;">✏️ 在田字格里书写，AI自动识别。写错或不会的词会重新排队，直到写对。</div>
+            <div class="text-small" style="text-align:center; margin-top:10px;">✏️ 在田字格里书写，AI自动识别。写错直接安排复习，不会的词则继续练习。</div>
             <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
         </div>
         <div v-if="sessionFinished" class="dictate-main-card" style="text-align:center;">
@@ -276,7 +276,7 @@
         }
     }
 
-    const STORAGE_KEY = 'handwrite_dict_final_v19';
+    const STORAGE_KEY = 'handwrite_dict_final_v20';
     const REVIEW_INTERVALS = [1, 3, 5, 7, 9, 15, 30];
     let defaultWords = [
         { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', errorCount:0, status:'learning', reviewDates:[] },
@@ -387,18 +387,15 @@
         mounted() { 
             this.loadData(); 
             this.generateTodayPlan();
-            // 尝试从 GitHub Pages 目录下的 data.json 拉取最新数据（不覆盖本地编辑中的临时状态，但优先使用远程数据）
             this.fetchRemoteData();
         },
         methods: {
-            // 从同目录下的 data.json 拉取数据（GitHub Pages 自动托管）
             async fetchRemoteData() {
                 try {
-                    const res = await fetch('./data.json?' + Date.now()); // 避免缓存
-                    if(!res.ok) throw new Error('no data.json');
+                    const res = await fetch('./data.json?' + Date.now());
+                    if(!res.ok) throw new Error();
                     const remote = await res.json();
                     if(remote.words && Array.isArray(remote.words)) {
-                        // 合并远程数据到当前
                         this.words = remote.words;
                         if(remote.checkinDays !== undefined) this.checkinDays = remote.checkinDays;
                         if(remote.parentPassword) this.parentPassword = remote.parentPassword;
@@ -410,30 +407,16 @@
                         this.generateTodayPlan();
                         this.showAlert('同步成功', '已从 data.json 加载最新数据');
                     }
-                } catch(e) {
-                    console.log('无远程 data.json 或加载失败，使用本地数据');
-                }
+                } catch(e) { console.log('无远程 data.json'); }
             },
             showAlert(title, message, callback) {
-                this.customModal = {
-                    visible: true, title, message, inputType: false, showCancel: false,
-                    onConfirm: () => { this.customModal.visible = false; if(callback) callback(); },
-                    onCancel: null
-                };
+                this.customModal = { visible: true, title, message, inputType: false, showCancel: false, onConfirm: () => { this.customModal.visible = false; if(callback) callback(); }, onCancel: null };
             },
             showConfirm(title, message, onConfirm, onCancel) {
-                this.customModal = {
-                    visible: true, title, message, inputType: false, showCancel: true,
-                    onConfirm: () => { this.customModal.visible = false; onConfirm?.(); },
-                    onCancel: () => { this.customModal.visible = false; onCancel?.(); }
-                };
+                this.customModal = { visible: true, title, message, inputType: false, showCancel: true, onConfirm: () => { this.customModal.visible = false; onConfirm?.(); }, onCancel: () => { this.customModal.visible = false; onCancel?.(); } };
             },
             showPrompt(title, message, placeholder, onConfirm) {
-                this.customModal = {
-                    visible: true, title, message, inputType: true, inputValue: '', placeholder, showCancel: true,
-                    onConfirm: () => { let val = this.customModal.inputValue; this.customModal.visible = false; onConfirm(val); },
-                    onCancel: () => { this.customModal.visible = false; }
-                };
+                this.customModal = { visible: true, title, message, inputType: true, inputValue: '', placeholder, showCancel: true, onConfirm: () => { let val = this.customModal.inputValue; this.customModal.visible = false; onConfirm(val); }, onCancel: () => { this.customModal.visible = false; } };
             },
             showResultModal(correct, word, pinyin, context, msg, nextText, callback) {
                 this.resultModalData = { correct, word, pinyin, context, message: msg, nextText };
@@ -447,31 +430,14 @@
             },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ 
-                    let d=JSON.parse(s); 
-                    this.words=d.words; 
-                    this.checkinDays=d.checkinDays; 
-                    this.parentPassword=d.parentPassword;
-                    this.parentTimeoutMin = d.parentTimeoutMin !== undefined ? d.parentTimeoutMin : 5;
-                    this.useBaiduOCR = d.useBaiduOCR || false; 
-                    this.baiduApiKey = d.baiduApiKey || ''; 
-                    this.baiduSecretKey = d.baiduSecretKey || ''; 
-                } 
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.parentTimeoutMin = d.parentTimeoutMin !== undefined ? d.parentTimeoutMin : 5; this.useBaiduOCR = d.useBaiduOCR || false; this.baiduApiKey = d.baiduApiKey || ''; this.baiduSecretKey = d.baiduSecretKey || ''; } 
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
                 this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; }); 
                 if(this.useBaiduOCR && this.baiduApiKey && this.baiduSecretKey) this.baiduOCR = new BaiduOCR(this.baiduApiKey, this.baiduSecretKey);
                 this.saveData(); 
             },
             saveData() { 
-                let toSave = {
-                    words: this.words,
-                    checkinDays: this.checkinDays,
-                    parentPassword: this.parentPassword,
-                    parentTimeoutMin: this.parentTimeoutMin,
-                    useBaiduOCR: this.useBaiduOCR,
-                    baiduApiKey: this.baiduApiKey,
-                    baiduSecretKey: this.baiduSecretKey
-                };
+                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, parentTimeoutMin: this.parentTimeoutMin, useBaiduOCR: this.useBaiduOCR, baiduApiKey: this.baiduApiKey, baiduSecretKey: this.baiduSecretKey };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
             },
             generateTodayPlan() {
@@ -486,8 +452,7 @@
             },
             generateReviewDates(wordObj) {
                 if(wordObj.status === 'mastered') { wordObj.reviewDates = []; return; }
-                let today = new Date();
-                today.setHours(0,0,0,0);
+                let today = new Date(); today.setHours(0,0,0,0);
                 let dates = [];
                 for(let days of REVIEW_INTERVALS) {
                     let date = new Date(today);
@@ -511,6 +476,14 @@
                 }
                 this.saveData();
             },
+            // 记录错误（写错时调用，生成复习计划，不塞回今日队列）
+            recordErrorAndSchedule(wordObj, recognizedText) {
+                wordObj.errorCount = (wordObj.errorCount || 0) + 1;
+                wordObj.lastWrittenAnswer = recognizedText;
+                if(wordObj.status === 'mastered') wordObj.status = 'learning';
+                this.regenerateReviewDates(wordObj);
+                this.saveData();
+            },
             startHandwriteSession() { 
                 if(this.todayPlanWords.length===0){ this.showAlert('提示', '暂无今日计划，请家长录入词语'); return; } 
                 this.sessionTaskList = JSON.parse(JSON.stringify(this.todayPlanWords)); 
@@ -531,17 +504,17 @@
                     let canvas = document.getElementById(`tg_${idx}`); 
                     if(canvas){ 
                         let ctx = canvas.getContext('2d'); 
-                        ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,120,120); 
-                        ctx.strokeStyle="#fbc48d"; ctx.lineWidth=1.5; ctx.strokeRect(0,0,120,120); 
-                        ctx.beginPath(); ctx.moveTo(60,0); ctx.lineTo(60,120); ctx.stroke(); 
-                        ctx.moveTo(0,60); ctx.lineTo(120,60); ctx.stroke(); 
+                        ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
+                        ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
+                        ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
+                        ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
                         this.enableDrawing(canvas); 
                     } 
                 }); 
             },
             enableDrawing(canvas) { 
                 let ctx = canvas.getContext('2d');
-                ctx.strokeStyle = '#000000'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+                ctx.strokeStyle = '#000000'; ctx.lineWidth = 12; ctx.lineCap = 'round';
                 let drawing = false;
                 let lastX, lastY;
                 const getCoord = (e, rect) => { 
@@ -580,22 +553,22 @@
                 let canvas = document.getElementById(`tg_${idx}`); 
                 if(canvas){ 
                     let ctx = canvas.getContext('2d'); 
-                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,120,120); 
-                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=1.5; ctx.strokeRect(0,0,120,120); 
-                    ctx.beginPath(); ctx.moveTo(60,0); ctx.lineTo(60,120); ctx.stroke(); 
-                    ctx.moveTo(0,60); ctx.lineTo(120,60); ctx.stroke();
+                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
+                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
+                    ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
+                    ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke();
                 } 
             },
             getMergedCanvas() {
                 let word = this.currentSessionWord;
                 let canvases = [];
                 for(let i=0;i<word.word.length;i++){ let c=document.getElementById(`tg_${i}`); if(c) canvases.push(c); }
-                const totalWidth = canvases.length * 120;
+                const totalWidth = canvases.length * 240;
                 const merged = document.createElement('canvas');
                 merged.width = totalWidth;
-                merged.height = 120;
+                merged.height = 240;
                 const ctx = merged.getContext('2d');
-                for(let i=0;i<canvases.length;i++) ctx.drawImage(canvases[i], i*120, 0);
+                for(let i=0;i<canvases.length;i++) ctx.drawImage(canvases[i], i*240, 0);
                 return merged;
             },
             async recognizeAndSubmit() {
@@ -623,7 +596,6 @@
             },
             processAnswer(recognized) {
                 let isCorrect = (recognized === this.currentSessionWord.word);
-                let reasonMsg = isCorrect ? 'AI识别正确！' : `AI识别为“${recognized}”，正确是“${this.currentSessionWord.word}”`;
                 const currentInfo = {
                     word: this.currentSessionWord.word,
                     pinyin: this.currentSessionWord.pinyin,
@@ -631,6 +603,7 @@
                 };
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
                 if(isCorrect) {
+                    // 正确：从队列中移除，更新词库（错误次数减1或设为已掌握）
                     this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                     this.handleCorrect(wordObj);
                     this.sessionCorrectCount++; 
@@ -642,36 +615,25 @@
                         else this.moveToNext();
                     });
                 } else {
-                    const currentWordCopy = JSON.parse(JSON.stringify(this.currentSessionWord));
-                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
-                    this.sessionTaskList.push(currentWordCopy);
+                    // 错误：记录错误次数并生成复习计划，但不塞回今日队列，直接移动到下一个词
                     const mergedCanvas = this.getMergedCanvas();
                     wordObj.handwritingData = [mergedCanvas.toDataURL()];
                     wordObj.pendingReview = true;
-                    wordObj.errorCount = (wordObj.errorCount||0)+1;
-                    if(wordObj.status === 'mastered') wordObj.status = 'learning';
-                    this.regenerateReviewDates(wordObj);
-                    this.saveData();
-                    this.showResultModal(false, currentInfo.word, currentInfo.pinyin, currentInfo.context, reasonMsg, "下一个 >", () => { 
+                    this.recordErrorAndSchedule(wordObj, recognized);
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1); // 移除当前词（不重试）
+                    this.showResultModal(false, currentInfo.word, currentInfo.pinyin, currentInfo.context, `识别为“${recognized}”，已加入复习计划。`, "下一个 >", () => { 
                         if(this.sessionTaskList.length === 0) this.finishSession();
                         else this.moveToNext();
                     });
                 }
             },
             handleDontKnow() {
+                // 不会：将该词追加到队列末尾，让孩子继续尝试
                 const currentInfo = {
                     word: this.currentSessionWord.word,
                     pinyin: this.currentSessionWord.pinyin,
                     context: this.currentSessionWord.context
                 };
-                const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
-                const mergedCanvas = this.getMergedCanvas();
-                wordObj.handwritingData = [mergedCanvas.toDataURL()];
-                wordObj.pendingReview = true;
-                wordObj.errorCount = (wordObj.errorCount||0)+1;
-                if(wordObj.status === 'mastered') wordObj.status = 'learning';
-                this.regenerateReviewDates(wordObj);
-                this.saveData();
                 const currentWordCopy = JSON.parse(JSON.stringify(this.currentSessionWord));
                 this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                 this.sessionTaskList.push(currentWordCopy);
@@ -695,9 +657,7 @@
                     if(pwd === this.parentPassword) {
                         this.currentView='parentHome';
                         this.startParentTimer();
-                    } else {
-                        this.showAlert('错误', '密码错误，请重试');
-                    }
+                    } else this.showAlert('错误', '密码错误');
                 });
             },
             startParentTimer(){ if(this.timerId)clearTimeout(this.timerId); if(this.parentTimeoutMin>0) this.timerId=setTimeout(()=>{ if(this.currentView !=='childHome'){ this.showAlert('提示', '超时返回孩子端'); this.currentView='childHome'; } }, this.parentTimeoutMin*60*1000); },
@@ -740,18 +700,13 @@
                     this.saveData(); this.generateTodayPlan();
                     this.showAlert('成功', `成功添加 ${added} 个词语${exists.length ? `，重复：${exists.join(', ')}` : ''}`);
                     this.currentView='parentHome';
-                } else {
-                    this.showAlert('提示', '所有词语都已存在');
-                }
+                } else this.showAlert('提示', '所有词语都已存在');
             },
             openSettingsView(){ this.currentView='settingsView'; },
             changePassword(){
                 this.showPrompt('修改密码', '请输入新密码', '新密码', (newPwd) => {
-                    if(newPwd && newPwd.trim()) {
-                        this.parentPassword = newPwd.trim();
-                        this.saveData();
-                        this.showAlert('成功', '密码已更新');
-                    } else this.showAlert('提示', '密码不能为空');
+                    if(newPwd && newPwd.trim()) { this.parentPassword = newPwd.trim(); this.saveData(); this.showAlert('成功', '密码已更新'); }
+                    else this.showAlert('提示', '密码不能为空');
                 });
             },
             saveTimeout(){ if(this.tempTimeout>0) this.parentTimeoutMin=this.tempTimeout; this.saveData(); this.showAlert('成功', '超时时间已更新'); },
@@ -810,9 +765,7 @@
                 URL.revokeObjectURL(url);
                 this.showAlert('成功', '数据已导出为 data.json，请将此文件上传到 GitHub 仓库覆盖原文件');
             },
-            importData(){
-                this.$refs.importFile.click();
-            },
+            importData(){ this.$refs.importFile.click(); },
             handleImport(e){
                 const file = e.target.files[0];
                 if(!file) return;
