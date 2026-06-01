@@ -1,0 +1,3294 @@
+{
+  "units": [
+    {
+      "name": "第一单元·识字",
+      "lessons": [
+        {
+          "name": "识字1：春夏秋冬",
+          "shizi": [
+            {
+              "char": "霜",
+              "word1": "霜雪",
+              "word2": "冰霜",
+              "sentence": "妈妈买了霜雪。"
+            },
+            {
+              "char": "落",
+              "word1": "落下",
+              "word2": "落叶",
+              "sentence": "我喜欢落下。"
+            },
+            {
+              "char": "降",
+              "word1": "降落",
+              "word2": "下降",
+              "sentence": "降落是很常见的。"
+            },
+            {
+              "char": "飘",
+              "word1": "飘扬",
+              "word2": "飘动",
+              "sentence": "老师教我们飘扬。"
+            },
+            {
+              "char": "游",
+              "word1": "游泳",
+              "word2": "游戏",
+              "sentence": "老师教我们游泳。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "春",
+              "word1": "春天",
+              "word2": "春风",
+              "sentence": "爸爸带我去春天。"
+            },
+            {
+              "char": "冬",
+              "word1": "冬天",
+              "word2": "冬日",
+              "sentence": "妈妈买了冬天。"
+            },
+            {
+              "char": "吹",
+              "word1": "吹风",
+              "word2": "吹牛",
+              "sentence": "小朋友都喜欢吹风。"
+            },
+            {
+              "char": "花",
+              "word1": "花朵",
+              "word2": "红花",
+              "sentence": "妈妈买了花朵。"
+            },
+            {
+              "char": "飞",
+              "word1": "飞机",
+              "word2": "飞走",
+              "sentence": "飞机是很重要的。"
+            },
+            {
+              "char": "入",
+              "word1": "入口",
+              "word2": "出入",
+              "sentence": "我们一起入口吧。"
+            }
+          ]
+        },
+        {
+          "name": "识字2：姓氏歌",
+          "shizi": [
+            {
+              "char": "氏",
+              "word1": "姓氏",
+              "word2": "氏族",
+              "sentence": "我喜欢姓氏。"
+            },
+            {
+              "char": "李",
+              "word1": "李子",
+              "word2": "姓李",
+              "sentence": "我喜欢李子。"
+            },
+            {
+              "char": "张",
+              "word1": "张开",
+              "word2": "姓张",
+              "sentence": "妈妈买了张开。"
+            },
+            {
+              "char": "弓",
+              "word1": "弓箭",
+              "word2": "拉弓",
+              "sentence": "老师教我们弓箭。"
+            },
+            {
+              "char": "吴",
+              "word1": "吴国",
+              "word2": "姓吴",
+              "sentence": "老师教我们吴国。"
+            },
+            {
+              "char": "孙",
+              "word1": "孙子",
+              "word2": "子孙",
+              "sentence": "小朋友都喜欢孙子。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "什",
+              "word1": "什么",
+              "word2": "为什么",
+              "sentence": "什么是很重要的。"
+            },
+            {
+              "char": "么",
+              "word1": "多么",
+              "word2": "那么",
+              "sentence": "我喜欢多么。"
+            },
+            {
+              "char": "古",
+              "word1": "古代",
+              "word2": "古人",
+              "sentence": "小朋友都喜欢古代。"
+            },
+            {
+              "char": "胡",
+              "word1": "胡子",
+              "word2": "胡说",
+              "sentence": "老师教我们胡子。"
+            },
+            {
+              "char": "双",
+              "word1": "双手",
+              "word2": "一双",
+              "sentence": "小朋友都喜欢双手。"
+            },
+            {
+              "char": "言",
+              "word1": "语言",
+              "word2": "言论",
+              "sentence": "我们一起语言吧。"
+            }
+          ]
+        },
+        {
+          "name": "识字3：小青蛙",
+          "shizi": [
+            {
+              "char": "睛",
+              "word1": "眼睛",
+              "word2": "定睛",
+              "sentence": "老师教我们眼睛。"
+            },
+            {
+              "char": "保",
+              "word1": "保护",
+              "word2": "保卫",
+              "sentence": "我会写保护。"
+            },
+            {
+              "char": "护",
+              "word1": "护士",
+              "word2": "爱护",
+              "sentence": "护士是很重要的。"
+            },
+            {
+              "char": "事",
+              "word1": "事情",
+              "word2": "故事",
+              "sentence": "事情是很常见的。"
+            },
+            {
+              "char": "情",
+              "word1": "心情",
+              "word2": "事情",
+              "sentence": "我喜欢心情。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "青",
+              "word1": "青草",
+              "word2": "青山",
+              "sentence": "爸爸带我去青草。"
+            },
+            {
+              "char": "清",
+              "word1": "清水",
+              "word2": "清楚",
+              "sentence": "我们一起清水吧。"
+            },
+            {
+              "char": "晴",
+              "word1": "晴天",
+              "word2": "晴朗",
+              "sentence": "今天天气很好，晴天。"
+            },
+            {
+              "char": "苗",
+              "word1": "禾苗",
+              "word2": "树苗",
+              "sentence": "禾苗是很常见的。"
+            },
+            {
+              "char": "请",
+              "word1": "请坐",
+              "word2": "请求",
+              "sentence": "爸爸带我去请坐。"
+            },
+            {
+              "char": "生",
+              "word1": "学生",
+              "word2": "生日",
+              "sentence": "老师教我们学生。"
+            }
+          ]
+        },
+        {
+          "name": "识字4：猜字谜",
+          "shizi": [
+            {
+              "char": "猜",
+              "word1": "猜谜",
+              "word2": "猜想",
+              "sentence": "今天天气很好，猜谜。"
+            },
+            {
+              "char": "凉",
+              "word1": "凉快",
+              "word2": "凉水",
+              "sentence": "妈妈买了凉快。"
+            },
+            {
+              "char": "喜",
+              "word1": "喜欢",
+              "word2": "喜爱",
+              "sentence": "妈妈买了喜欢。"
+            },
+            {
+              "char": "攻",
+              "word1": "攻击",
+              "word2": "进攻",
+              "sentence": "我们一起攻击吧。"
+            },
+            {
+              "char": "令",
+              "word1": "命令",
+              "word2": "口令",
+              "sentence": "妈妈买了命令。"
+            },
+            {
+              "char": "感",
+              "word1": "感情",
+              "word2": "感谢",
+              "sentence": "今天天气很好，感情。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "字",
+              "word1": "写字",
+              "word2": "汉字",
+              "sentence": "今天天气很好，写字。"
+            },
+            {
+              "char": "红",
+              "word1": "红色",
+              "word2": "红花",
+              "sentence": "红色是很重要的。"
+            },
+            {
+              "char": "动",
+              "word1": "运动",
+              "word2": "动手",
+              "sentence": "运动是很常见的。"
+            },
+            {
+              "char": "万",
+              "word1": "千万",
+              "word2": "万一",
+              "sentence": "我喜欢千万。"
+            },
+            {
+              "char": "无",
+              "word1": "无法",
+              "word2": "无声",
+              "sentence": "我会写无法。"
+            },
+            {
+              "char": "明",
+              "word1": "明天",
+              "word2": "明白",
+              "sentence": "小朋友都喜欢明天。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地一",
+          "shizi": [
+            {
+              "char": "识",
+              "word1": "认识",
+              "word2": "知识",
+              "sentence": "妈妈买了认识。"
+            },
+            {
+              "char": "组",
+              "word1": "组织",
+              "word2": "组成",
+              "sentence": "我们一起组织吧。"
+            },
+            {
+              "char": "计",
+              "word1": "计算",
+              "word2": "计划",
+              "sentence": "妈妈买了计算。"
+            },
+            {
+              "char": "算",
+              "word1": "计算",
+              "word2": "算数",
+              "sentence": "小朋友都喜欢计算。"
+            },
+            {
+              "char": "减",
+              "word1": "减少",
+              "word2": "减法",
+              "sentence": "减少是很常见的。"
+            },
+            {
+              "char": "式",
+              "word1": "公式",
+              "word2": "方式",
+              "sentence": "公式是很重要的。"
+            },
+            {
+              "char": "图",
+              "word1": "图画",
+              "word2": "地图",
+              "sentence": "今天天气很好，图画。"
+            },
+            {
+              "char": "形",
+              "word1": "形状",
+              "word2": "形式",
+              "sentence": "形状是很重要的。"
+            },
+            {
+              "char": "团",
+              "word1": "团结",
+              "word2": "团体",
+              "sentence": "老师教我们团结。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "文",
+              "word1": "文字",
+              "word2": "文化",
+              "sentence": "妈妈买了文字。"
+            },
+            {
+              "char": "卡",
+              "word1": "卡片",
+              "word2": "卡车",
+              "sentence": "我喜欢卡片。"
+            },
+            {
+              "char": "片",
+              "word1": "卡片",
+              "word2": "一片",
+              "sentence": "老师教我们卡片。"
+            },
+            {
+              "char": "合",
+              "word1": "合作",
+              "word2": "合上",
+              "sentence": "合作是很常见的。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二单元·阅读",
+      "lessons": [
+        {
+          "name": "阅读1：热爱中国共产党",
+          "shizi": [
+            {
+              "char": "热",
+              "word1": "热闹",
+              "word2": "热水",
+              "sentence": "妈妈买了热闹。"
+            },
+            {
+              "char": "爱",
+              "word1": "爱心",
+              "word2": "爱护",
+              "sentence": "老师教我们爱心。"
+            },
+            {
+              "char": "怀",
+              "word1": "怀抱",
+              "word2": "怀念",
+              "sentence": "妈妈买了怀抱。"
+            },
+            {
+              "char": "幸",
+              "word1": "幸福",
+              "word2": "幸运",
+              "sentence": "我们一起幸福吧。"
+            },
+            {
+              "char": "福",
+              "word1": "幸福",
+              "word2": "福气",
+              "sentence": "幸福是很常见的。"
+            },
+            {
+              "char": "成",
+              "word1": "成功",
+              "word2": "成为",
+              "sentence": "我会写成功。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "共",
+              "word1": "共同",
+              "word2": "一共",
+              "sentence": "今天天气很好，共同。"
+            },
+            {
+              "char": "产",
+              "word1": "生产",
+              "word2": "产品",
+              "sentence": "爸爸带我去生产。"
+            },
+            {
+              "char": "党",
+              "word1": "党员",
+              "word2": "党旗",
+              "sentence": "今天天气很好，党员。"
+            },
+            {
+              "char": "太",
+              "word1": "太阳",
+              "word2": "太大",
+              "sentence": "今天天气很好，太阳。"
+            },
+            {
+              "char": "阳",
+              "word1": "太阳",
+              "word2": "阳光",
+              "sentence": "老师教我们太阳。"
+            },
+            {
+              "char": "光",
+              "word1": "灯光",
+              "word2": "光明",
+              "sentence": "灯光是很常见的。"
+            }
+          ]
+        },
+        {
+          "name": "阅读2：吃水不忘挖井人",
+          "shizi": [
+            {
+              "char": "城",
+              "word1": "城市",
+              "word2": "长城",
+              "sentence": "妈妈买了城市。"
+            },
+            {
+              "char": "村",
+              "word1": "农村",
+              "word2": "村庄",
+              "sentence": "农村是很重要的。"
+            },
+            {
+              "char": "席",
+              "word1": "主席",
+              "word2": "出席",
+              "sentence": "爸爸带我去主席。"
+            },
+            {
+              "char": "亲",
+              "word1": "亲人",
+              "word2": "亲爱",
+              "sentence": "小朋友都喜欢亲人。"
+            },
+            {
+              "char": "战",
+              "word1": "战士",
+              "word2": "战斗",
+              "sentence": "老师教我们战士。"
+            },
+            {
+              "char": "士",
+              "word1": "士兵",
+              "word2": "绅士",
+              "sentence": "爸爸带我去士兵。"
+            },
+            {
+              "char": "想",
+              "word1": "想法",
+              "word2": "想念",
+              "sentence": "我会写想法。"
+            },
+            {
+              "char": "念",
+              "word1": "想念",
+              "word2": "念头",
+              "sentence": "我们一起想念吧。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "井",
+              "word1": "水井",
+              "word2": "井口",
+              "sentence": "水井是很常见的。"
+            },
+            {
+              "char": "主",
+              "word1": "主人",
+              "word2": "主要",
+              "sentence": "小朋友都喜欢主人。"
+            },
+            {
+              "char": "江",
+              "word1": "江水",
+              "word2": "长江",
+              "sentence": "老师教我们江水。"
+            },
+            {
+              "char": "住",
+              "word1": "住房",
+              "word2": "居住",
+              "sentence": "今天天气很好，住房。"
+            },
+            {
+              "char": "方",
+              "word1": "方向",
+              "word2": "地方",
+              "sentence": "我喜欢方向。"
+            },
+            {
+              "char": "后",
+              "word1": "后面",
+              "word2": "以后",
+              "sentence": "老师教我们后面。"
+            }
+          ]
+        },
+        {
+          "name": "阅读3：我多想去看看",
+          "shizi": [
+            {
+              "char": "诉",
+              "word1": "词语1",
+              "word2": "词语2",
+              "sentence": "我喜欢词语1。"
+            },
+            {
+              "char": "座",
+              "word1": "座位",
+              "word2": "一座",
+              "sentence": "今天天气很好，座位。"
+            },
+            {
+              "char": "场",
+              "word1": "场地",
+              "word2": "场合",
+              "sentence": "我们一起场地吧。"
+            },
+            {
+              "char": "非",
+              "word1": "非常",
+              "word2": "是非",
+              "sentence": "非常是很常见的。"
+            },
+            {
+              "char": "宽",
+              "word1": "宽度",
+              "word2": "宽敞",
+              "sentence": "妈妈买了宽度。"
+            },
+            {
+              "char": "丽",
+              "word1": "美丽",
+              "word2": "华丽",
+              "sentence": "老师教我们美丽。"
+            },
+            {
+              "char": "洁",
+              "word1": "清洁",
+              "word2": "洁白",
+              "sentence": "清洁是很重要的。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "告",
+              "word1": "告诉",
+              "word2": "广告",
+              "sentence": "今天天气很好，告诉。"
+            },
+            {
+              "char": "的",
+              "word1": "好的",
+              "word2": "我的",
+              "sentence": "老师教我们好的。"
+            },
+            {
+              "char": "会",
+              "word1": "开会",
+              "word2": "学会",
+              "sentence": "我会写开会。"
+            },
+            {
+              "char": "北",
+              "word1": "北方",
+              "word2": "北京",
+              "sentence": "我们一起北方吧。"
+            },
+            {
+              "char": "京",
+              "word1": "北京",
+              "word2": "京城",
+              "sentence": "我会写北京。"
+            },
+            {
+              "char": "广",
+              "word1": "广大",
+              "word2": "广场",
+              "sentence": "爸爸带我去广大。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地二",
+          "shizi": [
+            {
+              "char": "连",
+              "word1": "连接",
+              "word2": "连续",
+              "sentence": "连接是很常见的。"
+            },
+            {
+              "char": "选",
+              "word1": "选择",
+              "word2": "选手",
+              "sentence": "爸爸带我去选择。"
+            },
+            {
+              "char": "圈",
+              "word1": "圆圈",
+              "word2": "圈子",
+              "sentence": "老师教我们圆圈。"
+            },
+            {
+              "char": "涂",
+              "word1": "涂抹",
+              "word2": "涂色",
+              "sentence": "小朋友都喜欢涂抹。"
+            },
+            {
+              "char": "填",
+              "word1": "填空",
+              "word2": "填写",
+              "sentence": "小朋友都喜欢填空。"
+            },
+            {
+              "char": "试",
+              "word1": "考试",
+              "word2": "尝试",
+              "sentence": "考试是很常见的。"
+            },
+            {
+              "char": "练",
+              "word1": "练习",
+              "word2": "练习本",
+              "sentence": "练习是很重要的。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "写",
+              "word1": "写字",
+              "word2": "写作",
+              "sentence": "我们一起写字吧。"
+            },
+            {
+              "char": "认",
+              "word1": "认识",
+              "word2": "认真",
+              "sentence": "认识是很重要的。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第三单元·阅读",
+      "lessons": [
+        {
+          "name": "阅读4：小公鸡和小鸭子",
+          "shizi": [
+            {
+              "char": "得",
+              "word1": "得到",
+              "word2": "记得",
+              "sentence": "我们一起得到吧。"
+            },
+            {
+              "char": "急",
+              "word1": "着急",
+              "word2": "急忙",
+              "sentence": "今天天气很好，着急。"
+            },
+            {
+              "char": "直",
+              "word1": "直接",
+              "word2": "直线",
+              "sentence": "老师教我们直接。"
+            },
+            {
+              "char": "哭",
+              "word1": "哭泣",
+              "word2": "哭声",
+              "sentence": "爸爸带我去哭泣。"
+            },
+            {
+              "char": "跟",
+              "word1": "跟着",
+              "word2": "跟前",
+              "sentence": "小朋友都喜欢跟着。"
+            },
+            {
+              "char": "忽",
+              "word1": "忽然",
+              "word2": "忽视",
+              "sentence": "我会写忽然。"
+            },
+            {
+              "char": "然",
+              "word1": "然后",
+              "word2": "自然",
+              "sentence": "妈妈买了然后。"
+            },
+            {
+              "char": "喊",
+              "word1": "喊叫",
+              "word2": "大喊",
+              "sentence": "我喜欢喊叫。"
+            },
+            {
+              "char": "背",
+              "word1": "背书",
+              "word2": "背后",
+              "sentence": "妈妈买了背书。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "走",
+              "word1": "走路",
+              "word2": "走开",
+              "sentence": "爸爸带我去走路。"
+            },
+            {
+              "char": "河",
+              "word1": "河水",
+              "word2": "小河",
+              "sentence": "爸爸带我去河水。"
+            },
+            {
+              "char": "说",
+              "word1": "说话",
+              "word2": "小说",
+              "sentence": "我们一起说话吧。"
+            },
+            {
+              "char": "让",
+              "word1": "让开",
+              "word2": "让座",
+              "sentence": "让开是很重要的。"
+            },
+            {
+              "char": "自",
+              "word1": "自己",
+              "word2": "自由",
+              "sentence": "妈妈买了自己。"
+            },
+            {
+              "char": "己",
+              "word1": "自己",
+              "word2": "知己",
+              "sentence": "我们一起自己吧。"
+            }
+          ]
+        },
+        {
+          "name": "阅读5：树和喜鹊",
+          "shizi": [
+            {
+              "char": "只",
+              "word1": "只有",
+              "word2": "只要",
+              "sentence": "我们一起只有吧。"
+            },
+            {
+              "char": "很",
+              "word1": "很多",
+              "word2": "很好",
+              "sentence": "很多是很重要的。"
+            },
+            {
+              "char": "孤",
+              "word1": "孤单",
+              "word2": "孤独",
+              "sentence": "我会写孤单。"
+            },
+            {
+              "char": "单",
+              "word1": "简单",
+              "word2": "单位",
+              "sentence": "小朋友都喜欢简单。"
+            },
+            {
+              "char": "种",
+              "word1": "种子",
+              "word2": "种地",
+              "sentence": "种子是很常见的。"
+            },
+            {
+              "char": "每",
+              "word1": "每天",
+              "word2": "每次",
+              "sentence": "小朋友都喜欢每天。"
+            },
+            {
+              "char": "邻",
+              "word1": "邻居",
+              "word2": "邻近",
+              "sentence": "我喜欢邻居。"
+            },
+            {
+              "char": "居",
+              "word1": "居住",
+              "word2": "居民",
+              "sentence": "妈妈买了居住。"
+            },
+            {
+              "char": "招",
+              "word1": "招呼",
+              "word2": "招聘",
+              "sentence": "小朋友都喜欢招呼。"
+            },
+            {
+              "char": "呼",
+              "word1": "呼气",
+              "word2": "呼吸",
+              "sentence": "呼气是很常见的。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "从",
+              "word1": "从前",
+              "word2": "从来",
+              "sentence": "今天天气很好，从前。"
+            },
+            {
+              "char": "好",
+              "word1": "好的",
+              "word2": "好人",
+              "sentence": "妈妈买了好的。"
+            },
+            {
+              "char": "们",
+              "word1": "我们",
+              "word2": "他们",
+              "sentence": "我们是很常见的。"
+            },
+            {
+              "char": "叫",
+              "word1": "叫喊",
+              "word2": "叫声",
+              "sentence": "我们一起叫喊吧。"
+            },
+            {
+              "char": "他",
+              "word1": "他们",
+              "word2": "他的",
+              "sentence": "爸爸带我去他们。"
+            },
+            {
+              "char": "回",
+              "word1": "回家",
+              "word2": "回来",
+              "sentence": "我会写回家。"
+            }
+          ]
+        },
+        {
+          "name": "阅读6：怎么都快乐",
+          "shizi": [
+            {
+              "char": "怎",
+              "word1": "怎么",
+              "word2": "怎样",
+              "sentence": "我喜欢怎么。"
+            },
+            {
+              "char": "独",
+              "word1": "单独",
+              "word2": "独立",
+              "sentence": "单独是很常见的。"
+            },
+            {
+              "char": "跳",
+              "word1": "跳舞",
+              "word2": "跳高",
+              "sentence": "小朋友都喜欢跳舞。"
+            },
+            {
+              "char": "绳",
+              "word1": "绳子",
+              "word2": "跳绳",
+              "sentence": "爸爸带我去绳子。"
+            },
+            {
+              "char": "得",
+              "word1": "得到",
+              "word2": "记得",
+              "sentence": "小朋友都喜欢得到。"
+            },
+            {
+              "char": "羽",
+              "word1": "羽毛",
+              "word2": "羽毛球",
+              "sentence": "妈妈买了羽毛。"
+            },
+            {
+              "char": "球",
+              "word1": "足球",
+              "word2": "球类",
+              "sentence": "足球是很常见的。"
+            },
+            {
+              "char": "劲",
+              "word1": "使媒",
+              "word2": "干劲",
+              "sentence": "小朋友都喜欢使媒。"
+            },
+            {
+              "char": "轮",
+              "word1": "车轮",
+              "word2": "一轮",
+              "sentence": "车轮是很重要的。"
+            },
+            {
+              "char": "排",
+              "word1": "排队",
+              "word2": "排球",
+              "sentence": "老师教我们排队。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "快",
+              "word1": "快乐",
+              "word2": "飞快",
+              "sentence": "爸爸带我去快乐。"
+            },
+            {
+              "char": "乐",
+              "word1": "快乐",
+              "word2": "音乐",
+              "sentence": "今天天气很好，快乐。"
+            },
+            {
+              "char": "当",
+              "word1": "当然",
+              "word2": "当时",
+              "sentence": "爸爸带我去当然。"
+            },
+            {
+              "char": "书",
+              "word1": "书本",
+              "word2": "读书",
+              "sentence": "小朋友都喜欢书本。"
+            },
+            {
+              "char": "画",
+              "word1": "画画",
+              "word2": "图画",
+              "sentence": "小朋友都喜欢画画。"
+            },
+            {
+              "char": "毛",
+              "word1": "毛笔",
+              "word2": "羽毛",
+              "sentence": "我喜欢毛笔。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地三",
+          "shizi": [
+            {
+              "char": "母",
+              "word1": "母亲",
+              "word2": "父母",
+              "sentence": "母亲是很重要的。"
+            },
+            {
+              "char": "全",
+              "word1": "全部",
+              "word2": "完全",
+              "sentence": "今天天气很好，全部。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "止",
+              "word1": "停止",
+              "word2": "禁止",
+              "sentence": "我会写停止。"
+            },
+            {
+              "char": "斤",
+              "word1": "公斤",
+              "word2": "斤两",
+              "sentence": "我喜欢公斤。"
+            },
+            {
+              "char": "寸",
+              "word1": "尺寸",
+              "word2": "一寸",
+              "sentence": "妈妈买了尺寸。"
+            },
+            {
+              "char": "丁",
+              "word1": "园丁",
+              "word2": "丁香",
+              "sentence": "今天天气很好，园丁。"
+            },
+            {
+              "char": "千",
+              "word1": "千万",
+              "word2": "一千",
+              "sentence": "千万是很常见的。"
+            },
+            {
+              "char": "元",
+              "word1": "一元",
+              "word2": "元旦",
+              "sentence": "老师教我们一元。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第四单元·阅读",
+      "lessons": [
+        {
+          "name": "阅读7：静夜思",
+          "shizi": [
+            {
+              "char": "静",
+              "word1": "安静",
+              "word2": "静止",
+              "sentence": "我喜欢安静。"
+            },
+            {
+              "char": "疑",
+              "word1": "疑问",
+              "word2": "怀疑",
+              "sentence": "老师教我们疑问。"
+            },
+            {
+              "char": "举",
+              "word1": "举手",
+              "word2": "举行",
+              "sentence": "举手是很重要的。"
+            },
+            {
+              "char": "望",
+              "word1": "希望",
+              "word2": "远望",
+              "sentence": "妈妈买了希望。"
+            },
+            {
+              "char": "低",
+              "word1": "低头",
+              "word2": "高低",
+              "sentence": "妈妈买了低头。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "思",
+              "word1": "思考",
+              "word2": "思念",
+              "sentence": "我会写思考。"
+            },
+            {
+              "char": "床",
+              "word1": "床铺",
+              "word2": "床上",
+              "sentence": "妈妈买了床铺。"
+            },
+            {
+              "char": "前",
+              "word1": "前面",
+              "word2": "从前",
+              "sentence": "小朋友都喜欢前面。"
+            },
+            {
+              "char": "地",
+              "word1": "地上",
+              "word2": "地方",
+              "sentence": "爸爸带我去地上。"
+            },
+            {
+              "char": "故",
+              "word1": "故事",
+              "word2": "故乡",
+              "sentence": "爸爸带我去故事。"
+            },
+            {
+              "char": "乡",
+              "word1": "乡村",
+              "word2": "家乡",
+              "sentence": "我会写乡村。"
+            }
+          ]
+        },
+        {
+          "name": "阅读8：夜色",
+          "shizi": [
+            {
+              "char": "胆",
+              "word1": "胆子",
+              "word2": "大胆",
+              "sentence": "小朋友都喜欢胆子。"
+            },
+            {
+              "char": "敢",
+              "word1": "勇敢",
+              "word2": "敢于",
+              "sentence": "爸爸带我去勇敢。"
+            },
+            {
+              "char": "勇",
+              "word1": "勇敢",
+              "word2": "勇气",
+              "sentence": "勇敢是很常见的。"
+            },
+            {
+              "char": "窗",
+              "word1": "窗户",
+              "word2": "窗口",
+              "sentence": "小朋友都喜欢窗户。"
+            },
+            {
+              "char": "乱",
+              "word1": "乱跑",
+              "word2": "混乱",
+              "sentence": "乱跑是很重要的。"
+            },
+            {
+              "char": "拉",
+              "word1": "拉手",
+              "word2": "拉住",
+              "sentence": "我们一起拉手吧。"
+            },
+            {
+              "char": "睡",
+              "word1": "睡觉",
+              "word2": "睡眠",
+              "sentence": "老师教我们睡觉。"
+            },
+            {
+              "char": "觉",
+              "word1": "觉得",
+              "word2": "睡觉",
+              "sentence": "小朋友都喜欢觉得。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "色",
+              "word1": "颜色",
+              "word2": "红色",
+              "sentence": "老师教我们颜色。"
+            },
+            {
+              "char": "把",
+              "word1": "把手",
+              "word2": "一把",
+              "sentence": "把手是很常见的。"
+            },
+            {
+              "char": "讲",
+              "word1": "讲话",
+              "word2": "讲课",
+              "sentence": "我们一起讲话吧。"
+            },
+            {
+              "char": "样",
+              "word1": "样子",
+              "word2": "一样",
+              "sentence": "今天天气很好，样子。"
+            },
+            {
+              "char": "笑",
+              "word1": "笑容",
+              "word2": "笑话",
+              "sentence": "我会写笑容。"
+            },
+            {
+              "char": "再",
+              "word1": "再见",
+              "word2": "再次",
+              "sentence": "小朋友都喜欢再见。"
+            }
+          ]
+        },
+        {
+          "name": "阅读9：端午粽",
+          "shizi": [
+            {
+              "char": "端",
+              "word1": "端午",
+              "word2": "端正",
+              "sentence": "我会写端午。"
+            },
+            {
+              "char": "粽",
+              "word1": "粽子",
+              "word2": "粽叶",
+              "sentence": "妈妈买了粽子。"
+            },
+            {
+              "char": "总",
+              "word1": "总是",
+              "word2": "总共",
+              "sentence": "老师教我们总是。"
+            },
+            {
+              "char": "煮",
+              "word1": "煮饭",
+              "word2": "煮面",
+              "sentence": "老师教我们煮饭。"
+            },
+            {
+              "char": "盼",
+              "word1": "盼望",
+              "word2": "期盼",
+              "sentence": "妈妈买了盼望。"
+            },
+            {
+              "char": "枣",
+              "word1": "红枣",
+              "word2": "枣子",
+              "sentence": "今天天气很好，红枣。"
+            },
+            {
+              "char": "甜",
+              "word1": "甜味",
+              "word2": "甜美",
+              "sentence": "我喜欢甜味。"
+            },
+            {
+              "char": "鲜",
+              "word1": "新鲜",
+              "word2": "鲜花",
+              "sentence": "新鲜是很重要的。"
+            },
+            {
+              "char": "了",
+              "word1": "好了",
+              "word2": "完了",
+              "sentence": "小朋友都喜欢好了。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "节",
+              "word1": "节日",
+              "word2": "节目",
+              "sentence": "老师教我们节日。"
+            },
+            {
+              "char": "米",
+              "word1": "大米",
+              "word2": "米饭",
+              "sentence": "大米是很重要的。"
+            },
+            {
+              "char": "间",
+              "word1": "时间",
+              "word2": "中间",
+              "sentence": "老师教我们时间。"
+            },
+            {
+              "char": "分",
+              "word1": "分开",
+              "word2": "分数",
+              "sentence": "我喜欢分开。"
+            },
+            {
+              "char": "吃",
+              "word1": "吃饭",
+              "word2": "小吃",
+              "sentence": "妈妈买了吃饭。"
+            },
+            {
+              "char": "肉",
+              "word1": "牛肉",
+              "word2": "猪肉",
+              "sentence": "我喜欢牛肉。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地四",
+          "shizi": [
+            {
+              "char": "视",
+              "word1": "电视",
+              "word2": "视力",
+              "sentence": "老师教我们电视。"
+            },
+            {
+              "char": "部",
+              "word1": "部分",
+              "word2": "部门",
+              "sentence": "妈妈买了部分。"
+            },
+            {
+              "char": "裤",
+              "word1": "裤子",
+              "word2": "短裤",
+              "sentence": "我喜欢裤子。"
+            },
+            {
+              "char": "被",
+              "word1": "被子",
+              "word2": "被动",
+              "sentence": "今天天气很好，被子。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "册",
+              "word1": "画册",
+              "word2": "手册",
+              "sentence": "妈妈买了画册。"
+            },
+            {
+              "char": "支",
+              "word1": "一支",
+              "word2": "支持",
+              "sentence": "小朋友都喜欢一支。"
+            },
+            {
+              "char": "电",
+              "word1": "电话",
+              "word2": "电脑",
+              "sentence": "老师教我们电话。"
+            },
+            {
+              "char": "衣",
+              "word1": "衣服",
+              "word2": "雨衣",
+              "sentence": "衣服是很常见的。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第五单元·识字",
+      "lessons": [
+        {
+          "name": "识字5：动物儿歌",
+          "shizi": [
+            {
+              "char": "捉",
+              "word1": "捉住",
+              "word2": "捉迷藏",
+              "sentence": "我会写捉住。"
+            },
+            {
+              "char": "迷",
+              "word1": "迷路",
+              "word2": "着迷",
+              "sentence": "老师教我们迷路。"
+            },
+            {
+              "char": "藏",
+              "word1": "捉迷藏",
+              "word2": "收藏",
+              "sentence": "小朋友都喜欢捉迷藏。"
+            },
+            {
+              "char": "蚂",
+              "word1": "蚂蚁",
+              "word2": "蚂蚱",
+              "sentence": "爸爸带我去蚂蚁。"
+            },
+            {
+              "char": "蚁",
+              "word1": "蚂蚁",
+              "word2": "白蚁",
+              "sentence": "蚂蚁是很重要的。"
+            },
+            {
+              "char": "食",
+              "word1": "食物",
+              "word2": "粮食",
+              "sentence": "食物是很重要的。"
+            },
+            {
+              "char": "粮",
+              "word1": "粮食",
+              "word2": "粮仓",
+              "sentence": "我会写粮食。"
+            },
+            {
+              "char": "结",
+              "word1": "结果",
+              "word2": "结束",
+              "sentence": "老师教我们结果。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "物",
+              "word1": "动物",
+              "word2": "植物",
+              "sentence": "我会写动物。"
+            },
+            {
+              "char": "造",
+              "word1": "造句",
+              "word2": "制造",
+              "sentence": "我们一起造句吧。"
+            },
+            {
+              "char": "运",
+              "word1": "运动",
+              "word2": "运气",
+              "sentence": "老师教我们运动。"
+            },
+            {
+              "char": "欢",
+              "word1": "欢乐",
+              "word2": "欢迎",
+              "sentence": "妈妈买了欢乐。"
+            },
+            {
+              "char": "房",
+              "word1": "房子",
+              "word2": "房间",
+              "sentence": "妈妈买了房子。"
+            },
+            {
+              "char": "网",
+              "word1": "上网",
+              "word2": "渔网",
+              "sentence": "我们一起上网吧。"
+            }
+          ]
+        },
+        {
+          "name": "识字6：古对今",
+          "shizi": [
+            {
+              "char": "圆",
+              "word1": "圆形",
+              "word2": "团圆",
+              "sentence": "今天天气很好，圆形。"
+            },
+            {
+              "char": "严",
+              "word1": "严格",
+              "word2": "严重",
+              "sentence": "我们一起严格吧。"
+            },
+            {
+              "char": "寒",
+              "word1": "寒冷",
+              "word2": "寒冬",
+              "sentence": "我们一起寒冷吧。"
+            },
+            {
+              "char": "酷",
+              "word1": "酷热",
+              "word2": "酷暑",
+              "sentence": "我会写酷热。"
+            },
+            {
+              "char": "暑",
+              "word1": "暑假",
+              "word2": "暑期",
+              "sentence": "我喜欢暑假。"
+            },
+            {
+              "char": "暖",
+              "word1": "暖和",
+              "word2": "温暖",
+              "sentence": "妈妈买了暖和。"
+            },
+            {
+              "char": "晨",
+              "word1": "早晨",
+              "word2": "清晨",
+              "sentence": "我喜欢早晨。"
+            },
+            {
+              "char": "朝",
+              "word1": "朝阳",
+              "word2": "朝霞",
+              "sentence": "我们一起朝阳吧。"
+            },
+            {
+              "char": "霞",
+              "word1": "朝霞",
+              "word2": "晚霞",
+              "sentence": "今天天气很好，朝霞。"
+            },
+            {
+              "char": "杨",
+              "word1": "杨树",
+              "word2": "白杨",
+              "sentence": "妈妈买了杨树。"
+            },
+            {
+              "char": "香",
+              "word1": "香味",
+              "word2": "香气",
+              "sentence": "老师教我们香味。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "对",
+              "word1": "对手",
+              "word2": "不对",
+              "sentence": "老师教我们对手。"
+            },
+            {
+              "char": "今",
+              "word1": "今天",
+              "word2": "今年",
+              "sentence": "老师教我们今天。"
+            },
+            {
+              "char": "雪",
+              "word1": "下雪",
+              "word2": "雪花",
+              "sentence": "小朋友都喜欢下雪。"
+            },
+            {
+              "char": "细",
+              "word1": "细心",
+              "word2": "仔细",
+              "sentence": "我会写细心。"
+            },
+            {
+              "char": "夕",
+              "word1": "夕阳",
+              "word2": "夕阳",
+              "sentence": "爸爸带我去夕阳。"
+            },
+            {
+              "char": "语",
+              "word1": "语言",
+              "word2": "语文",
+              "sentence": "我们一起语言吧。"
+            }
+          ]
+        },
+        {
+          "name": "识字7：操场上",
+          "shizi": [
+            {
+              "char": "操",
+              "word1": "操场",
+              "word2": "操作",
+              "sentence": "爸爸带我去操场。"
+            },
+            {
+              "char": "拔",
+              "word1": "拔河",
+              "word2": "选拔",
+              "sentence": "拔河是很常见的。"
+            },
+            {
+              "char": "拍",
+              "word1": "拍手",
+              "word2": "拍照",
+              "sentence": "我会写拍手。"
+            },
+            {
+              "char": "踢",
+              "word1": "踢球",
+              "word2": "踢腿",
+              "sentence": "老师教我们踢球。"
+            },
+            {
+              "char": "铃",
+              "word1": "铃声",
+              "word2": "铃铛",
+              "sentence": "妈妈买了铃声。"
+            },
+            {
+              "char": "真",
+              "word1": "真的",
+              "word2": "认真",
+              "sentence": "我会写真的。"
+            },
+            {
+              "char": "闹",
+              "word1": "热闹",
+              "word2": "闹钟",
+              "sentence": "小朋友都喜欢热闹。"
+            },
+            {
+              "char": "丢",
+              "word1": "丢失",
+              "word2": "丢弃",
+              "sentence": "妈妈买了丢失。"
+            },
+            {
+              "char": "体",
+              "word1": "体育",
+              "word2": "身体",
+              "sentence": "我喜欢体育。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "打",
+              "word1": "打球",
+              "word2": "打电话",
+              "sentence": "小朋友都喜欢打球。"
+            },
+            {
+              "char": "皮",
+              "word1": "皮肤",
+              "word2": "皮球",
+              "sentence": "我喜欢皮肤。"
+            },
+            {
+              "char": "跑",
+              "word1": "跑步",
+              "word2": "奔跑",
+              "sentence": "妈妈买了跑步。"
+            },
+            {
+              "char": "足",
+              "word1": "足球",
+              "word2": "手足",
+              "sentence": "老师教我们足球。"
+            },
+            {
+              "char": "沙",
+              "word1": "沙子",
+              "word2": "沙滩",
+              "sentence": "爸爸带我去沙子。"
+            },
+            {
+              "char": "包",
+              "word1": "书包",
+              "word2": "包子",
+              "sentence": "我们一起书包吧。"
+            }
+          ]
+        },
+        {
+          "name": "识字8：人之初",
+          "shizi": [
+            {
+              "char": "之",
+              "word1": "之前",
+              "word2": "之后",
+              "sentence": "我会写之前。"
+            },
+            {
+              "char": "初",
+              "word1": "初期",
+              "word2": "最初",
+              "sentence": "我会写初期。"
+            },
+            {
+              "char": "相",
+              "word1": "相同",
+              "word2": "互相",
+              "sentence": "老师教我们相同。"
+            },
+            {
+              "char": "教",
+              "word1": "教书",
+              "word2": "教室",
+              "sentence": "我们一起教书吧。"
+            },
+            {
+              "char": "专",
+              "word1": "专心",
+              "word2": "专业",
+              "sentence": "我喜欢专心。"
+            },
+            {
+              "char": "幼",
+              "word1": "幼儿",
+              "word2": "幼儿园",
+              "sentence": "爸爸带我去幼儿。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "近",
+              "word1": "远近",
+              "word2": "附近",
+              "sentence": "我们一起远近吧。"
+            },
+            {
+              "char": "习",
+              "word1": "学习",
+              "word2": "练习",
+              "sentence": "我喜欢学习。"
+            },
+            {
+              "char": "远",
+              "word1": "远方",
+              "word2": "远处",
+              "sentence": "我们一起远方吧。"
+            },
+            {
+              "char": "学",
+              "word1": "学生",
+              "word2": "学习",
+              "sentence": "学生是很常见的。"
+            },
+            {
+              "char": "玉",
+              "word1": "玉石",
+              "word2": "玉米",
+              "sentence": "我会写玉石。"
+            },
+            {
+              "char": "义",
+              "word1": "正义",
+              "word2": "意义",
+              "sentence": "正义是很常见的。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地五",
+          "shizi": [
+            {
+              "char": "饭",
+              "word1": "吃饭",
+              "word2": "米饭",
+              "sentence": "我们一起吃饭吧。"
+            },
+            {
+              "char": "茶",
+              "word1": "茶叶",
+              "word2": "喝茶",
+              "sentence": "小朋友都喜欢茶叶。"
+            },
+            {
+              "char": "泡",
+              "word1": "泡泡",
+              "word2": "泡茶",
+              "sentence": "我会写泡泡。"
+            },
+            {
+              "char": "轻",
+              "word1": "轻轻",
+              "word2": "年轻",
+              "sentence": "爸爸带我去轻轻。"
+            },
+            {
+              "char": "穿",
+              "word1": "穿衣",
+              "word2": "穿过",
+              "sentence": "老师教我们穿衣。"
+            },
+            {
+              "char": "袍",
+              "word1": "旗袍",
+              "word2": "长袍",
+              "sentence": "旗袍是很常见的。"
+            },
+            {
+              "char": "鞭",
+              "word1": "鞭子",
+              "word2": "鞭炮",
+              "sentence": "老师教我们鞭子。"
+            },
+            {
+              "char": "炮",
+              "word1": "大炮",
+              "word2": "鞭炮",
+              "sentence": "我喜欢大炮。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "饱",
+              "word1": "吃饱",
+              "word2": "饱和",
+              "sentence": "吃饱是很重要的。"
+            },
+            {
+              "char": "抱",
+              "word1": "拥抱",
+              "word2": "抱着",
+              "sentence": "小朋友都喜欢拥抱。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第六单元·阅读",
+      "lessons": [
+        {
+          "name": "阅读10：古诗二首",
+          "shizi": [
+            {
+              "char": "诗",
+              "word1": "诗歌",
+              "word2": "诗人",
+              "sentence": "我喜欢诗歌。"
+            },
+            {
+              "char": "偷",
+              "word1": "偷偷",
+              "word2": "小偷",
+              "sentence": "今天天气很好，偷偷。"
+            },
+            {
+              "char": "浮",
+              "word1": "浮动",
+              "word2": "漂浮",
+              "sentence": "我喜欢浮动。"
+            },
+            {
+              "char": "萍",
+              "word1": "浮萍",
+              "word2": "萍水",
+              "sentence": "我喜欢浮萍。"
+            },
+            {
+              "char": "泉",
+              "word1": "泉水",
+              "word2": "温泉",
+              "sentence": "泉水是很重要的。"
+            },
+            {
+              "char": "惜",
+              "word1": "珍惜",
+              "word2": "可惜",
+              "sentence": "我会写珍惜。"
+            },
+            {
+              "char": "照",
+              "word1": "照亮",
+              "word2": "照片",
+              "sentence": "小朋友都喜欢照亮。"
+            },
+            {
+              "char": "柔",
+              "word1": "柔软",
+              "word2": "温柔",
+              "sentence": "小朋友都喜欢柔软。"
+            },
+            {
+              "char": "荷",
+              "word1": "荷花",
+              "word2": "荷叶",
+              "sentence": "爸爸带我去荷花。"
+            },
+            {
+              "char": "露",
+              "word1": "露水",
+              "word2": "露出",
+              "sentence": "我喜欢露水。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "首",
+              "word1": "首先",
+              "word2": "首长",
+              "sentence": "小朋友都喜欢首先。"
+            },
+            {
+              "char": "池",
+              "word1": "水池",
+              "word2": "池塘",
+              "sentence": "妈妈买了水池。"
+            },
+            {
+              "char": "采",
+              "word1": "采集",
+              "word2": "采花",
+              "sentence": "爸爸带我去采集。"
+            },
+            {
+              "char": "尖",
+              "word1": "尖刀",
+              "word2": "笔尖",
+              "sentence": "妈妈买了尖刀。"
+            },
+            {
+              "char": "角",
+              "word1": "牛角",
+              "word2": "角度",
+              "sentence": "牛角是很重要的。"
+            },
+            {
+              "char": "早",
+              "word1": "早上",
+              "word2": "早晨",
+              "sentence": "妈妈买了早上。"
+            }
+          ]
+        },
+        {
+          "name": "阅读11：浪花",
+          "shizi": [
+            {
+              "char": "浪",
+              "word1": "浪花",
+              "word2": "海浪",
+              "sentence": "老师教我们浪花。"
+            },
+            {
+              "char": "迈",
+              "word1": "迈步",
+              "word2": "年迈",
+              "sentence": "我们一起迈步吧。"
+            },
+            {
+              "char": "悄",
+              "word1": "悄悄",
+              "word2": "静悄悄",
+              "sentence": "妈妈买了悄悄。"
+            },
+            {
+              "char": "次",
+              "word1": "次数",
+              "word2": "每次",
+              "sentence": "次数是很重要的。"
+            },
+            {
+              "char": "给",
+              "word1": "给你",
+              "word2": "送给",
+              "sentence": "老师教我们给你。"
+            },
+            {
+              "char": "壳",
+              "word1": "贝壳",
+              "word2": "外壳",
+              "sentence": "贝壳是很重要的。"
+            },
+            {
+              "char": "虾",
+              "word1": "虾米",
+              "word2": "龙虾",
+              "sentence": "虾米是很重要的。"
+            },
+            {
+              "char": "装",
+              "word1": "装扮",
+              "word2": "服装",
+              "sentence": "我喜欢装扮。"
+            },
+            {
+              "char": "像",
+              "word1": "好像",
+              "word2": "画像",
+              "sentence": "好像是很重要的。"
+            },
+            {
+              "char": "淘",
+              "word1": "淘气",
+              "word2": "淘米",
+              "sentence": "妈妈买了淘气。"
+            },
+            {
+              "char": "娃",
+              "word1": "娃娃",
+              "word2": "女娃",
+              "sentence": "我们一起娃娃吧。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "玩",
+              "word1": "玩具",
+              "word2": "玩耍",
+              "sentence": "玩具是很重要的。"
+            },
+            {
+              "char": "眼",
+              "word1": "眼睛",
+              "word2": "眼泪",
+              "sentence": "眼睛是很重要的。"
+            },
+            {
+              "char": "泪",
+              "word1": "眼泪",
+              "word2": "泪水",
+              "sentence": "小朋友都喜欢眼泪。"
+            },
+            {
+              "char": "它",
+              "word1": "它们",
+              "word2": "它",
+              "sentence": "今天天气很好，它们。"
+            },
+            {
+              "char": "贝",
+              "word1": "贝壳",
+              "word2": "宝贝",
+              "sentence": "贝壳是很常见的。"
+            },
+            {
+              "char": "气",
+              "word1": "生气",
+              "word2": "气体",
+              "sentence": "老师教我们生气。"
+            }
+          ]
+        },
+        {
+          "name": "阅读12：荷叶圆圆",
+          "shizi": [
+            {
+              "char": "珠",
+              "word1": "珠子",
+              "word2": "珍珠",
+              "sentence": "今天天气很好，珠子。"
+            },
+            {
+              "char": "摇",
+              "word1": "摇头",
+              "word2": "摇晃",
+              "sentence": "老师教我们摇头。"
+            },
+            {
+              "char": "篮",
+              "word1": "篮子",
+              "word2": "篮球",
+              "sentence": "篮子是很常见的。"
+            },
+            {
+              "char": "亮",
+              "word1": "明亮",
+              "word2": "月亮",
+              "sentence": "我们一起明亮吧。"
+            },
+            {
+              "char": "晶",
+              "word1": "水晶",
+              "word2": "晶莹",
+              "sentence": "爸爸带我去水晶。"
+            },
+            {
+              "char": "停",
+              "word1": "停止",
+              "word2": "停车",
+              "sentence": "停止是很常见的。"
+            },
+            {
+              "char": "坪",
+              "word1": "草坪",
+              "word2": "坪坝",
+              "sentence": "我会写草坪。"
+            },
+            {
+              "char": "展",
+              "word1": "展开",
+              "word2": "展示",
+              "sentence": "今天天气很好，展开。"
+            },
+            {
+              "char": "透",
+              "word1": "透明",
+              "word2": "透气",
+              "sentence": "妈妈买了透明。"
+            },
+            {
+              "char": "翅",
+              "word1": "翅膀",
+              "word2": "膀",
+              "sentence": "我喜欢翅膀。"
+            },
+            {
+              "char": "膀",
+              "word1": "翅膀",
+              "word2": "肩膀",
+              "sentence": "我会写翅膀。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "机",
+              "word1": "飞机",
+              "word2": "手机",
+              "sentence": "飞机是很重要的。"
+            },
+            {
+              "char": "台",
+              "word1": "台风",
+              "word2": "台上",
+              "sentence": "台风是很重要的。"
+            },
+            {
+              "char": "唱",
+              "word1": "唱歌",
+              "word2": "合唱",
+              "sentence": "妈妈买了唱歌。"
+            },
+            {
+              "char": "伞",
+              "word1": "雨伞",
+              "word2": "打伞",
+              "sentence": "妈妈买了雨伞。"
+            },
+            {
+              "char": "朵",
+              "word1": "花朵",
+              "word2": "云朵",
+              "sentence": "小朋友都喜欢花朵。"
+            },
+            {
+              "char": "美",
+              "word1": "美丽",
+              "word2": "美好",
+              "sentence": "老师教我们美丽。"
+            }
+          ]
+        },
+        {
+          "name": "阅读13：要下雨了",
+          "shizi": [
+            {
+              "char": "要",
+              "word1": "要求",
+              "word2": "需要",
+              "sentence": "小朋友都喜欢要求。"
+            },
+            {
+              "char": "腰",
+              "word1": "弯腰",
+              "word2": "腰部",
+              "sentence": "弯腰是很常见的。"
+            },
+            {
+              "char": "阴",
+              "word1": "阴天",
+              "word2": "阴暗",
+              "sentence": "爸爸带我去阴天。"
+            },
+            {
+              "char": "沉",
+              "word1": "沉重",
+              "word2": "下沉",
+              "sentence": "今天天气很好，沉重。"
+            },
+            {
+              "char": "呀",
+              "word1": "好呀",
+              "word2": "哎呀",
+              "sentence": "妈妈买了好呀。"
+            },
+            {
+              "char": "忙",
+              "word1": "帮忙",
+              "word2": "忙碌",
+              "sentence": "老师教我们帮忙。"
+            },
+            {
+              "char": "呢",
+              "word1": "什么呢",
+              "word2": "好吗",
+              "sentence": "今天天气很好，什么呢。"
+            },
+            {
+              "char": "吗",
+              "word1": "好吗",
+              "word2": "是不是",
+              "sentence": "好吗是很常见的。"
+            },
+            {
+              "char": "闷",
+              "word1": "闷热",
+              "word2": "烦闷",
+              "sentence": "爸爸带我去闷热。"
+            },
+            {
+              "char": "吧",
+              "word1": "好吧",
+              "word2": "来吧",
+              "sentence": "我会写好吧。"
+            },
+            {
+              "char": "消",
+              "word1": "消失",
+              "word2": "消息",
+              "sentence": "小朋友都喜欢消失。"
+            },
+            {
+              "char": "息",
+              "word1": "休息",
+              "word2": "利息",
+              "sentence": "休息是很常见的。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "这",
+              "word1": "这里",
+              "word2": "这个",
+              "sentence": "这里是很重要的。"
+            },
+            {
+              "char": "看",
+              "word1": "看见",
+              "word2": "看书",
+              "sentence": "小朋友都喜欢看见。"
+            },
+            {
+              "char": "鱼",
+              "word1": "小鱼",
+              "word2": "金鱼",
+              "sentence": "我喜欢小鱼。"
+            },
+            {
+              "char": "面",
+              "word1": "面条",
+              "word2": "面包",
+              "sentence": "小朋友都喜欢面条。"
+            },
+            {
+              "char": "问",
+              "word1": "问题",
+              "word2": "提问",
+              "sentence": "问题是很常见的。"
+            },
+            {
+              "char": "加",
+              "word1": "加法",
+              "word2": "加上",
+              "sentence": "妈妈买了加法。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地六",
+          "shizi": [
+            {
+              "char": "棍",
+              "word1": "棍子",
+              "word2": "木棍",
+              "sentence": "爸爸带我去棍子。"
+            },
+            {
+              "char": "汤",
+              "word1": "汤水",
+              "word2": "喝汤",
+              "sentence": "汤水是很常见的。"
+            },
+            {
+              "char": "蚊",
+              "word1": "蚊子",
+              "word2": "蚊虫",
+              "sentence": "妈妈买了蚊子。"
+            },
+            {
+              "char": "扇",
+              "word1": "扇子",
+              "word2": "扇风",
+              "sentence": "妈妈买了扇子。"
+            },
+            {
+              "char": "椅",
+              "word1": "椅子",
+              "word2": "桌椅",
+              "sentence": "小朋友都喜欢椅子。"
+            },
+            {
+              "char": "牵",
+              "word1": "牵手",
+              "word2": "牵牛",
+              "sentence": "爸爸带我去牵手。"
+            },
+            {
+              "char": "织",
+              "word1": "织布",
+              "word2": "编织",
+              "sentence": "织布是很常见的。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "豆",
+              "word1": "豆芽",
+              "word2": "豆子",
+              "sentence": "豆芽是很常见的。"
+            },
+            {
+              "char": "斗",
+              "word1": "北斗星",
+              "word2": "斗争",
+              "sentence": "北斗星是很重要的。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第七单元·阅读",
+      "lessons": [
+        {
+          "name": "阅读14：文具的家",
+          "shizi": [
+            {
+              "char": "具",
+              "word1": "工具",
+              "word2": "具体",
+              "sentence": "老师教我们工具。"
+            },
+            {
+              "char": "铅",
+              "word1": "铅笔",
+              "word2": "铅球",
+              "sentence": "今天天气很好，铅笔。"
+            },
+            {
+              "char": "新",
+              "word1": "新年",
+              "word2": "新书",
+              "sentence": "老师教我们新年。"
+            },
+            {
+              "char": "盒",
+              "word1": "盒子",
+              "word2": "饭盒",
+              "sentence": "盒子是很常见的。"
+            },
+            {
+              "char": "些",
+              "word1": "一些",
+              "word2": "这些",
+              "sentence": "小朋友都喜欢一些。"
+            },
+            {
+              "char": "此",
+              "word1": "此时",
+              "word2": "此地",
+              "sentence": "我会写此时。"
+            },
+            {
+              "char": "仔",
+              "word1": "仔细",
+              "word2": "仔鸡",
+              "sentence": "仔细是很常见的。"
+            },
+            {
+              "char": "检",
+              "word1": "检查",
+              "word2": "检阅",
+              "sentence": "我喜欢检查。"
+            },
+            {
+              "char": "查",
+              "word1": "查看",
+              "word2": "调查",
+              "sentence": "妈妈买了查看。"
+            },
+            {
+              "char": "所",
+              "word1": "所以",
+              "word2": "所有",
+              "sentence": "我们一起所以吧。"
+            },
+            {
+              "char": "伙",
+              "word1": "伙伴",
+              "word2": "合伙",
+              "sentence": "伙伴是很常见的。"
+            },
+            {
+              "char": "伴",
+              "word1": "伙伴",
+              "word2": "陪伴",
+              "sentence": "我喜欢伙伴。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "笔",
+              "word1": "铅笔",
+              "word2": "笔画",
+              "sentence": "我喜欢铅笔。"
+            },
+            {
+              "char": "知",
+              "word1": "知道",
+              "word2": "知识",
+              "sentence": "今天天气很好，知道。"
+            },
+            {
+              "char": "道",
+              "word1": "道路",
+              "word2": "道理",
+              "sentence": "爸爸带我去道路。"
+            },
+            {
+              "char": "放",
+              "word1": "放学",
+              "word2": "放手",
+              "sentence": "放学是很常见的。"
+            },
+            {
+              "char": "平",
+              "word1": "平安",
+              "word2": "平时",
+              "sentence": "爸爸带我去平安。"
+            },
+            {
+              "char": "安",
+              "word1": "安全",
+              "word2": "安静",
+              "sentence": "我会写安全。"
+            }
+          ]
+        },
+        {
+          "name": "阅读15：一分钟",
+          "shizi": [
+            {
+              "char": "钟",
+              "word1": "时钟",
+              "word2": "分钟",
+              "sentence": "小朋友都喜欢时钟。"
+            },
+            {
+              "char": "迟",
+              "word1": "迟到",
+              "word2": "迟迟",
+              "sentence": "我们一起迟到吧。"
+            },
+            {
+              "char": "背",
+              "word1": "背书",
+              "word2": "背后",
+              "sentence": "小朋友都喜欢背书。"
+            },
+            {
+              "char": "等",
+              "word1": "等待",
+              "word2": "平等",
+              "sentence": "我喜欢等待。"
+            },
+            {
+              "char": "啊",
+              "word1": "好啊",
+              "word2": "是啊",
+              "sentence": "妈妈买了好啊。"
+            },
+            {
+              "char": "决",
+              "word1": "决定",
+              "word2": "决心",
+              "sentence": "妈妈买了决定。"
+            },
+            {
+              "char": "定",
+              "word1": "一定",
+              "word2": "定时",
+              "sentence": "爸爸带我去一定。"
+            },
+            {
+              "char": "已",
+              "word1": "已经",
+              "word2": "已知",
+              "sentence": "小朋友都喜欢已经。"
+            },
+            {
+              "char": "经",
+              "word1": "已经",
+              "word2": "经过",
+              "sentence": "我喜欢已经。"
+            },
+            {
+              "char": "位",
+              "word1": "位置",
+              "word2": "座位",
+              "sentence": "今天天气很好，位置。"
+            },
+            {
+              "char": "表",
+              "word1": "表示",
+              "word2": "表现",
+              "sentence": "表示是很重要的。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "灯",
+              "word1": "电灯",
+              "word2": "灯光",
+              "sentence": "小朋友都喜欢电灯。"
+            },
+            {
+              "char": "车",
+              "word1": "汽车",
+              "word2": "火车",
+              "sentence": "爸爸带我去汽车。"
+            },
+            {
+              "char": "站",
+              "word1": "站立",
+              "word2": "车站",
+              "sentence": "我们一起站立吧。"
+            },
+            {
+              "char": "课",
+              "word1": "上课",
+              "word2": "课文",
+              "sentence": "爸爸带我去上课。"
+            },
+            {
+              "char": "坐",
+              "word1": "座位",
+              "word2": "坐下",
+              "sentence": "我喜欢座位。"
+            },
+            {
+              "char": "老",
+              "word1": "老师",
+              "word2": "老人",
+              "sentence": "老师是很常见的。"
+            },
+            {
+              "char": "师",
+              "word1": "老师",
+              "word2": "师长",
+              "sentence": "今天天气很好，老师。"
+            }
+          ]
+        },
+        {
+          "name": "阅读16：动物王国开大会",
+          "shizi": [
+            {
+              "char": "虎",
+              "word1": "老虎",
+              "word2": "虎头",
+              "sentence": "我喜欢老虎。"
+            },
+            {
+              "char": "熊",
+              "word1": "熊猫",
+              "word2": "狗熊",
+              "sentence": "今天天气很好，熊猫。"
+            },
+            {
+              "char": "通",
+              "word1": "通知",
+              "word2": "通过",
+              "sentence": "老师教我们通知。"
+            },
+            {
+              "char": "注",
+              "word1": "注意",
+              "word2": "注目",
+              "sentence": "老师教我们注意。"
+            },
+            {
+              "char": "意",
+              "word1": "意思",
+              "word2": "意见",
+              "sentence": "妈妈买了意思。"
+            },
+            {
+              "char": "遍",
+              "word1": "一遍",
+              "word2": "普遍",
+              "sentence": "今天天气很好，一遍。"
+            },
+            {
+              "char": "因",
+              "word1": "因为",
+              "word2": "原因",
+              "sentence": "小朋友都喜欢因为。"
+            },
+            {
+              "char": "舌",
+              "word1": "舌头",
+              "word2": "舌苔",
+              "sentence": "我们一起舌头吧。"
+            },
+            {
+              "char": "理",
+              "word1": "理由",
+              "word2": "理解",
+              "sentence": "理由是很重要的。"
+            },
+            {
+              "char": "呀",
+              "word1": "好呀",
+              "word2": "哎呀",
+              "sentence": "爸爸带我去好呀。"
+            },
+            {
+              "char": "忘",
+              "word1": "忘记",
+              "word2": "遗忘",
+              "sentence": "老师教我们忘记。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "国",
+              "word1": "国家",
+              "word2": "中国",
+              "sentence": "爸爸带我去国家。"
+            },
+            {
+              "char": "都",
+              "word1": "都是",
+              "word2": "首都",
+              "sentence": "爸爸带我去都是。"
+            },
+            {
+              "char": "百",
+              "word1": "一百",
+              "word2": "百花",
+              "sentence": "我们一起一百吧。"
+            },
+            {
+              "char": "听",
+              "word1": "听见",
+              "word2": "听话",
+              "sentence": "我喜欢听见。"
+            },
+            {
+              "char": "时",
+              "word1": "时间",
+              "word2": "时候",
+              "sentence": "爸爸带我去时间。"
+            },
+            {
+              "char": "点",
+              "word1": "点头",
+              "word2": "一点",
+              "sentence": "今天天气很好，点头。"
+            },
+            {
+              "char": "林",
+              "word1": "树林",
+              "word2": "森林",
+              "sentence": "我们一起树林吧。"
+            }
+          ]
+        },
+        {
+          "name": "阅读17：小猴子下山",
+          "shizi": [
+            {
+              "char": "猴",
+              "word1": "猴子",
+              "word2": "猴王",
+              "sentence": "老师教我们猴子。"
+            },
+            {
+              "char": "块",
+              "word1": "一块",
+              "word2": "块状",
+              "sentence": "一块是很常见的。"
+            },
+            {
+              "char": "结",
+              "word1": "结果",
+              "word2": "结束",
+              "sentence": "爸爸带我去结果。"
+            },
+            {
+              "char": "掰",
+              "word1": "掰开",
+              "word2": "掰手腕",
+              "sentence": "妈妈买了掰开。"
+            },
+            {
+              "char": "扛",
+              "word1": "扛着",
+              "word2": "扛枪",
+              "sentence": "我们一起扛着吧。"
+            },
+            {
+              "char": "棵",
+              "word1": "一棵",
+              "word2": "棵树",
+              "sentence": "我喜欢一棵。"
+            },
+            {
+              "char": "满",
+              "word1": "满意",
+              "word2": "充满",
+              "sentence": "我会写满意。"
+            },
+            {
+              "char": "扔",
+              "word1": "扔掉",
+              "word2": "扔球",
+              "sentence": "老师教我们扔掉。"
+            },
+            {
+              "char": "摘",
+              "word1": "摘花",
+              "word2": "采摘",
+              "sentence": "老师教我们摘花。"
+            },
+            {
+              "char": "捧",
+              "word1": "捧着",
+              "word2": "吹捧",
+              "sentence": "我会写捧着。"
+            },
+            {
+              "char": "追",
+              "word1": "追赶",
+              "word2": "追求",
+              "sentence": "今天天气很好，追赶。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "高",
+              "word1": "高兴",
+              "word2": "高大",
+              "sentence": "高兴是很常见的。"
+            },
+            {
+              "char": "兴",
+              "word1": "高兴",
+              "word2": "兴趣",
+              "sentence": "老师教我们高兴。"
+            },
+            {
+              "char": "着",
+              "word1": "看着",
+              "word2": "听着",
+              "sentence": "老师教我们看着。"
+            },
+            {
+              "char": "往",
+              "word1": "来往",
+              "word2": "往事",
+              "sentence": "我喜欢来往。"
+            },
+            {
+              "char": "瓜",
+              "word1": "西瓜",
+              "word2": "瓜子",
+              "sentence": "老师教我们西瓜。"
+            },
+            {
+              "char": "兔",
+              "word1": "兔子",
+              "word2": "白兔",
+              "sentence": "我们一起兔子吧。"
+            },
+            {
+              "char": "进",
+              "word1": "进来",
+              "word2": "进步",
+              "sentence": "今天天气很好，进来。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地七",
+          "shizi": [
+            {
+              "char": "刷",
+              "word1": "刷牙",
+              "word2": "刷子",
+              "sentence": "刷牙是很常见的。"
+            },
+            {
+              "char": "梳",
+              "word1": "梳子",
+              "word2": "梳理",
+              "sentence": "妈妈买了梳子。"
+            },
+            {
+              "char": "皂",
+              "word1": "肥皂",
+              "word2": "香皂",
+              "sentence": "肥皂是很常见的。"
+            },
+            {
+              "char": "澡",
+              "word1": "洗澡",
+              "word2": "澡堂",
+              "sentence": "今天天气很好，洗澡。"
+            },
+            {
+              "char": "脸",
+              "word1": "脸盆",
+              "word2": "洗脸",
+              "sentence": "小朋友都喜欢脸盆。"
+            },
+            {
+              "char": "盆",
+              "word1": "脸盆",
+              "word2": "盆栽",
+              "sentence": "我们一起脸盆吧。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "巾",
+              "word1": "毛巾",
+              "word2": "头巾",
+              "sentence": "小朋友都喜欢毛巾。"
+            },
+            {
+              "char": "洗",
+              "word1": "洗手",
+              "word2": "洗澡",
+              "sentence": "今天天气很好，洗手。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第八单元·阅读",
+      "lessons": [
+        {
+          "name": "阅读18：棉花姑娘",
+          "shizi": [
+            {
+              "char": "棉",
+              "word1": "棉花",
+              "word2": "棉衣",
+              "sentence": "我喜欢棉花。"
+            },
+            {
+              "char": "姑",
+              "word1": "姑娘",
+              "word2": "姑妈",
+              "sentence": "妈妈买了姑娘。"
+            },
+            {
+              "char": "娘",
+              "word1": "姑娘",
+              "word2": "大娘",
+              "sentence": "姑娘是很常见的。"
+            },
+            {
+              "char": "病",
+              "word1": "生病",
+              "word2": "病人",
+              "sentence": "爸爸带我去生病。"
+            },
+            {
+              "char": "治",
+              "word1": "治病",
+              "word2": "治疗",
+              "sentence": "治病是很重要的。"
+            },
+            {
+              "char": "燕",
+              "word1": "燕子",
+              "word2": "燕窝",
+              "sentence": "燕子是很常见的。"
+            },
+            {
+              "char": "帮",
+              "word1": "帮助",
+              "word2": "帮忙",
+              "sentence": "我喜欢帮助。"
+            },
+            {
+              "char": "害",
+              "word1": "害怕",
+              "word2": "害人",
+              "sentence": "妈妈买了害怕。"
+            },
+            {
+              "char": "别",
+              "word1": "别人",
+              "word2": "分别",
+              "sentence": "别人是很重要的。"
+            },
+            {
+              "char": "惊",
+              "word1": "惊奇",
+              "word2": "惊讶",
+              "sentence": "我们一起惊奇吧。"
+            },
+            {
+              "char": "奇",
+              "word1": "奇怪",
+              "word2": "奇妙",
+              "sentence": "今天天气很好，奇怪。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "她",
+              "word1": "她们",
+              "word2": "她的",
+              "sentence": "今天天气很好，她们。"
+            },
+            {
+              "char": "空",
+              "word1": "天空",
+              "word2": "空气",
+              "sentence": "我们一起天空吧。"
+            },
+            {
+              "char": "还",
+              "word1": "还有",
+              "word2": "还是",
+              "sentence": "还有是很重要的。"
+            },
+            {
+              "char": "干",
+              "word1": "干净",
+              "word2": "干部",
+              "sentence": "小朋友都喜欢干净。"
+            },
+            {
+              "char": "身",
+              "word1": "身体",
+              "word2": "身上",
+              "sentence": "妈妈买了身体。"
+            },
+            {
+              "char": "星",
+              "word1": "星星",
+              "word2": "星空",
+              "sentence": "我们一起星星吧。"
+            },
+            {
+              "char": "久",
+              "word1": "很久",
+              "word2": "久远",
+              "sentence": "很久是很重要的。"
+            }
+          ]
+        },
+        {
+          "name": "阅读19：咕咚",
+          "shizi": [
+            {
+              "char": "咕",
+              "word1": "咕咚",
+              "word2": "咕咕",
+              "sentence": "老师教我们咕咚。"
+            },
+            {
+              "char": "咚",
+              "word1": "咕咚",
+              "word2": "咚咚",
+              "sentence": "咕咚是很常见的。"
+            },
+            {
+              "char": "熟",
+              "word1": "熟悉",
+              "word2": "成熟",
+              "sentence": "我喜欢熟悉。"
+            },
+            {
+              "char": "掉",
+              "word1": "掉下",
+              "word2": "丢掉",
+              "sentence": "我们一起掉下吧。"
+            },
+            {
+              "char": "湖",
+              "word1": "湖水",
+              "word2": "湖泊",
+              "sentence": "我喜欢湖水。"
+            },
+            {
+              "char": "啦",
+              "word1": "好啦",
+              "word2": "哗啦",
+              "sentence": "小朋友都喜欢好啦。"
+            },
+            {
+              "char": "鹿",
+              "word1": "小鹿",
+              "word2": "鹿角",
+              "sentence": "小朋友都喜欢小鹿。"
+            },
+            {
+              "char": "野",
+              "word1": "野外",
+              "word2": "野生",
+              "sentence": "老师教我们野外。"
+            },
+            {
+              "char": "拦",
+              "word1": "拦住",
+              "word2": "拦截",
+              "sentence": "今天天气很好，拦住。"
+            },
+            {
+              "char": "哪",
+              "word1": "哪里",
+              "word2": "哪个",
+              "sentence": "我们一起哪里吧。"
+            },
+            {
+              "char": "那",
+              "word1": "那里",
+              "word2": "那个",
+              "sentence": "妈妈买了那里。"
+            },
+            {
+              "char": "领",
+              "word1": "领子",
+              "word2": "领导",
+              "sentence": "今天天气很好，领子。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "吓",
+              "word1": "吓人",
+              "word2": "吓跑",
+              "sentence": "吓人是很重要的。"
+            },
+            {
+              "char": "为",
+              "word1": "因为",
+              "word2": "为什么",
+              "sentence": "今天天气很好，因为。"
+            },
+            {
+              "char": "怕",
+              "word1": "害怕",
+              "word2": "不怕",
+              "sentence": "妈妈买了害怕。"
+            },
+            {
+              "char": "家",
+              "word1": "回家",
+              "word2": "家人",
+              "sentence": "回家是很常见的。"
+            },
+            {
+              "char": "象",
+              "word1": "大象",
+              "word2": "气象",
+              "sentence": "小朋友都喜欢大象。"
+            },
+            {
+              "char": "没",
+              "word1": "没有",
+              "word2": "没事",
+              "sentence": "没有是很常见的。"
+            },
+            {
+              "char": "到",
+              "word1": "到达",
+              "word2": "来到",
+              "sentence": "我们一起到达吧。"
+            }
+          ]
+        },
+        {
+          "name": "阅读20：小壁虎借尾巴",
+          "shizi": [
+            {
+              "char": "壁",
+              "word1": "墙壁",
+              "word2": "壁纸",
+              "sentence": "今天天气很好，墙壁。"
+            },
+            {
+              "char": "借",
+              "word1": "借书",
+              "word2": "借用",
+              "sentence": "我们一起借书吧。"
+            },
+            {
+              "char": "咬",
+              "word1": "咬住",
+              "word2": "咬牙",
+              "sentence": "咬住是很常见的。"
+            },
+            {
+              "char": "难",
+              "word1": "困难",
+              "word2": "难过",
+              "sentence": "小朋友都喜欢困难。"
+            },
+            {
+              "char": "哪",
+              "word1": "哪里",
+              "word2": "哪个",
+              "sentence": "爸爸带我去哪里。"
+            },
+            {
+              "char": "爬",
+              "word1": "爬山",
+              "word2": "爬行",
+              "sentence": "老师教我们爬山。"
+            },
+            {
+              "char": "您",
+              "word1": "您好",
+              "word2": "您的",
+              "sentence": "我们一起您好吧。"
+            },
+            {
+              "char": "拨",
+              "word1": "拨动",
+              "word2": "拨打",
+              "sentence": "我们一起拨动吧。"
+            },
+            {
+              "char": "摆",
+              "word1": "摆动",
+              "word2": "摆放",
+              "sentence": "爸爸带我去摆动。"
+            },
+            {
+              "char": "孩",
+              "word1": "孩子",
+              "word2": "小孩",
+              "sentence": "孩子是很重要的。"
+            },
+            {
+              "char": "转",
+              "word1": "转身",
+              "word2": "转动",
+              "sentence": "转身是很重要的。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "向",
+              "word1": "方向",
+              "word2": "向上",
+              "sentence": "方向是很常见的。"
+            },
+            {
+              "char": "边",
+              "word1": "旁边",
+              "word2": "一边",
+              "sentence": "我们一起旁边吧。"
+            },
+            {
+              "char": "行",
+              "word1": "行走",
+              "word2": "行人",
+              "sentence": "小朋友都喜欢行走。"
+            },
+            {
+              "char": "草",
+              "word1": "草地",
+              "word2": "小草",
+              "sentence": "我喜欢草地。"
+            },
+            {
+              "char": "赶",
+              "word1": "赶快",
+              "word2": "赶路",
+              "sentence": "赶快是很常见的。"
+            },
+            {
+              "char": "过",
+              "word1": "过去",
+              "word2": "过来",
+              "sentence": "过去是很常见的。"
+            },
+            {
+              "char": "找",
+              "word1": "找到",
+              "word2": "寻找",
+              "sentence": "老师教我们找到。"
+            }
+          ]
+        },
+        {
+          "name": "语文园地八",
+          "shizi": [
+            {
+              "char": "吵",
+              "word1": "吵架",
+              "word2": "吵闹",
+              "sentence": "我们一起吵架吧。"
+            },
+            {
+              "char": "现",
+              "word1": "现在",
+              "word2": "发现",
+              "sentence": "现在是很重要的。"
+            },
+            {
+              "char": "顶",
+              "word1": "头顶",
+              "word2": "顶点",
+              "sentence": "头顶是很重要的。"
+            },
+            {
+              "char": "胖",
+              "word1": "胖子",
+              "word2": "肥胖",
+              "sentence": "今天天气很好，胖子。"
+            },
+            {
+              "char": "票",
+              "word1": "车票",
+              "word2": "门票",
+              "sentence": "我会写车票。"
+            }
+          ],
+          "xiezhi": [
+            {
+              "char": "页",
+              "word1": "页码",
+              "word2": "一页",
+              "sentence": "我会写页码。"
+            },
+            {
+              "char": "户",
+              "word1": "户口",
+              "word2": "窗户",
+              "sentence": "我会写户口。"
+            },
+            {
+              "char": "交",
+              "word1": "交给",
+              "word2": "交通",
+              "sentence": "老师教我们交给。"
+            },
+            {
+              "char": "父",
+              "word1": "父亲",
+              "word2": "父母",
+              "sentence": "小朋友都喜欢父亲。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "统计",
+      "lessons": []
+    }
+  ]
+}
