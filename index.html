@@ -317,7 +317,7 @@
         <div v-else>
             <div class="vocab-summary">
                 <span>已选 {{ vocabSelectedChars.length + vocabSelectedLessons.reduce((sum,ln)=>sum+(vocabLessonCharCount(ln)||0),0) }} 个字</span>
-                <button class="cute-btn primary" style="padding:8px 20px;" @click="confirmVocabSelect">✅ 确认录入</button>
+                <button class="cute-btn primary" style="padding:8px 20px;" @click="confirmVocabSelect">下一步：确认词语</button>
             </div>
             <div style="max-height:60vh; overflow-y:auto;">
                 <div v-for="unit in vocabularyData.units" :key="unit.name" class="vocab-unit">
@@ -740,7 +740,7 @@
                 let combined = [...newWords, ...rollingWords, ...day7Words, ...randomCheck];
                 combined = [...new Map(combined.map(w=>[w.id,w])).values()];
 
-                this.todayPlanWords = combined.slice(0, 18);
+                this.todayPlanWords = combined;
                 this.todayCompletedCount = 0;
             },
             generateReviewDates(wordObj) {
@@ -1455,11 +1455,11 @@
                     seen.add(item.ch.char);
                     return true;
                 });
-                let added = 0, exists = 0;
+                // 交替选组词，填入 pendingWords 跳转到确认页面
+                this.pendingWords = [];
                 for(let item of selectedChars) {
-                    // 交替选组词
                     const ch = item.ch;
-                    const lastUsed = this.vocabUsage[ch.char]; // 'word1' or 'word2'
+                    const lastUsed = this.vocabUsage[ch.char];
                     let pick;
                     if(!lastUsed) {
                         pick = Math.random() < 0.5 ? 'word1' : 'word2';
@@ -1468,31 +1468,14 @@
                     }
                     this.vocabUsage[ch.char] = pick;
                     const pickedWord = ch[pick];
-                    if(!this.words.some(w => w.word === pickedWord)) {
-                        this.words.push({
-                            id: Date.now() + pickedWord,
-                            word: pickedWord,
-                            pinyin: toPinyinWithTone(pickedWord),
-                            context: ch.sentence,
-                            status: 'learning',
-                            correctCount: 0,
-                            wrongCount: 0,
-                            firstWrong: false,
-                            reviewDates: [],
-                            pendingReview: false,
-                            _127_rollingStreak: 0,
-                            _127_day7Entry: null,
-                            _127_randomCheckWeek: 0
-                        });
-                        added++;
-                    } else {
-                        exists++;
-                    }
+                    this.pendingWords.push({
+                        word: pickedWord,
+                        pinyin: toPinyinWithTone(pickedWord),
+                        example: ch.sentence
+                    });
                 }
-                this.saveData();
-                this.generateTodayPlan();
-                this.showAlert('完成', `成功录入 ${added} 个字词` + (exists ? `（${exists} 个已存在）` : ''));
-                this.currentView = 'parentHome';
+                this.currentView = 'addWizard';
+                this.wizardStep = 2;
             },
         }
     }).mount('#app');
