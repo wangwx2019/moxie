@@ -312,7 +312,12 @@
         <h3>📖 从生词库选择</h3>
         <div v-if="!vocabularyLoaded" style="text-align:center; padding:40px 0;">
             <div v-if="vocabLoading" class="text-small">加载生词库中...</div>
-            <button v-else class="cute-btn primary" style="padding:14px 32px;" @click="fetchVocabulary">📥 加载生词库</button>
+            <div v-else style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+                <button class="cute-btn primary" style="padding:14px 32px;" @click="fetchVocabulary">📥 从 GitHub 加载</button>
+                <div class="text-small" style="color:#b45309;">或者</div>
+                <button class="cute-btn" style="padding:14px 32px;" @click="$refs.vocabFileInput.click()">📂 从本地导入 JSON</button>
+                <input type="file" ref="vocabFileInput" style="display:none" accept=".json" @change="handleVocabImport">
+            </div>
         </div>
         <div v-else>
             <div class="vocab-summary">
@@ -1147,11 +1152,10 @@
                 });
             },
             confirmDeleteWord(word){
-                this.showConfirm('删除词语', `确定要删除“${word.word}”吗？所有相关记录将丢失。`, () => {
+                this.showConfirm('删除词语', `确定要删除“${word.word}”吗？`, () => {
                     this.words = this.words.filter(w=>w.id !== word.id);
                     this.saveData();
                     this.generateTodayPlan();
-                    this.showAlert('完成', '词语已删除');
                 });
             },
             exportData(){
@@ -1351,6 +1355,27 @@
                     this.showAlert('提示', '生词库加载失败，请检查 vocabulary.json 是否存在');
                 }
                 this.vocabLoading = false;
+            },
+            handleVocabImport(e) {
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if(data && data.units && Array.isArray(data.units)) {
+                            this.vocabularyData = data;
+                            this.vocabularyLoaded = true;
+                            this.showAlert('成功', '生词库导入成功');
+                        } else {
+                            this.showAlert('错误', 'JSON 格式不正确，需要包含 units 数组');
+                        }
+                    } catch(e) {
+                        this.showAlert('错误', '文件解析失败，请确认是有效的 JSON 文件');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
             },
             openVocabSelector() {
                 if(!this.vocabularyLoaded && !this.vocabLoading) {
