@@ -641,7 +641,6 @@
                         if(remote.baiduAccounts && remote.baiduAccounts.length) { this.baiduAccounts = remote.baiduAccounts; this.baiduActiveIdx = remote.baiduActiveIdx || 0; }
                         this.saveData();
                         this.generateTodayPlan();
-                        this.showAlert('同步成功', '已从 data.json 加载最新数据');
                     }
                 } catch(e) { console.log('无远程 data.json'); }
             },
@@ -1493,10 +1492,16 @@
                     }
                     this.vocabUsage[ch.char] = pick;
                     const pickedWord = ch[pick];
+                    const pickedPinyin = toPinyinWithTone(pickedWord);
+                    const sentenceKey = 'sentence' + pick.slice(-1);
+                    let example = ch[sentenceKey] || '';
+                    if(example.includes(pickedWord)) {
+                        example = example.split(pickedWord).join(pickedPinyin);
+                    }
                     this.pendingWords.push({
                         word: pickedWord,
-                        pinyin: toPinyinWithTone(pickedWord),
-                        example: ch.sentence
+                        pinyin: pickedPinyin,
+                        example: example
                     });
                 }
                 this.currentView = 'addWizard';
