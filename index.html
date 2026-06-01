@@ -89,6 +89,33 @@
         .stat-card.active .stat-number { color: #f97316; }
         .stat-number { font-size: 1.8rem; font-weight: 800; color: #f97316; }
         .stat-label { font-size: 0.75rem; color: #b45309; }
+        .lesson-item { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#fef9f2; border-radius:16px; margin-bottom:6px; cursor:pointer; border:2px solid transparent; transition:all 0.15s; }
+        .lesson-item:hover { background:#fff2e6; border-color:#fcd4a8; }
+        .lesson-item.selected { background:#fff0e0; border-color:#f97316; box-shadow:0 0 0 1px #f97316; }
+        .lesson-item .lesson-check { width:24px; height:24px; border-radius:6px; border:2px solid #d4d4d4; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+        .lesson-item.selected .lesson-check { background:#f97316; border-color:#f97316; color:white; }
+        .textbook-import-textarea { width:100%; min-height:300px; border:2px solid #ffe2cc; border-radius:20px; padding:16px; font-size:0.95rem; font-family:inherit; resize:vertical; }
+        .textbook-tag { display:inline-block; background:#fff0e0; color:#d97706; padding:3px 12px; border-radius:40px; font-size:0.78rem; font-weight:600; margin:2px 4px; }
+        /* 生词库选择器样式 */
+        .vocab-unit { margin-bottom:16px; }
+        .vocab-unit-header { font-weight:700; font-size:1rem; color:#92400e; padding:8px 0; border-bottom:2px solid #ffedd5; margin-bottom:8px; }
+        .vocab-lesson { border:2px solid #ffe2cc; border-radius:20px; margin-bottom:8px; overflow:hidden; }
+        .vocab-lesson-header { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#fffaf5; cursor:pointer; user-select:none; }
+        .vocab-lesson-header:hover { background:#fff2e6; }
+        .vocab-lesson-header .expand-icon { transition:transform 0.2s; font-size:0.8rem; }
+        .vocab-lesson-header .expand-icon.open { transform:rotate(90deg); }
+        .vocab-lesson-check { width:22px; height:22px; border-radius:6px; border:2px solid #d4d4d4; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; cursor:pointer; background:white; }
+        .vocab-lesson-check.checked { background:#f97316; border-color:#f97316; color:white; }
+        .vocab-lesson-body { border-top:1px solid #ffe2cc; padding:8px 12px; background:white; }
+        .vocab-cat-label { font-size:0.78rem; font-weight:600; color:#b45309; margin:6px 0 4px; }
+        .vocab-char-grid { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+        .vocab-char-item { display:flex; align-items:center; gap:4px; padding:4px 10px; border-radius:30px; border:1.5px solid #fcd4a8; cursor:pointer; font-size:0.85rem; background:white; user-select:none; transition:all 0.1s; }
+        .vocab-char-item:hover { border-color:#f97316; background:#fff2e6; }
+        .vocab-char-item.checked { background:#f97316; border-color:#f97316; color:white; }
+        .vocab-char-item .char-word { font-weight:600; }
+        .vocab-char-item .char-detail { font-size:0.72rem; opacity:0.7; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .vocab-char-item.checked .char-detail { opacity:0.9; }
+        .vocab-summary { display:flex; justify-content:space-between; align-items:center; padding:12px 0; font-size:0.9rem; font-weight:600; color:#92400e; }
     </style>
 </head>
 <body>
@@ -109,6 +136,26 @@
             <div class="flex-between"><strong>📖 今日默写计划</strong><span class="badge">{{ todayPlanWords.length }} 个</span></div>
             <div style="margin: 10px 0;">✨ 已完成: {{ todayCompletedCount }} / {{ todayPlanWords.length }}</div>
             <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession">✍️ 田字格手写默写</button>
+        </div>
+        <div class="card-white" v-if="Object.keys(textbookLessons).length > 0">
+            <div class="flex-between">
+                <strong>📖 课本选词</strong>
+                <span class="badge" v-if="textbookSelections.length">已选 {{ textbookWordCount }} 课</span>
+            </div>
+            <div style="margin: 10px 0;">
+                <div v-for="(words, lesson) in textbookLessons" :key="lesson"
+                     class="lesson-item" :class="{selected: textbookSelections.includes(lesson)}"
+                     @click="toggleTextbookLesson(lesson)">
+                    <span><strong>{{ lesson }}</strong> <span class="text-small">({{ words.length }}词)</span></span>
+                    <div class="lesson-check">{{ textbookSelections.includes(lesson) ? '✓' : '' }}</div>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px;" v-if="textbookSelections.length > 0">
+                <button class="cute-btn primary" style="flex:1;" @click="applyTextbookToPlan" v-if="!usingTextbookPlan">📋 应用为今日计划</button>
+                <button class="cute-btn primary" style="flex:1;" @click="applyTextbookToPlan" v-else>🔄 更新计划</button>
+                <button class="cute-btn" style="flex-shrink:0;" @click="resetToAutoPlan">↩️ 自动计划</button>
+            </div>
+            <div v-if="usingTextbookPlan" style="margin-top:8px; font-size:0.8rem; color:#f97316; text-align:center;">✅ 当前使用课本计划</div>
         </div>
     </div>
 
@@ -157,6 +204,7 @@
         <div class="card-white" @click="openReviewParentView" style="cursor:pointer;"><div class="flex-between"><span>📋 复核默写</span><span>待复核 {{ pendingReviewCount }} →</span></div></div>
         <div class="card-white" @click="openPlanCalendarView" style="cursor:pointer;"><div class="flex-between"><span>📅 复习计划看板</span><span>查看每日计划 →</span></div></div>
         <div class="card-white" @click="openAddWizard" style="cursor:pointer;"><div class="flex-between"><span>🎤 录入词语</span><span>批量/语音</span></div></div>
+        <div class="card-white" @click="openTextbookManage" style="cursor:pointer;"><div class="flex-between"><span>📖 课本管理</span><span>导入/选词</span></div></div>
         <div class="card-white" @click="openSettingsView" style="cursor:pointer;"><div class="flex-between"><span>⚙️ 设置</span><span>密码/识别引擎/数据</span></div></div>
     </div>
 
@@ -246,7 +294,7 @@
     <!-- 录入词语向导 -->
     <div v-if="currentView === 'addWizard'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
-        <div v-if="wizardStep === 1"><div class="card-white"><label>✏️ 输入词语（空格或逗号分隔）</label><textarea rows="4" v-model="rawWordsInput" placeholder="输入词语" style="width:100%; border-radius:28px; padding:14px; box-sizing:border-box;"></textarea><button class="cute-btn primary" style="width:100%; margin-top:16px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="parseToStep2">下一步：确认词语</button></div></div>
+        <div v-if="wizardStep === 1"><div class="card-white"><label>✏️ 输入词语（空格或逗号分隔）</label><textarea rows="4" v-model="rawWordsInput" placeholder="输入词语" style="width:100%; border-radius:28px; padding:14px; box-sizing:border-box;"></textarea><button class="cute-btn primary" style="width:100%; margin-top:16px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="parseToStep2">下一步：确认词语</button></div><div class="card-white" style="text-align:center;"><div class="text-small" style="margin-bottom:8px; color:#b45309;">或者</div><button class="cute-btn" style="width:100%; padding:16px 0; font-size:1.1rem;" @click="openVocabSelector">📖 从生词库选择</button></div></div>
         <div v-else><div class="flex-between"><h3>📝 共 {{ pendingWords.length }} 个词语</h3><span class="cute-btn-sm" @click="wizardStep=1">重新输入</span></div><div style="max-height: 50vh; overflow: auto;"><div v-for="(item, idx) in pendingWords" :key="idx" class="word-list-item" style="flex-direction:column; align-items:start;">
             <strong>{{ item.word }}  {{ item.pinyin }}</strong>
             <div style="width:100%; margin-top:6px;">
@@ -256,6 +304,55 @@
                 </div>
             </div>
         </div></div><button class="cute-btn primary" style="width:100%; margin-top:16px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="confirmAddWords">✅ 确认录入</button></div>
+    </div>
+
+    <!-- 生词库选择 -->
+    <div v-if="currentView === 'vocabSelector'" class="page-container">
+        <div class="nav-back" @click="currentView='addWizard'; wizardStep=1">← 返回</div>
+        <h3>📖 从生词库选择</h3>
+        <div v-if="!vocabularyLoaded" style="text-align:center; padding:40px 0;">
+            <div v-if="vocabLoading" class="text-small">加载生词库中...</div>
+            <button v-else class="cute-btn primary" style="padding:14px 32px;" @click="fetchVocabulary">📥 加载生词库</button>
+        </div>
+        <div v-else>
+            <div class="vocab-summary">
+                <span>已选 {{ vocabSelectedChars.length + vocabSelectedLessons.reduce((sum,ln)=>sum+(vocabLessonCharCount(ln)||0),0) }} 个字</span>
+                <button class="cute-btn primary" style="padding:8px 20px;" @click="confirmVocabSelect">✅ 确认录入</button>
+            </div>
+            <div style="max-height:60vh; overflow-y:auto;">
+                <div v-for="unit in vocabularyData.units" :key="unit.name" class="vocab-unit">
+                    <div class="vocab-unit-header">{{ unit.name }}</div>
+                    <div v-for="lesson in unit.lessons" :key="unit.name + lesson.name" class="vocab-lesson">
+                        <div class="vocab-lesson-header" @click="toggleLessonExpand(unit.name + lesson.name)">
+                            <span class="expand-icon" :class="{open: expandedLessons.includes(unit.name + lesson.name)}">▶</span>
+                            <div class="vocab-lesson-check" :class="{checked: vocabSelectedLessons.includes(unit.name + '||' + lesson.name)}" @click.stop="toggleVocabLesson(unit.name, lesson)">✓</div>
+                            <span style="flex:1; font-weight:600;">{{ lesson.name }}</span>
+                            <span class="text-small" style="color:#b45309;">{{ (lesson.shizi||[]).length + (lesson.xiezhi||[]).length }} 字</span>
+                        </div>
+                        <div v-if="expandedLessons.includes(unit.name + lesson.name)" class="vocab-lesson-body">
+                            <div v-if="lesson.shizi && lesson.shizi.length">
+                                <div class="vocab-cat-label">会认（{{ lesson.shizi.length }} 个）</div>
+                                <div class="vocab-char-grid">
+                                    <div v-for="ch in lesson.shizi" :key="'sz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'shizi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'shizi', ch)">
+                                        <span class="char-word">{{ ch.char }}</span>
+                                        <span class="char-detail">{{ ch.word1 }} / {{ ch.word2 }} · {{ ch.sentence }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="lesson.xiezhi && lesson.xiezhi.length">
+                                <div class="vocab-cat-label">会写（{{ lesson.xiezhi.length }} 个）</div>
+                                <div class="vocab-char-grid">
+                                    <div v-for="ch in lesson.xiezhi" :key="'xz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'xiezhi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'xiezhi', ch)">
+                                        <span class="char-word">{{ ch.char }}</span>
+                                        <span class="char-detail">{{ ch.word1 }} / {{ ch.word2 }} · {{ ch.sentence }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 设置页面（移除超时时间配置） -->
@@ -328,6 +425,22 @@
             <button class="modal-btn" style="width:100%;" @click="closeResultModal">{{ resultModalData.nextText }}</button>
         </div>
     </div>
+
+    <!-- 课本导入弹窗 -->
+    <div v-if="showTextbookImport" class="modal-mask" @click.self="showTextbookImport=false">
+        <div class="modal-card" style="max-width:600px;">
+            <div class="modal-icon">📖</div>
+            <div class="modal-word">导入课本词汇</div>
+            <div class="modal-message" style="text-align:left; font-size:0.85rem; color:#666; margin-bottom:8px;">
+                格式：每课一个标题（# 第X课），每行：词语 拼音 例句（可选，用空格或Tab分隔）
+            </div>
+            <textarea v-model="textbookImportInput" class="textbook-import-textarea" placeholder="# 第1课&#10;词语1 pinyin1 例句1&#10;词语2 pinyin2&#10;&#10;# 第2课&#10;词语3 pinyin3 例句3"></textarea>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button class="modal-btn" style="flex:1;" @click="confirmImportTextbook">📥 导入</button>
+                <button class="modal-btn cancel" style="flex:1;" @click="showTextbookImport=false">取消</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -381,6 +494,18 @@
                 githubToken: '',
                 githubSyncTime: '',
                 syncing: false,
+                textbookLessons: {},
+                textbookSelections: [],
+                textbookImportInput: '',
+                showTextbookImport: false,
+                usingTextbookPlan: false,
+                vocabularyData: null,
+                vocabularyLoaded: false,
+                vocabLoading: false,
+                vocabUsage: {},
+                vocabSelectedLessons: [],
+                vocabSelectedChars: [],
+                expandedLessons: [],
             }
         },
         computed: {
@@ -455,6 +580,13 @@
                 if(this.wordBankFilter === 'mastered') return this.words.filter(w => w.status === 'mastered');
                 return this.words;
             },
+            textbookWordCount() {
+                let count = 0;
+                for(let lesson of this.textbookSelections) {
+                    if(this.textbookLessons[lesson]) count += this.textbookLessons[lesson].length;
+                }
+                return count;
+            },
             allReviewPlans() {
                 let plansMap = new Map();
                 for(let word of this.words) {
@@ -486,7 +618,7 @@
             formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
             currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
         },
-        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData' },
+        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' } },
         mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); },
         methods: {
             async fetchRemoteData() {
@@ -538,7 +670,7 @@
             },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; } this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; } 
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }                 this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; }  
                 // 月初重置百度账号用量
                 const now = new Date();
                 const thisMonth = now.getFullYear() + '-' + (now.getMonth()+1);
@@ -551,7 +683,7 @@
                 this.saveData(); 
             },
             saveData() { 
-                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime };
+                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
             },
             // ---- 127 辅助方法 ----
@@ -578,6 +710,7 @@
                 return selected;
             },
             generateTodayPlan() {
+                if(this.usingTextbookPlan) return;
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
 
@@ -923,7 +1056,13 @@
                 this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
                     if(pwd === this.parentPassword) {
                         this.currentView='parentHome';
-                    } else this.showAlert('错误', '密码错误');
+                    } else {
+                        this.showConfirm('密码错误', '密码不正确。是否重置为默认密码 8899？', () => {
+                            this.parentPassword = '8899';
+                            this.saveData();
+                            this.showAlert('已重置', '家长密码已重置为 8899，请重新进入家长端');
+                        });
+                    }
                 });
             },
             openWordBankView(){ this.wordBankFilter='all'; this.currentView='wordBank'; },
@@ -1053,6 +1192,116 @@
                 reader.readAsText(file);
                 e.target.value = '';
             },
+            openTextbookManage() {
+                this.textbookImportInput = '';
+                this.showTextbookImport = true;
+            },
+            confirmImportTextbook() {
+                const input = this.textbookImportInput.trim();
+                if(!input) { this.showAlert('提示', '请粘贴课本词汇内容'); return; }
+                try {
+                    const parsed = this.parseTextbookMD(input);
+                    if(Object.keys(parsed).length === 0) { this.showAlert('提示', '未解析到任何课程数据，请检查格式'); return; }
+                    // 合并到现有数据
+                    for(let lesson of Object.keys(parsed)) {
+                        this.textbookLessons[lesson] = parsed[lesson];
+                    }
+                    this.saveData();
+                    this.showTextbookImport = false;
+                    this.textbookImportInput = '';
+                    this.showAlert('导入成功', `共导入 ${Object.keys(parsed).length} 课，${Object.values(parsed).reduce((a,b)=>a+b.length,0)} 个词语`);
+                } catch(e) {
+                    this.showAlert('解析失败', e.message);
+                }
+            },
+            parseTextbookMD(md) {
+                const lines = md.split('\n');
+                const result = {};
+                let currentLesson = null;
+                for(let line of lines) {
+                    line = line.trim();
+                    if(!line) continue;
+                    // 匹配标题行：# 第X课 或 ## 第X课
+                    const titleMatch = line.match(/^#{1,3}\s+(.+)/);
+                    if(titleMatch) {
+                        currentLesson = titleMatch[1].trim();
+                        if(!result[currentLesson]) result[currentLesson] = [];
+                        continue;
+                    }
+                    if(!currentLesson) continue;
+                    // 解析词语行：词语 拼音 例句(可选)
+                    const parts = line.split(/\s+/);
+                    if(parts.length >= 2) {
+                        const word = parts[0];
+                        const pinyin = parts[1];
+                        const context = parts.slice(2).join(' ') || '';
+                        if(word && pinyin) {
+                            result[currentLesson].push({
+                                id: 'tb_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+                                word: word,
+                                pinyin: pinyin,
+                                context: context,
+                                correctCount: 0,
+                                wrongCount: 0,
+                                firstWrong: false,
+                                status: 'learning',
+                                reviewDates: [],
+                                pendingReview: false,
+                                pendingReviewDate: null,
+                                handwritingData: null,
+                                _127_rollingStreak: 0,
+                                _127_day7Entry: null,
+                                _127_randomCheckWeek: 0
+                            });
+                        }
+                    }
+                }
+                return result;
+            },
+            toggleTextbookLesson(lesson) {
+                const idx = this.textbookSelections.indexOf(lesson);
+                if(idx > -1) {
+                    this.textbookSelections.splice(idx, 1);
+                } else {
+                    this.textbookSelections.push(lesson);
+                }
+            },
+            clearTextbookSelections() {
+                this.textbookSelections = [];
+                this.usingTextbookPlan = false;
+                this.generateTodayPlan();
+            },
+            resetToAutoPlan() {
+                this.usingTextbookPlan = false;
+                this.generateTodayPlan();
+            },
+            applyTextbookToPlan() {
+                let selectedWords = [];
+                for(let lesson of this.textbookSelections) {
+                    if(this.textbookLessons[lesson]) {
+                        selectedWords = selectedWords.concat(this.textbookLessons[lesson]);
+                    }
+                }
+                // 去重（按word去重）
+                selectedWords = [...new Map(selectedWords.map(w=>[w.word,w])).values()];
+                if(selectedWords.length === 0) {
+                    this.showAlert('提示', '请先选择至少一课');
+                    return;
+                }
+                // 将课本词合并到主词库（以便默写流程正常记录）
+                for(let w of selectedWords) {
+                    let existing = this.words.find(x => x.word === w.word);
+                    if(!existing) {
+                        this.words.push(w);
+                    }
+                }
+                this.saveData();
+                // 替换今日计划为课本选词
+                this.todayPlanWords = selectedWords.slice(0, 30);
+                this.todayCompletedCount = 0;
+                this.usingTextbookPlan = true;
+                this.showAlert('已应用', `已将 ${this.todayPlanWords.length} 个课本生字设为今日计划`);
+            },
             async syncToGitHub() {
                 if(!this.githubToken) return;
                 this.syncing = true;
@@ -1088,6 +1337,162 @@
                     this.showAlert('同步失败', '网络错误：' + (e.message || e));
                 }
                 this.syncing = false;
+            },
+            // ---- 生词库方法 ----
+            async fetchVocabulary() {
+                if(this.vocabularyData) return;
+                this.vocabLoading = true;
+                try {
+                    const res = await fetch('./vocabulary.json?' + Date.now());
+                    if(!res.ok) throw new Error();
+                    this.vocabularyData = await res.json();
+                    this.vocabularyLoaded = true;
+                } catch(e) {
+                    this.showAlert('提示', '生词库加载失败，请检查 vocabulary.json 是否存在');
+                }
+                this.vocabLoading = false;
+            },
+            openVocabSelector() {
+                if(!this.vocabularyLoaded && !this.vocabLoading) {
+                    this.fetchVocabulary();
+                }
+                this.vocabSelectedLessons = [];
+                this.vocabSelectedChars = [];
+                this.expandedLessons = [];
+                this.currentView = 'vocabSelector';
+            },
+            toggleLessonExpand(key) {
+                const idx = this.expandedLessons.indexOf(key);
+                if(idx > -1) this.expandedLessons.splice(idx, 1);
+                else this.expandedLessons.push(key);
+            },
+            vocabLessonCharCount(lessonKey) {
+                for(let unit of (this.vocabularyData?.units || [])) {
+                    for(let lesson of unit.lessons) {
+                        if(unit.name + '||' + lesson.name === lessonKey) {
+                            return (lesson.shizi?.length || 0) + (lesson.xiezhi?.length || 0);
+                        }
+                    }
+                }
+                return 0;
+            },
+            toggleVocabLesson(unitName, lesson) {
+                const key = unitName + '||' + lesson.name;
+                const idx = this.vocabSelectedLessons.indexOf(key);
+                if(idx > -1) {
+                    this.vocabSelectedLessons.splice(idx, 1);
+                    // 同时取消该课下所有单字勾选
+                    const prefix = unitName + '_' + lesson.name + '_';
+                    this.vocabSelectedChars = this.vocabSelectedChars.filter(c => !c.startsWith(prefix));
+                } else {
+                    this.vocabSelectedLessons.push(key);
+                    // 同时取消该课下所有单字勾选（整课优先）
+                    const prefix = unitName + '_' + lesson.name + '_';
+                    this.vocabSelectedChars = this.vocabSelectedChars.filter(c => !c.startsWith(prefix));
+                }
+            },
+            toggleVocabChar(unitName, lessonName, cat, ch) {
+                const key = unitName + '_' + lessonName + '_' + cat + '_' + ch.char;
+                const idx = this.vocabSelectedChars.indexOf(key);
+                if(idx > -1) {
+                    this.vocabSelectedChars.splice(idx, 1);
+                } else {
+                    // 如果该课是整课选中，先取消整课
+                    const lessonKey = unitName + '||' + lessonName;
+                    const li = this.vocabSelectedLessons.indexOf(lessonKey);
+                    if(li > -1) this.vocabSelectedLessons.splice(li, 1);
+                    this.vocabSelectedChars.push(key);
+                }
+            },
+            isVocabCharSelected(unitName, lessonName, cat, char) {
+                const lessonKey = unitName + '||' + lessonName;
+                if(this.vocabSelectedLessons.includes(lessonKey)) return true;
+                const key = unitName + '_' + lessonName + '_' + cat + '_' + char;
+                return this.vocabSelectedChars.includes(key);
+            },
+            confirmVocabSelect() {
+                let selectedChars = [];
+                // 收集整课勾选的
+                for(let lessonKey of this.vocabSelectedLessons) {
+                    for(let unit of (this.vocabularyData?.units || [])) {
+                        for(let lesson of unit.lessons) {
+                            if(unit.name + '||' + lesson.name === lessonKey) {
+                                for(let ch of (lesson.shizi || [])) {
+                                    selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                                }
+                                for(let ch of (lesson.xiezhi || [])) {
+                                    selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                                }
+                            }
+                        }
+                    }
+                }
+                // 收集单字勾选的
+                for(let key of this.vocabSelectedChars) {
+                    const parts = key.split('_');
+                    const unitName = parts[0];
+                    const lessonName = parts[1];
+                    const cat = parts[2];
+                    const char = parts.slice(3).join('_');
+                    for(let unit of (this.vocabularyData?.units || [])) {
+                        if(unit.name !== unitName) continue;
+                        for(let lesson of unit.lessons) {
+                            if(lesson.name !== lessonName) continue;
+                            const list = cat === 'shizi' ? lesson.shizi : lesson.xiezhi;
+                            const ch = list?.find(c => c.char === char);
+                            if(ch) selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                        }
+                    }
+                }
+                if(selectedChars.length === 0) {
+                    this.showAlert('提示', '请先选择至少一个字');
+                    return;
+                }
+                // 去重（同一个字可能同时被整课和单字选中）
+                const seen = new Set();
+                selectedChars = selectedChars.filter(item => {
+                    if(seen.has(item.ch.char)) return false;
+                    seen.add(item.ch.char);
+                    return true;
+                });
+                let added = 0, exists = 0;
+                for(let item of selectedChars) {
+                    // 交替选组词
+                    const ch = item.ch;
+                    const lastUsed = this.vocabUsage[ch.char]; // 'word1' or 'word2'
+                    let pick;
+                    if(!lastUsed) {
+                        pick = Math.random() < 0.5 ? 'word1' : 'word2';
+                    } else {
+                        pick = lastUsed === 'word1' ? 'word2' : 'word1';
+                    }
+                    this.vocabUsage[ch.char] = pick;
+                    const pickedWord = ch[pick];
+                    if(!this.words.some(w => w.word === pickedWord)) {
+                        this.words.push({
+                            id: Date.now() + pickedWord,
+                            word: pickedWord,
+                            pinyin: toPinyinWithTone(pickedWord),
+                            context: ch.sentence,
+                            status: 'learning',
+                            correctCount: 0,
+                            wrongCount: 0,
+                            firstWrong: false,
+                            reviewDates: [],
+                            pendingReview: false,
+                            _127_rollingStreak: 0,
+                            _127_day7Entry: null,
+                            _127_randomCheckWeek: 0
+                        });
+                        added++;
+                    } else {
+                        exists++;
+                    }
+                }
+                this.saveData();
+                this.generateTodayPlan();
+                this.showAlert('完成', `成功录入 ${added} 个字词` + (exists ? `（${exists} 个已存在）` : ''));
+                this.currentView = 'parentHome';
             },
         }
     }).mount('#app');
