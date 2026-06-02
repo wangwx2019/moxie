@@ -3,23 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>墨趣听写 · 智能复习计划</title>
-    <script>
-    // ===== 版本自检：检测 vocabulary.json 是否更新，强制刷新页面 =====
-    (function(){
-        var VERSION_KEY = 'moxie_vocab_version';
-        var versionMatch = location.href.match(/[?&]v=(\d+)/);
-        if(versionMatch) {
-            localStorage.setItem(VERSION_KEY, versionMatch[1]);
-            // 清理 URL 中的 ?v=xxx
-            var clean = location.href.replace(/[?&]v=\d+/, '').replace(/^([^?]*)[?&]$/, '$1');
-            history.replaceState(null, '', clean);
-        }
-    })();
-    </script>
     <script src="https://unpkg.com/pinyin-pro@3.19.6/dist/index.js"></script>
     <script src="https://unpkg.com/vue@3.4.27/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -425,10 +409,7 @@
         <div v-else>
             <div class="vocab-summary">
                 <span>已选 {{ vocabSelectedChars.length + vocabSelectedLessons.reduce((sum,ln)=>sum+(vocabLessonCharCount(ln)||0),0) }} 个字</span>
-                <div style="display:flex; gap:8px;">
-                    <button class="cute-btn" style="padding:8px 14px; font-size:0.78rem;" @click="hardRefreshVocab" title="词库有更新时点此刷新">🔄 刷新词库</button>
-                    <button class="cute-btn primary" style="padding:8px 20px;" @click="confirmVocabSelect">下一步：确认词语</button>
-                </div>
+                <button class="cute-btn primary" style="padding:8px 20px;" @click="confirmVocabSelect">下一步：确认词语</button>
             </div>
             <div style="max-height:60vh; overflow-y:auto;">
                 <div v-for="unit in vocabularyData.units" :key="unit.name" class="vocab-unit">
@@ -1908,19 +1889,6 @@
                     if(!res.ok) throw new Error();
                     this.vocabularyData = await res.json();
                     this.vocabularyLoaded = true;
-                    // 版本自检：如果 vocabulary.json 有 version 字段且与 localStorage 不一致，硬刷新
-                    if(this.vocabularyData.version) {
-                        var VERSION_KEY = 'moxie_vocab_version';
-                        var oldVer = localStorage.getItem(VERSION_KEY);
-                        var newVer = String(this.vocabularyData.version);
-                        if(oldVer !== newVer) {
-                            localStorage.setItem(VERSION_KEY, newVer);
-                            // 延迟一点让 alert 显示出来再刷新
-                            setTimeout(function(){
-                                location.href = location.href.split('?')[0].split('#')[0] + '?v=' + newVer;
-                            }, 800);
-                        }
-                    }
                 } catch(e) {
                     this.showAlert('提示', '生词库加载失败，请检查 vocabulary.json 是否存在');
                 }
@@ -2004,11 +1972,6 @@
                 if(this.vocabSelectedLessons.includes(lessonKey)) return true;
                 const key = unitName + '_' + lessonName + '_' + cat + '_' + char;
                 return this.vocabSelectedChars.includes(key);
-            },
-            hardRefreshVocab() {
-                // 清除所有缓存，强制重新加载整个页面
-                localStorage.removeItem('moxie_vocab_version');
-                location.href = location.href.split('?')[0].split('#')[0] + '?_=' + Date.now();
             },
             confirmVocabSelect() {
                 let selectedChars = [];
