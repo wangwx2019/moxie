@@ -1,0 +1,4 @@
+*.bak
+word_db_export.json
+.DS_Store
+Thumbs.db
