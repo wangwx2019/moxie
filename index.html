@@ -1907,16 +1907,14 @@
                     if(!res.ok) throw new Error();
                     this.vocabularyData = await res.json();
                     this.vocabularyLoaded = true;
-                    // 版本自检：如果 vocabulary.json 有 version 字段且与 localStorage 不一致，硬刷新
+                    // 版本标记：记录 vocabulary.json 版本号，用于下次检测更新
                     if(this.vocabularyData.version) {
                         var VERSION_KEY = 'moxie_vocab_version';
                         var oldVer = localStorage.getItem(VERSION_KEY);
                         var newVer = String(this.vocabularyData.version);
                         if(oldVer !== newVer) {
                             localStorage.setItem(VERSION_KEY, newVer);
-                            setTimeout(function(){
-                                location.href = location.href.split('?')[0].split('#')[0] + '?v=' + newVer;
-                            }, 800);
+                            // 数据已经加载完成，无需刷新页面
                         }
                     }
                 } catch(e) {
@@ -2005,7 +2003,11 @@
             },
             hardRefreshVocab() {
                 localStorage.removeItem('moxie_vocab_version');
-                location.href = location.href.split('?')[0].split('#')[0] + '?_=' + Date.now();
+                this.vocabularyData = null;
+                this.vocabularyLoaded = false;
+                this.vocabLoading = false;
+                this.showAlert('提示', '正在重新加载词库...');
+                this.fetchVocabulary();
             },
             confirmVocabSelect() {
                 let selectedChars = [];
