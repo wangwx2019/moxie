@@ -2007,16 +2007,19 @@
                 this.vocabularyLoaded = false;
                 this.vocabLoading = true;
                 this.fetchVocabulary().then(() => {
-                    var cnt = 0;
+                    var cnt = 0, unitCnt = 0;
                     if(this.vocabularyData && this.vocabularyData.units) {
                         for(var u of this.vocabularyData.units) {
+                            var hasContent = false;
                             for(var l of u.lessons || []) {
-                                cnt += (l.shizi||[]).length + (l.xiezhi||[]).length;
+                                var n = (l.shizi||[]).length + (l.xiezhi||[]).length;
+                                cnt += n;
+                                if(n > 0) hasContent = true;
                             }
+                            if(hasContent) unitCnt++;
                         }
                     }
-                    var units = this.vocabularyData?.units?.length || 0;
-                    this.showAlert('成功', '词库已刷新：' + units + ' 个单元，' + cnt + ' 个字');
+                    this.showAlert('成功', '词库已刷新：' + unitCnt + ' 个单元，' + cnt + ' 个字');
                 });
             },
             confirmVocabSelect() {
