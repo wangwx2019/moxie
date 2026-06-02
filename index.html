@@ -1899,22 +1899,40 @@
                 this.syncing = false;
             },
             // ---- 生词库方法 ----
-            async fetchVocabulary() {
+            async fetchVocabulary(skipCache) {
                 if(this.vocabularyData) return;
                 this.vocabLoading = true;
+                // 先从 localStorage 读取缓存（除非强制跳过）
+                var CACHE_KEY = 'moxie_vocab_cache';
+                if(!skipCache) {
+                    try {
+                        var cached = localStorage.getItem(CACHE_KEY);
+                        if(cached) {
+                            var parsed = JSON.parse(cached);
+                            if(parsed && parsed.units && parsed.version) {
+                                this.vocabularyData = parsed;
+                                this.vocabularyLoaded = true;
+                                this.vocabLoading = false;
+                                return;
+                            }
+                        }
+                    } catch(e) {}
+                }
+                // 缓存没有或跳过缓存，从网络加载
                 try {
                     const res = await fetch('./vocabulary.json?' + Date.now());
                     if(!res.ok) throw new Error();
                     this.vocabularyData = await res.json();
                     this.vocabularyLoaded = true;
-                    // 版本标记：记录 vocabulary.json 版本号，用于下次检测更新
+                    // 写入缓存
+                    try { localStorage.setItem(CACHE_KEY, JSON.stringify(this.vocabularyData)); } catch(e) {}
+                    // 版本标记
                     if(this.vocabularyData.version) {
                         var VERSION_KEY = 'moxie_vocab_version';
                         var oldVer = localStorage.getItem(VERSION_KEY);
                         var newVer = String(this.vocabularyData.version);
                         if(oldVer !== newVer) {
                             localStorage.setItem(VERSION_KEY, newVer);
-                            // 数据已经加载完成，无需刷新页面
                         }
                     }
                 } catch(e) {
@@ -2003,10 +2021,11 @@
             },
             hardRefreshVocab() {
                 localStorage.removeItem('moxie_vocab_version');
+                localStorage.removeItem('moxie_vocab_cache');
                 this.vocabularyData = null;
                 this.vocabularyLoaded = false;
                 this.vocabLoading = true;
-                this.fetchVocabulary().then(() => {
+                this.fetchVocabulary(true).then(() => {
                     var cnt = 0, unitCnt = 0;
                     if(this.vocabularyData && this.vocabularyData.units) {
                         for(var u of this.vocabularyData.units) {
