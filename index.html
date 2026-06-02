@@ -2005,9 +2005,19 @@
                 localStorage.removeItem('moxie_vocab_version');
                 this.vocabularyData = null;
                 this.vocabularyLoaded = false;
-                this.vocabLoading = false;
-                this.showAlert('提示', '正在重新加载词库...');
-                this.fetchVocabulary();
+                this.vocabLoading = true;
+                this.fetchVocabulary().then(() => {
+                    var cnt = 0;
+                    if(this.vocabularyData && this.vocabularyData.units) {
+                        for(var u of this.vocabularyData.units) {
+                            for(var l of u.lessons || []) {
+                                cnt += (l.shizi||[]).length + (l.xiezhi||[]).length;
+                            }
+                        }
+                    }
+                    var units = this.vocabularyData?.units?.length || 0;
+                    this.showAlert('成功', '词库已刷新：' + units + ' 个单元，' + cnt + ' 个字');
+                });
             },
             confirmVocabSelect() {
                 let selectedChars = [];
