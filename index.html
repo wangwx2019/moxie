@@ -2100,8 +2100,7 @@
                     this.vocabUsage[ch.char] = pick;
                     const pickedWord = ch[pick];
                     const pickedPinyin = toPinyinWithTone(pickedWord);
-                    const sentenceKey = 'sentence' + pick.slice(-1);
-                    let example = ch[sentenceKey] || '';
+                    let example = ch.sentence || '';
                     if(example.includes(pickedWord)) {
                         example = example.split(pickedWord).join(pickedPinyin);
                     }
