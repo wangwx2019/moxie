@@ -156,7 +156,6 @@
             <div class="flex-between"><strong>📖 今日默写计划</strong><span class="badge">{{ todayPlanWords.length }} 个</span></div>
             <div style="margin: 10px 0;">✨ 已完成: {{ todayCompletedCount }} / {{ todayPlanWords.length }}</div>
             <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession" :disabled="todayPlanWords.length === 0">✍️ 田字格手写默写</button>
-            <button class="cute-btn" style="width:100%; margin-top:10px;" :disabled="todayWrongReviewWords.length === 0" @click="startWrongReviewSession">🔁 错字复习 <span class="badge" :style="todayWrongReviewWords.length === 0 ? 'background:#9ca3af; color:#fff;' : 'background:#fbbf24; color:#1c1917;'">{{ todayWrongReviewWords.length }}</span></button>
         </div>
         <div class="card-white" @click="openWrongWordsView" style="cursor:pointer;">
             <div class="flex-between">
@@ -164,13 +163,16 @@
                 <span class="badge">{{ wrongWordsCount }} 个错字 →</span>
             </div>
         </div>
-        <div class="card-white" v-if="todayWrongReviewWords.length > 0" @click="startWrongReviewSession" style="cursor:pointer; border: 2px solid var(--danger);">
-            <div class="flex-between">
-                <span><strong>🔁 今日错字复习</strong></span>
-                <span class="badge" style="background:#fbbf24; color:#1c1917; font-weight:800;">{{ todayWrongReviewWords.length }} 个需抄写 →</span>
+        <div class="card-white" v-if="wrongWordsCount > 0">
+            <div><strong>🔁 累计错字 <span class="badge" style="background:#ef4444; color:#fff;">{{ wrongWordsCount }}</span></strong></div>
+            <div style="margin:10px 0; display:flex; gap:6px; flex-wrap:wrap;">
+                <span v-for="w in allWrongWordsDisplay" :key="w.id" style="display:inline-flex; align-items:center; gap:6px; background:#fef2f2; padding:4px 10px; border-radius:20px;">
+                    <span style="font-weight:700; font-size:1.1rem;">{{ w.word }}</span>
+                    <span style="font-size:0.75rem; color:#9ca3af;">{{ w.wrongCount }}次</span>
+                </span>
             </div>
-            <div style="margin:8px 0 0; display:flex; gap:6px; flex-wrap:wrap;">
-                <span v-for="w in todayWrongReviewWords" :key="w.id" class="chip-word" style="font-size:1.2rem;">{{ w.word }}</span>
+            <div style="text-align:center;">
+                <button class="cute-btn primary" style="width:100%; padding:14px 0; font-size:1rem; font-weight:700;" @click="practiceAllWrongWords">✍️ 练习全部错字</button>
             </div>
         </div>
         <div class="card-white" v-if="Object.keys(textbookLessons).length > 0">
@@ -198,84 +200,54 @@
     <!-- 手写默写界面 -->
     <div v-if="currentView === 'dictateView'" class="dictate-session">
         <div style="padding: 12px 16px 0;"><div class="nav-back" @click="abortDictate">🐣 返回首页</div></div>
-        <!-- 错字复习模式的头部统计 -->
-        <div class="dictate-header-stats" v-if="isWrongReviewMode">
-            <span>🔁 {{ wrongReviewCorrectCount }}/{{ wrongReviewTotalCount }}</span>
-            <span class="timer">⏱️ {{ formattedWrongReviewTimer }}</span>
-            <span>✨ 余{{ wrongReviewRemainCount }}</span>
-            <span>📝 错字复习</span>
-        </div>
-        <!-- 正常默写模式的头部统计 -->
-        <div class="dictate-header-stats" v-else>
+        <!-- 默写模式头部统计 -->
+        <div class="dictate-header-stats">
             <span>📝 {{ sessionCorrectCount }}/{{ sessionTotalCount }}</span>
             <span class="timer">⏱️ {{ formattedTimer }}</span>
             <span>✨ 余{{ sessionRemainCount }}</span>
             <span class="review-link" @click="goToReviewFromChild">💾 待复核 {{ pendingReviewCount }}</span>
         </div>
-        <!-- 错字复习模式：显示汉字+拼音，抄写3遍 -->
-        <div class="dictate-main-card" v-if="isWrongReviewMode && currentWrongReviewWord">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:16px;">
-                <div style="font-size:4rem; font-weight:900; color:#f97316; line-height:1.2;">{{ currentWrongReviewWord.word }}</div>
-                <div style="font-size:1.8rem; color:#b45309; font-weight:600;">{{ currentWrongReviewWord.pinyin }}</div>
-            </div>
-            <div v-for="copy in 3" :key="copy" style="margin-bottom:16px;">
-                <div style="text-align:center; margin-bottom:8px;">
-                    <span style="display:inline-block; background:#fef3c7; padding:4px 20px; border-radius:40px; font-size:1rem; font-weight:700; color:#92400e;">{{ ['第一遍','第二遍','第三遍'][copy-1] }}</span>
-                </div>
-                <div class="tian-ge-grid">
-                    <div v-for="(char, idx) in currentWrongReviewWord.word.split('')" :key="copy + '_' + idx" class="tian-ge-cell">
-                        <canvas :id="'tg_wr_' + (copy-1) + '_' + idx" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="action-row">
-                <button class="cute-btn" :class="{ 'eraser-active': eraserActive }" @click="toggleEraser" style="position:relative;">🧽 橡皮擦</button>
-                <button class="cute-btn primary" @click="wrongReviewNextWord">✨ 下一个</button>
-            </div>
-            <div v-if="eraserActive" style="text-align:center; margin-bottom:8px; font-size:0.85rem; color:#d97706;">✏️ 点击田字格中的字即可擦除，再次点击「橡皮擦」退出</div>
-            <div class="text-small" v-else>✏️ 在下方3行田字格中各写一遍，然后点击"下一个"。</div>
-            <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
-        </div>
-        <!-- 正常默写模式 -->
+        <!-- 三词连练模式 -->
         <div class="dictate-main-card" v-else-if="currentSessionWord">
-            <!-- 大字显示：拼音 + 词语（错字复习）/ 拼音（正常学习） -->
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                <div class="pinyin-big">🔊 {{ currentSessionWord.pinyin }}</div>
-                <span v-if="isInReviewQueue(currentSessionWord)" style="font-size:2.2rem; font-weight:800; line-height:1.2;">{{ currentSessionWord.word }}</span>
+            <!-- 拼音大号居中 -->
+            <div style="text-align:center; margin-bottom:20px;">
+                <div style="font-size:3.5rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">🔊 {{ currentSessionWord.pinyin }}</div>
             </div>
-            <!-- 错字复习：例句完整显示词语 -->
-            <div class="context-illustration">{{ currentSessionWord.context.replace(/(.*?)(\s[\u4e00-\u9fa5]+[\s。！？。]?) | (.*?)(\s[\u4e00-\u9fa5]+[\s。！？。?]?) /g, '$1<span style="color:#f97316; font-size:1.3rem;">$2</span>$3') }}</div>
-            <div class="tian-ge-grid">
-                <div v-for="(char, idx) in currentSessionWord.word.split('')" :key="idx" class="tian-ge-cell">
-                    <canvas :id="'tg_' + idx" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;"></canvas>
+            <!-- 3个组词卡片 -->
+            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px; flex-wrap:wrap;">
+                <div v-for="(w, idx) in (currentSessionWord.words || [currentSessionWord.word])" :key="idx"
+                     :style="{
+                         padding: '10px 20px',
+                         borderRadius: '16px',
+                         border: idx === sessionCurrentWordIdx ? '3px solid #f97316' : '2px solid #e5e7eb',
+                         background: idx === sessionCurrentWordIdx ? '#fff7ed' : '#f9fafb',
+                         color: idx === sessionCurrentWordIdx ? '#c2410c' : '#9ca3af',
+                         fontWeight: idx === sessionCurrentWordIdx ? 700 : 400,
+                         fontSize: '1.2rem',
+                         transition: 'all 0.2s',
+                         cursor: 'default'
+                     }">
+                    {{ w }}
+                </div>
+            </div>
+            <!-- 单字田字格canvas -->
+            <div style="display:flex; justify-content:center; margin-bottom:16px;">
+                <div class="tian-ge-cell">
+                    <canvas id="tg_c" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;"></canvas>
                 </div>
             </div>
             <div class="action-row">
                 <button class="cute-btn" @click="handleDontKnow">😵 不会</button>
                 <button class="cute-btn" @click="clearCurrentCanvas">🧽 橡皮擦</button>
                 <button class="cute-btn" @click="clearAllCanvas">🗑️ 清除</button>
-                <button class="cute-btn primary" @click="recognizeAndSubmit">✨ 保存并继续</button>
+                <button class="cute-btn primary" @click="recognizeAndSubmit">✨ {{ traceMode ? '保存并继续' : '保存并继续' }}</button>
             </div>
-            <div class="text-small">✏️ 在田字格里书写。写错直接安排复习；不会的词则继续练习。</div>
+            <div class="text-small" v-if="!traceMode">✏️ 写出「<span style="color:#f97316; font-weight:700;">{{ (currentSessionWord.words || [currentSessionWord.word])[sessionCurrentWordIdx] }}</span>」中的「{{ currentSessionWord.word }}」字。写对任意一个即算通过。</div>
+            <div class="text-small" v-else style="color:#d97706;">✏️ 照着浅色字描摹，然后点击「保存并继续」。</div>
             <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
         </div>
-        <!-- 错字复习完成页面 -->
-        <div v-if="isWrongReviewMode && wrongReviewFinished" class="dictate-main-card" style="text-align:center;">
-            <div v-if="!sessionBatchSubmitted">
-                <div style="font-size:1.3rem;">✍️ 全部抄写完了！提交AI批改</div>
-                <button class="cute-btn primary" style="width:100%; margin-top:20px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="submitWrongReviewBatch" :disabled="ocrBusy">{{ ocrBusy ? '批改中...' : '📋 提交AI批改' }}</button>
-            </div>
-            <div v-else>
-                <div style="font-size:1.3rem;">🎉 错字复习完成！</div>
-                <div style="margin:12px 0; font-size:1rem;">✅ 正确 {{ sessionCorrectCount }} / {{ wrongReviewTaskList.length }} 个词</div>
-                <div v-if="todayWrongReviewWords.length > 0" style="margin:8px 0; padding:10px; background:#fef3c7; border-radius:16px; color:#92400e;">
-                    还有 {{ todayWrongReviewWords.length }} 个词需要继续复习
-                </div>
-                <button class="cute-btn primary" style="width:100%; margin-top:20px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="finishAndGoHome">返回首页</button>
-            </div>
-        </div>
-        <!-- 正常默写完成页面 -->
-        <div v-if="!isWrongReviewMode && sessionFinished" class="dictate-main-card" style="text-align:center;">
+        <!-- 默写完成页面 -->
+        <div v-if="sessionFinished" class="dictate-main-card" style="text-align:center;">
             <div v-if="!sessionBatchSubmitted">
                 <div style="font-size:1.3rem;">✍️ 全部写完了！提交AI批改判对错</div>
                 <button class="cute-btn primary" style="width:100%; margin-top:20px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="batchSubmitAll" :disabled="ocrBusy">{{ ocrBusy ? '批改中...' : '📋 提交AI批改全部' }}</button>
@@ -308,16 +280,24 @@
     <!-- 词库管理 -->
     <div v-if="currentView === 'wordBank'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
-        <h3>📖 词库管理</h3>
+        <div class="flex-between"><h3>📖 词库管理</h3><button class="cute-btn-sm" style="background:#ef4444; color:white;" @click.stop="confirmDeleteAll()">🗑️ 清空当前</button></div>
         <div class="category-tabs"><div v-for="cat in categoryStats" :key="cat.key" class="cat-item" :class="{active: wordBankFilter === cat.key}" @click="wordBankFilter = cat.key">{{ cat.label }}({{ cat.count }})</div></div>
-        <div style="max-height: 55vh; overflow-y: auto;">
-            <div v-for="word in filteredWordBank" :key="word.id" class="word-list-item">
-                <div style="cursor:pointer;" @click="showWordDetail(word)">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <span style="font-weight:700; white-space:nowrap;">{{ word.word }}</span>
-                        <span v-if="!isInReviewQueue(word)" style="color:#666; font-size:0.9em;">({{ word.pinyin }})</span>
-                        <span class="word-badge" v-if="word.wrongCount >= 5" style="margin-left:4px;">顽固</span><span class="word-badge" v-else-if="word.wrongCount >= 3" style="margin-left:4px;">难点</span><span class="word-badge" v-else-if="word.wrongCount === 1" style="margin-left:4px;">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="margin-left:4px; background:#dcfce7;">已掌握</span>
-                        <div class="text-small" style="margin-left:4px;">错{{ word.wrongCount || 0 }}次</div>
+        <div v-if="wordBankSelected.length > 0" style="display:flex; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid #ffe2cc; margin-bottom:8px;">
+            <span style="font-size:0.85rem; color:#92400e; font-weight:600;">已选 {{ wordBankSelected.length }} 项</span>
+            <button class="cute-btn-sm" style="background:#ef4444; color:white;" @click="confirmBatchDelete()">删除选中</button>
+            <button class="cute-btn-sm" style="background:#eee;" @click="clearSelection()">取消选择</button>
+        </div>
+        <div style="max-height: 50vh; overflow-y: auto;">
+            <div v-for="word in filteredWordBank" :key="word.id" class="word-list-item" :style="{background: wordBankSelected.includes(word.id) ? '#fff2e6' : ''}">
+                <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+                    <div class="vocab-lesson-check" :class="{checked: wordBankSelected.includes(word.id)}" @click.stop="toggleWordSelection(word.id)" style="cursor:pointer; flex-shrink:0;">{{ wordBankSelected.includes(word.id) ? '✓' : '' }}</div>
+                    <div style="cursor:pointer; flex:1; min-width:0;" @click="showWordDetail(word)">
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                            <span style="font-weight:700; white-space:nowrap;">{{ word.word }}</span>
+                            <span v-if="!isInReviewQueue(word)" style="color:#666; font-size:0.9em;">({{ word.pinyin }})</span>
+                            <span class="word-badge" v-if="word.wrongCount >= 5" style="margin-left:4px;">顽固</span><span class="word-badge" v-else-if="word.wrongCount >= 3" style="margin-left:4px;">难点</span><span class="word-badge" v-else-if="word.wrongCount === 1" style="margin-left:4px;">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="margin-left:4px; background:#dcfce7;">已掌握</span>
+                            <div class="text-small" style="margin-left:4px;">错{{ word.wrongCount || 0 }}次</div>
+                        </div>
                     </div>
                 </div>
                 <div><button class="cute-btn-sm" style="padding:2px 12px; margin-right:6px;" @click.stop="editWord(word)">✏️</button><button class="cute-btn-sm" style="padding:2px 12px; background:#ef4444;" @click.stop="confirmDeleteWord(word)">🗑️</button></div>
@@ -363,15 +343,17 @@
                         <span v-if="item.word.pendingReviewDate" class="date-badge">{{ relativeDateStr(item.word.pendingReviewDate) }}</span>
                         <span class="text-small">({{ item.word.pinyin }})</span>
                     </div>
-                    <button v-if="item.word.pendingReview" class="cute-btn-sm" @click="correctWord(item.word)">纠正</button>
-                    <span v-else class="text-small" style="color:#16a34a;">已确认</span>
+                    <span v-if="item.word.reviewCorrected" style="display:flex; gap:4px; align-items:center;">
+                        <span class="text-small" style="color:#16a34a;">已纠正</span>
+                        <button class="cute-btn-sm" style="background:#eee; color:#666; padding:2px 8px; font-size:0.7rem;" @click="undoCorrectWord(item.word)">撤销</button>
+                    </span>
+                    <button v-else class="cute-btn-sm" @click="correctWord(item.word)">纠正</button>
                 </div>
                 <div v-if="item.handwritingImages" class="handwriting-preview">
                     <div v-for="(imgSrc, cidx) in item.handwritingImages" :key="cidx">
                         <img :src="imgSrc" class="preview-img" width="70" height="70" />
                     </div>
                 </div>
-                <div v-if="item.showCorrectionHint" class="correction-hint">已将【错】纠正为【对】</div>
             </div>
             <div v-if="filteredReviewList.length === 0" class="card-white">📅 今日无默写计划</div>
             <div v-else-if="reviewList.length > 0 && filteredReviewList.length === 0" class="card-white">当前筛选项没有匹配的词</div>
@@ -412,6 +394,10 @@
     <div v-if="currentView === 'vocabSelector'" class="page-container">
         <div class="nav-back" @click="currentView='addWizard'; wizardStep=1">← 返回</div>
         <h3>📖 从生词库选择</h3>
+        <div style="display:flex; gap:8px; margin-bottom:12px; background:#fef5e8; border-radius:40px; padding:4px;">
+            <span :style="{flex:1, textAlign:'center', padding:'8px 12px', borderRadius:'40px', fontWeight:'600', fontSize:'0.9rem', cursor:'pointer', transition:'all 0.15s', background: vocabSource === 'xiezhi' ? '#f97316' : 'transparent', color: vocabSource === 'xiezhi' ? 'white' : '#92400e'}" @click="switchVocabSource('xiezhi')">✍️ 写字表（会写字）</span>
+            <span :style="{flex:1, textAlign:'center', padding:'8px 12px', borderRadius:'40px', fontWeight:'600', fontSize:'0.9rem', cursor:'pointer', transition:'all 0.15s', background: vocabSource === 'shizi' ? '#f97316' : 'transparent', color: vocabSource === 'shizi' ? 'white' : '#92400e'}" @click="switchVocabSource('shizi')">👀 识字表（会认字）</span>
+        </div>
         <div v-if="!vocabularyLoaded" style="text-align:center; padding:40px 0;">
             <div v-if="vocabLoading" class="text-small">加载生词库中...</div>
             <div v-else style="display:flex; flex-direction:column; gap:12px; align-items:center;">
@@ -445,7 +431,7 @@
                                 <div class="vocab-char-grid">
                                     <div v-for="ch in lesson.shizi" :key="'sz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'shizi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'shizi', ch)">
                                         <span class="char-word">{{ ch.char }}</span>
-                                        <span class="char-detail">{{ ch.word1 }} / {{ ch.word2 }} · {{ ch.sentence }}</span>
+                                        <span class="char-detail">{{ ch.words[0] }} / {{ ch.words[1] }} · {{ ch.words[2] }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -454,7 +440,7 @@
                                 <div class="vocab-char-grid">
                                     <div v-for="ch in lesson.xiezhi" :key="'xz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'xiezhi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'xiezhi', ch)">
                                         <span class="char-word">{{ ch.char }}</span>
-                                        <span class="char-detail">{{ ch.word1 }} / {{ ch.word2 }} · {{ ch.sentence }}</span>
+                                        <span class="char-detail">{{ ch.words[0] }} / {{ ch.words[1] }} · {{ ch.words[2] }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -488,7 +474,24 @@
                         <span style="font-size:0.75rem; color:#a16207;">{{ acc.used }}/500 次</span>
                         <button v-if="baiduAccounts.length>1" class="cute-btn-sm" style="background:#eee; color:#999; padding:2px 10px; font-size:0.7rem;" @click="removeAccount(i)">✕</button>
                     </div>
-                    <input type="text" v-model="acc.token" placeholder="粘贴 access_token" style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; margin-top:6px; box-sizing:border-box;">
+                    <div style="display:flex; gap:6px; margin-top:6px;">
+                        <input type="text" v-model="acc.apiKey" placeholder="API Key" style="flex:1; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; box-sizing:border-box;">
+                        <input type="password" v-model="acc.secretKey" placeholder="Secret Key" style="flex:1; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; box-sizing:border-box;">
+                    </div>
+                    <div style="margin-top:6px;">
+                        <input type="text" v-model="acc.token" placeholder="access_token（从百度接口返回的 JSON 中复制过来）" style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; box-sizing:border-box;">
+                    </div>
+                    <div style="display:flex; gap:6px; margin-top:6px; align-items:center;">
+                        <span :style="'font-size:0.75rem; color:' + (isBaiduTokenExpired(acc) ? '#dc2626' : '#16a34a') + '; flex:1;'">
+                            {{ isBaiduTokenExpired(acc) ? '❌ Token 已过期或未获取' : '✅ Token 有效中' }}
+                        </span>
+                        <button class="cute-btn-sm" style="background:#f97316; color:white; border:none; padding:6px 14px; border-radius:40px; font-size:0.78rem; cursor:pointer;" @click="refreshBaiduToken(i)">🔄 自动获取 Token</button>
+                        <button class="cute-btn-sm" style="background:#e5e7eb; color:#374151; border:none; padding:6px 12px; border-radius:40px; font-size:0.75rem; cursor:pointer;" @click="saveBaiduToken(i)">保存</button>
+                    </div>
+                    <div class="text-small" style="margin-top:4px; color:#b45309;">
+                        <b>方式一：</b>在百度云控制台 → 文字识别 → 创建应用，拿到 API Key 和 Secret Key，点击「自动获取 Token」<br>
+                        <b>方式二：</b>如果浏览器限制无法自动获取，点击「自动获取 Token」→ 复制链接 → 浏览器新标签页打开 → 返回的 JSON 中找到 <code>access_token</code> 字段 → 复制粘到上面的输入框 → 点「保存」
+                    </div>
                     <div style="margin-top:6px; height:6px; background:#f0e4d0; border-radius:3px; overflow:hidden;">
                         <div :style="'height:100%; width:' + Math.min(acc.used*100/500,100) + '%; background:' + (acc.used>=500?'#ef4444':'#f97316') + '; border-radius:3px;'"></div>
                     </div>
@@ -519,9 +522,12 @@
         <div class="category-tabs">
             <div v-for="cat in wrongWordsCategories" :key="cat.key" class="cat-item" :class="{active: wrongWordsFilter === cat.key}" @click="wrongWordsFilter = cat.key">{{ cat.label }}({{ cat.count }})</div>
         </div>
-        <div style="max-height: 60vh; overflow-y: auto;">
+        <div style="margin-bottom:12px;">
+            <button class="cute-btn" style="width:100%;" @click="openAddWrongWordModal">➕ 新增错字</button>
+        </div>
+        <div style="max-height: 50vh; overflow-y: auto;">
             <div v-for="word in filteredWrongWords" :key="word.id" class="word-list-item">
-                <div style="cursor:pointer;" @click="showWordDetail(word)">
+                <div style="cursor:pointer; flex:1;" @click="showWordDetail(word)">
                     <span style="font-weight:700;">{{ word.word }}</span>
                     <span class="word-badge" v-if="word.status === 'mastered'" style="background:#dcfce7; color:#166534;">已掌握</span>
                     <span class="word-badge" v-else-if="word.wrongCount >= 5">顽固</span>
@@ -534,6 +540,9 @@
                         <img :src="imgSrc" class="preview-img">
                     </div>
                 </div>
+                <div style="margin-left:8px;">
+                    <button class="cute-btn" style="padding:4px 10px; font-size:0.8rem; background:#fee2e2; color:#dc2626; border:none; border-radius:8px; cursor:pointer;" @click="removeFromWrongWords(word)">删除</button>
+                </div>
             </div>
         </div>
         <div v-if="filteredWrongWords.length === 0" style="text-align:center; padding:40px 0; color:#aaa;">
@@ -544,14 +553,14 @@
 
     <!-- 弹窗组件 -->
     <div v-if="customModal.visible" class="modal-mask" @click.self="customModal.visible=false">
-        <div class="modal-container">
+        <div class="modal-container" tabindex="0" ref="confirmModal" @keydown.enter="customModal.onConfirm?.()" @keydown.escape="customModal.onCancel?.()">
             <div class="modal-icon">{{ customModal.icon || '📌' }}</div>
             <div class="modal-word">{{ customModal.title || '提示' }}</div>
             <div class="modal-message">{{ customModal.message }}</div>
-            <input v-if="customModal.inputType" v-model="customModal.inputValue" class="modal-input" :placeholder="customModal.placeholder || ''">
+            <input v-if="customModal.inputType" v-model="customModal.inputValue" class="modal-input" :placeholder="customModal.placeholder || ''" @keydown.enter="customModal.onConfirm?.()">
             <div class="modal-buttons">
                 <button v-if="customModal.showCancel" class="modal-btn cancel" @click="customModal.onCancel?.()">取消</button>
-                <button class="modal-btn" @click="customModal.onConfirm?.()">确认</button>
+                <button class="modal-btn" ref="confirmBtn" @click="customModal.onConfirm?.()">确认</button>
             </div>
         </div>
     </div>
@@ -584,6 +593,438 @@
     </div>
 </div>
 
+<script>window.VOCABULARY_EMBEDDED = {
+  units: [
+    {
+      name: '第一单元',
+      lessons: [
+        {
+          name: '课文1',
+          shizi: [
+            { char: '两', pinyin: '', words: ['两个', '两边', '两旁'] },
+            { char: '条', pinyin: '', words: ['面条', '条纹', '一条'] },
+            { char: '哪', pinyin: '', words: ['哪里', '哪儿', '哪位'] },
+            { char: '宽', pinyin: '', words: ['宽阔', '宽广', '宽大'] },
+            { char: '那', pinyin: '', words: ['那里', '那边', '那样'] },
+            { char: '短', pinyin: '', words: ['长短', '短小', '短处'] },
+            { char: '孩', pinyin: '', words: ['孩子', '小孩', '孩童'] },
+            { char: '成', pinyin: '', words: ['成长', '完成', '成功'] },
+          ]
+        },
+        {
+          name: '课文2',
+          shizi: [
+            { char: '升', pinyin: '', words: ['升起', '上升', '升高'] },
+            { char: '连', pinyin: '', words: ['连线', '相连', '接连'] },
+            { char: '起', pinyin: '', words: ['起床', '起立', '起身'] },
+            { char: '海', pinyin: '', words: ['大海', '海水', '海洋'] },
+            { char: '洋', pinyin: '', words: ['海洋', '大洋', '洋流'] },
+            { char: '许', pinyin: '', words: ['许多', '少许', '准许'] },
+            { char: '作', pinyin: '', words: ['作业', '工作', '作画'] },
+            { char: '办', pinyin: '', words: ['办法', '办事', '办理'] },
+            { char: '法', pinyin: '', words: ['方法', '法则', '法律'] },
+          ]
+        },
+        {
+          name: '课文3',
+          shizi: [
+            { char: '如', pinyin: '', words: ['如果', '如今', '如同'] },
+            { char: '已', pinyin: '', words: ['已经', '已然', '早已'] },
+            { char: '经', pinyin: '', words: ['经过', '经常', '经历'] },
+            { char: '别', pinyin: '', words: ['别人', '分别', '告别'] },
+            { char: '轻', pinyin: '', words: ['轻巧', '轻松', '轻快'] },
+            { char: '发', pinyin: 'fā', words: ['发现', '出发', '分发'] },
+            { char: '胆', pinyin: '', words: ['胆子', '胆量', '胆小'] },
+            { char: '肚', pinyin: 'dù', words: ['肚子', '肚皮', '肚量'] },
+            { char: '更', pinyin: 'gèng', words: ['更加', '更好', '更新'] },
+            { char: '识', pinyin: 'shí', words: ['认识', '知识', '识别'] },
+          ]
+        },
+        {
+          name: '语文园地一',
+          shizi: [
+            { char: '转', pinyin: 'zhuǎn', words: ['转身', '转弯', '转动'] },
+          ]
+        },
+      ]
+    },
+    {
+      name: '第二单元',
+      lessons: [
+        {
+          name: '课文1',
+          shizi: [
+            { char: '处', pinyin: 'chù', words: ['住处', '处所', '处理'] },
+            { char: '块', pinyin: '', words: ['石块', '方块', '冰块'] },
+            { char: '座', pinyin: '', words: ['座位', '一座', '底座'] },
+            { char: '园', pinyin: '', words: ['公园', '花园', '园林'] },
+            { char: '群', pinyin: '', words: ['人群', '羊群', '群体'] },
+            { char: '队', pinyin: '', words: ['队伍', '排队', '队长'] },
+            { char: '领', pinyin: '', words: ['带领', '领取', '领头'] },
+          ]
+        },
+        {
+          name: '课文2',
+          shizi: [
+            { char: '树', pinyin: '', words: ['树木', '大树', '树叶'] },
+            { char: '之', pinyin: '', words: ['之间', '之前', '总之'] },
+            { char: '杨', pinyin: '', words: ['杨树', '白杨', '杨柳'] },
+            { char: '松', pinyin: '', words: ['松树', '松柏', '放松'] },
+            { char: '柏', pinyin: 'bǎi', words: ['柏树', '松柏', '柏木'] },
+            { char: '化', pinyin: '', words: ['变化', '化石', '融化'] },
+            { char: '金', pinyin: '', words: ['金色', '黄金', '金秋'] },
+            { char: '桂', pinyin: '', words: ['桂花', '桂圆', '桂树'] },
+          ]
+        },
+        {
+          name: '课文3',
+          shizi: [
+            { char: '拍', pinyin: '', words: ['拍打', '拍手', '拍照'] },
+            { char: '世', pinyin: '', words: ['世界', '世间', '世代'] },
+            { char: '界', pinyin: '', words: ['边界', '外界', '界限'] },
+            { char: '彩', pinyin: '', words: ['彩色', '彩虹', '色彩'] },
+            { char: '丛', pinyin: '', words: ['草丛', '丛林', '花丛'] },
+            { char: '休', pinyin: '', words: ['休息', '休假', '午休'] },
+            { char: '朋', pinyin: '', words: ['朋友', '亲朋', '朋党'] },
+            { char: '友', pinyin: '', words: ['友人', '友好', '友爱'] },
+            { char: '保', pinyin: '', words: ['保护', '保卫', '保存'] },
+            { char: '护', pinyin: '', words: ['守护', '爱护', '防护'] },
+          ]
+        },
+        {
+          name: '课文4',
+          shizi: [
+            { char: '季', pinyin: '', words: ['季节', '四季', '季度'] },
+            { char: '肥', pinyin: '', words: ['肥胖', '肥料', '肥沃'] },
+            { char: '农', pinyin: '', words: ['农民', '农田', '农业'] },
+            { char: '事', pinyin: '', words: ['事情', '故事', '事务'] },
+            { char: '谷', pinyin: 'gǔ', words: ['稻谷', '山谷', '谷物'] },
+            { char: '体', pinyin: '', words: ['身体', '体育', '形体'] },
+            { char: '虽', pinyin: '', words: ['虽然', '虽说', '虽则'] },
+            { char: '辛', pinyin: '', words: ['辛苦', '辛劳', '艰辛'] },
+            { char: '苦', pinyin: '', words: ['苦难', '吃苦', '苦味'] },
+            { char: '初', pinyin: '', words: ['初始', '初夏', '初次'] },
+          ]
+        },
+        {
+          name: '语文园地二',
+          shizi: [
+            { char: '丑', pinyin: '', words: ['丑陋', '丑事', '丑恶'] },
+          ]
+        },
+      ]
+    },
+    {
+      name: '第三单元',
+      lessons: [
+        {
+          name: '课文4',
+          shizi: [
+            { char: '丽', pinyin: '', words: ['美丽', '秀丽', '华丽'] },
+            { char: '提', pinyin: 'tí', words: ['提起', '手提', '提醒'] },
+            { char: '吗', pinyin: 'ma', words: ['好吗', '是吗', '对吗'] },
+            { char: '圆', pinyin: '', words: ['圆形', '圆圈', '团圆'] },
+            { char: '哥', pinyin: '', words: ['哥哥', '表哥', '大哥'] },
+            { char: '秋', pinyin: '', words: ['秋天', '金秋', '秋风'] },
+            { char: '挂', pinyin: '', words: ['悬挂', '挂钩', '挂念'] },
+            { char: '啊', pinyin: '', words: ['好啊', '真美啊'] },
+          ]
+        },
+        {
+          name: '语文园地三',
+          shizi: [
+            { char: '图', pinyin: '', words: ['图画', '地图', '图纸'] },
+            { char: '泥', pinyin: '', words: ['泥土', '泥巴', '水泥'] },
+            { char: '铁', pinyin: '', words: ['铁钉', '钢铁', '铁锅'] },
+          ]
+        },
+      ]
+    },
+    {
+      name: '第四单元',
+      lessons: [
+        {
+          name: '课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银',
+          shizi: [
+            { char: '依', pinyin: '', words: ['依赖', '依靠', '依据'] },
+            { char: '尽', pinyin: '', words: ['尽力', '尽头', '尽心'] },
+            { char: '穷', pinyin: '', words: ['无穷', '贫穷', '穷苦'] },
+            { char: '层', pinyin: '', words: ['层次', '分层', '层级'] },
+            { char: '照', pinyin: '', words: ['照看', '依照', '照射'] },
+            { char: '炉', pinyin: '', words: ['火炉', '电炉', '锅炉'] },
+            { char: '烟', pinyin: '', words: ['烟火', '浓烟', '烟花'] },
+            { char: '川', pinyin: '', words: ['名山大川', '一马平川', '川流不息'] },
+            { char: '直', pinyin: '', words: ['笔直', '正直', '真心'] },
+            { char: '银', pinyin: '', words: ['银行', '银河', '银杏'] },
+          ]
+        },
+        {
+          name: '课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状',
+          shizi: [
+            { char: '仙', pinyin: '', words: ['仙女', '神仙', '仙境'] },
+            { char: '顶', pinyin: '', words: ['山顶', '头顶', '房顶'] },
+            { char: '巨', pinyin: '', words: ['巨大', '巨人', '巨变'] },
+            { char: '位', pinyin: '', words: ['一位', '地位', '位子'] },
+            { char: '闪', pinyin: '', words: ['闪耀', '闪电', '闪开'] },
+            { char: '狗', pinyin: '', words: ['小狗', '狼狗', '猎狗'] },
+            { char: '形', pinyin: '', words: ['形状', '形成', '圆形'] },
+            { char: '状', pinyin: '', words: ['形状', '状况', '奖状'] },
+          ]
+        },
+        {
+          name: '课文9《日月潭》湖、区、胜、岛、弯、现、就、外',
+          shizi: [
+            { char: '湖', pinyin: '', words: ['西湖', '湖泊', '湖水'] },
+            { char: '区', pinyin: '', words: ['地区', '区域', '区别'] },
+            { char: '胜', pinyin: '', words: ['胜利', '取胜', '名胜'] },
+            { char: '岛', pinyin: '', words: ['小岛', '岛屿', '海岛'] },
+            { char: '弯', pinyin: '', words: ['弯曲', '弯道', '弯腰'] },
+            { char: '现', pinyin: '', words: ['现在', '现今', '出现'] },
+            { char: '就', pinyin: '', words: ['成就', '就业', '就近'] },
+            { char: '外', pinyin: '', words: ['外面', '窗外', '外边'] },
+          ]
+        },
+        {
+          name: '课文10《葡萄沟》份、枝、客、城、市、孔、钉、味',
+          shizi: [
+            { char: '份', pinyin: '', words: ['月份', '年份', '股份'] },
+            { char: '枝', pinyin: '', words: ['枝头', '树枝', '分枝'] },
+            { char: '客', pinyin: '', words: ['客人', '乘客', '宾客'] },
+            { char: '城', pinyin: '', words: ['城市', '城区', '长城'] },
+            { char: '市', pinyin: '', words: ['城市', '市区', '市场'] },
+            { char: '孔', pinyin: '', words: ['孔雀', '桥孔', '针孔'] },
+            { char: '钉', pinyin: '', words: ['钉子', '钉扣子', '钉木板'] },
+            { char: '味', pinyin: '', words: ['味道', '气味', '香味'] },
+          ]
+        },
+        {
+          name: '语文园地四',
+          shizi: [
+            { char: '号', pinyin: '', words: ['口号', '号码', '学号'] },
+          ]
+        },
+      ]
+    },
+    {
+      name: '第五单元',
+      lessons: [
+        {
+          name: '课文11《坐井观天》观、呀、答、话、抬、能、信',
+          shizi: [
+            { char: '观', pinyin: '', words: ['观看', '观察', '主观'] },
+            { char: '呀', pinyin: '', words: ['好呀', '快呀', '哎呀'] },
+            { char: '答', pinyin: '', words: ['回答', '答复', '答案'] },
+            { char: '话', pinyin: '', words: ['说话', '谈话', '话语'] },
+            { char: '抬', pinyin: '', words: ['抬头', '抬举', '抬水'] },
+            { char: '能', pinyin: '', words: ['能力', '才能', '能干'] },
+            { char: '信', pinyin: '', words: ['相信', '书信', '信用'] },
+          ]
+        },
+        {
+          name: '课文12《寒号鸟》阵、做、冻、第、像、冷、冰、亮',
+          shizi: [
+            { char: '阵', pinyin: '', words: ['阵雨', '阵地', '阵势'] },
+            { char: '做', pinyin: '', words: ['做事', '做工', '做客'] },
+            { char: '冻', pinyin: '', words: ['冷冻', '果冻', '冻结'] },
+            { char: '第', pinyin: '', words: ['第一', '次第', '门第'] },
+            { char: '像', pinyin: '', words: ['好像', '画像', '偶像'] },
+            { char: '冷', pinyin: '', words: ['寒冷', '冰冷', '心灰意冷'] },
+            { char: '冰', pinyin: '', words: ['冰雪', '冰块', '冰冻'] },
+            { char: '亮', pinyin: '', words: ['明亮', '光亮', '响亮'] },
+          ]
+        },
+        {
+          name: '课文13《我要的是葫芦》种、棵、以、次、想、邻、居、吧、奇、怪',
+          shizi: [
+            { char: '种', pinyin: 'zhǒng', words: ['种子', '种花', '种植'] },
+            { char: '棵', pinyin: '', words: ['一棵草', '一棵苗', '一棵树'] },
+            { char: '以', pinyin: '', words: ['以前', '以后', '可以'] },
+            { char: '次', pinyin: '', words: ['一次', '次序', '名次'] },
+            { char: '想', pinyin: '', words: ['想法', '想象', '理想'] },
+            { char: '邻', pinyin: '', words: ['邻居', '邻近', '邻里'] },
+            { char: '居', pinyin: '', words: ['居住', '居民', '居中'] },
+            { char: '吧', pinyin: '', words: ['来吧', '走吧', '火把'] },
+            { char: '奇', pinyin: '', words: ['奇怪', '惊奇', '好奇'] },
+            { char: '怪', pinyin: '', words: ['怪事', '怪物', '奇怪'] },
+          ]
+        },
+        {
+          name: '语文园地五',
+          shizi: [
+            { char: '货', pinyin: '', words: ['货物', '百货', '货车'] },
+          ]
+        },
+      ]
+    },
+    {
+      name: '第六单元',
+      lessons: [
+        {
+          name: '课文14《八角楼上》楼、代、穿、视、利、路',
+          shizi: [
+            { char: '楼', pinyin: '', words: ['楼房', '大楼', '楼道'] },
+            { char: '代', pinyin: '', words: ['古代', '时代', '代替'] },
+            { char: '穿', pinyin: '', words: ['穿衣', '穿过', '穿戴'] },
+            { char: '视', pinyin: '', words: ['电视', '视线', '视听'] },
+            { char: '利', pinyin: '', words: ['顺利', '便利', '利益'] },
+            { char: '路', pinyin: '', words: ['马路', '路边', '道路'] },
+          ]
+        },
+        {
+          name: '课文15《朱德的扁担》同、志、军、故、常、非、每',
+          shizi: [
+            { char: '同', pinyin: '', words: ['同学', '相同', '共同'] },
+            { char: '志', pinyin: '', words: ['同志', '志气', '志向'] },
+            { char: '军', pinyin: '', words: ['军人', '海军', '空军'] },
+            { char: '故', pinyin: '', words: ['故人', '故事', '故乡'] },
+            { char: '常', pinyin: '', words: ['平常', '非常', '经常'] },
+            { char: '非', pinyin: '', words: ['非常', '非凡', '除非'] },
+            { char: '每', pinyin: '', words: ['每天', '每个', '每次'] },
+          ]
+        },
+        {
+          name: '课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴',
+          shizi: [
+            { char: '难', pinyin: 'nán', words: ['难过', '艰难', '难处'] },
+            { char: '忘', pinyin: '', words: ['忘记', '忘怀', '淡忘'] },
+            { char: '民', pinyin: '', words: ['人民', '民族', '农民'] },
+            { char: '因', pinyin: '', words: ['因为', '原因', '因此'] },
+            { char: '理', pinyin: '', words: ['理发', '道理', '理由'] },
+            { char: '串', pinyin: '', words: ['一串', '串联', '串通'] },
+            { char: '裤', pinyin: '', words: ['裤子', '短裤', '长裤'] },
+            { char: '令', pinyin: '', words: ['命令', '口令', '当今'] },
+            { char: '战', pinyin: '', words: ['战士', '战斗', '攻占'] },
+            { char: '士', pinyin: '', words: ['士兵', '战士', '烈士'] },
+            { char: '戴', pinyin: '', words: ['穿戴', '爱戴', '戴眼镜'] },
+          ]
+        },
+        {
+          name: '课文17《刘胡兰》反、村、由、于、员、被、声',
+          shizi: [
+            { char: '反', pinyin: '', words: ['反向', '反复', '反对'] },
+            { char: '村', pinyin: '', words: ['村庄', '山村', '村民'] },
+            { char: '由', pinyin: '', words: ['自由', '由于', '理由'] },
+            { char: '于', pinyin: '', words: ['于是', '终于', '无济于事'] },
+            { char: '员', pinyin: '', words: ['队员', '学员', '人员'] },
+            { char: '被', pinyin: '', words: ['被子', '棉被', '被动'] },
+            { char: '声', pinyin: '', words: ['声音', '铃声', '名声'] },
+          ]
+        },
+        {
+          name: '语文园地六',
+          shizi: [
+            { char: '抄', pinyin: '', words: ['抄写', '摘抄', '抄书'] },
+          ]
+        },
+      ]
+    },
+    {
+      name: '第七单元',
+      lessons: [
+        {
+          name: '课文18《古诗二首》绝、灭、舟、独、阴、似、野、低',
+          shizi: [
+            { char: '绝', pinyin: '', words: ['绝句', '绝对', '杜绝'] },
+            { char: '灭', pinyin: '', words: ['消灭', '灭亡', '灰飞烟灭'] },
+            { char: '舟', pinyin: '', words: ['扁舟', '泛舟', '同舟共济'] },
+            { char: '独', pinyin: '', words: ['独自', '单独', '孤独'] },
+            { char: '阴', pinyin: '', words: ['阴沉', '光阴', '阴差阳错'] },
+            { char: '似', pinyin: 'sì', words: ['好似', '似乎', '比拟'] },
+            { char: '野', pinyin: '', words: ['田野', '野外', '野兽'] },
+            { char: '低', pinyin: '', words: ['低头', '低下', '低音'] },
+          ]
+        },
+        {
+          name: '课文19《雾在哪里》论、船、猫、切、该、散、步、失',
+          shizi: [
+            { char: '论', pinyin: 'lùn', words: ['讨论', '议论', '论点'] },
+            { char: '船', pinyin: '', words: ['大船', '小船', '帆船'] },
+            { char: '猫', pinyin: '', words: ['小猫', '花猫', '照猫画虎'] },
+            { char: '切', pinyin: 'qiè', words: ['关切', '亲切', '切身'] },
+            { char: '该', pinyin: '', words: ['应该', '不该', '活该'] },
+            { char: '散', pinyin: 'sàn', words: ['散步', '烟消云散', '零散'] },
+            { char: '步', pinyin: '', words: ['跑步', '脚步', '进步'] },
+            { char: '失', pinyin: '', words: ['失去', '失足', '丢失'] },
+          ]
+        },
+        {
+          name: '课文20《雪孩子》要、伙、伴、歌、得、闭、忙',
+          shizi: [
+            { char: '要', pinyin: 'yào', words: ['将要', '主要', '要挟'] },
+            { char: '伙', pinyin: '', words: ['伙伴', '大伙', '合伙'] },
+            { char: '伴', pinyin: '', words: ['同伴', '陪伴', '相伴'] },
+            { char: '歌', pinyin: '', words: ['唱歌', '民歌', '歌曲'] },
+            { char: '得', pinyin: 'dé', words: ['跑得快', '过得去', '得亏'] },
+            { char: '闭', pinyin: '', words: ['关闭', '封闭', '闭塞'] },
+            { char: '忙', pinyin: '', words: ['急忙', '帮忙', '忙碌'] },
+          ]
+        },
+        {
+          name: '语文园地七',
+          shizi: [
+            { char: '饥', pinyin: '', words: ['饥饿', '饥荒', '饥寒'] },
+            { char: '饿', pinyin: '', words: ['挨饿', '饿肚子', '饿饭'] },
+            { char: '宁', pinyin: 'níng', words: ['安宁', '宁静', '康宁'] },
+          ]
+        },
+      ]
+    },
+    {
+      name: '第八单元',
+      lessons: [
+        {
+          name: '课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉',
+          shizi: [
+            { char: '谁', pinyin: '', words: ['是谁', '谁的', '谁是谁非'] },
+            { char: '汽', pinyin: '', words: ['汽水', '汽车', '汽油'] },
+            { char: '拿', pinyin: '', words: ['拿走', '拿着', '拿手'] },
+            { char: '仔', pinyin: 'zǎi', words: ['仔细', '牛仔'] },
+            { char: '极', pinyin: '', words: ['极致', '北极', '积极'] },
+            { char: '送', pinyin: '', words: ['送行', '送别', '欢送会'] },
+            { char: '椅', pinyin: '', words: ['靠椅', '椅子', '转椅'] },
+            { char: '怎', pinyin: '', words: ['怎样', '怎么', '自作自受'] },
+            { char: '拉', pinyin: '', words: ['拉手', '拉扯', '拉面'] },
+          ]
+        },
+        {
+          name: '课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭',
+          shizi: [
+            { char: '收', pinyin: '', words: ['丰收', '收拾', '收藏'] },
+            { char: '接', pinyin: '', words: ['连接', '接纳', '拉扯'] },
+            { char: '纸', pinyin: '', words: ['报纸', '纸张', '纸片'] },
+            { char: '抓', pinyin: '', words: ['抓紧', '抓捕', '抓牢'] },
+            { char: '线', pinyin: '', words: ['丝线', '毛线', '电线'] },
+            { char: '吵', pinyin: '', words: ['吵架', '争吵', '吵闹'] },
+            { char: '但', pinyin: '', words: ['但是', '但凡', '但愿如此'] },
+            { char: '受', pinyin: '', words: ['接受', '难受', '受益'] },
+            { char: '句', pinyin: '', words: ['语句', '病句', '诗句'] },
+            { char: '哭', pinyin: '', words: ['哭泣', '哭笑不得', '哭声'] },
+          ]
+        },
+        {
+          name: '课文23《快乐的小河》游、戏、爱、呢、跳、咱',
+          shizi: [
+            { char: '游', pinyin: '', words: ['游泳', '游玩', '春游'] },
+            { char: '戏', pinyin: '', words: ['嬉戏', '游戏', '戏曲'] },
+            { char: '爱', pinyin: '', words: ['喜爱', '爱好', '爱护'] },
+            { char: '呢', pinyin: 'ní', words: ['来呢', '哪儿呢', '毛呢'] },
+            { char: '跳', pinyin: '', words: ['跳高', '跳远', '活蹦乱跳'] },
+            { char: '咱', pinyin: 'zán', words: ['咱们', '咱俩', '咱家'] },
+          ]
+        },
+        {
+          name: '语文园地八：狼、蛇',
+          shizi: [
+            { char: '狼', pinyin: '', words: ['野狼', '狼狗', '狼嚎'] },
+            { char: '蛇', pinyin: '', words: ['毒蛇', '蟒蛇', '蛇皮'] },
+          ]
+        },
+      ]
+    },
+  ]
+};</script>
+<script>window.VOCABULARY_SHIZI_EMBEDDED = {"units":[{"name":"第一单元","lessons":[{"name":"阅读1","shizi":[{"char":"蝌","pinyin":"","words":["蝌蚪","蝌子","蝌蚪苗"]},{"char":"蚪","pinyin":"","words":["蝌蚪","蚪虫","墨蚪"]},{"char":"脑","pinyin":"","words":["脑袋","大脑","头脑"]},{"char":"袋","pinyin":"","words":["口袋","袋子","布袋"]},{"char":"灰","pinyin":"","words":["灰色","灰尘","灰暗"]},{"char":"甩","pinyin":"","words":["甩开","甩手","甩动"]},{"char":"活","pinyin":"","words":["活动","干活","活泼"]},{"char":"腿","pinyin":"","words":["大腿","腿脚","后腿"]},{"char":"教","pinyin":"jiāo","words":["教书","教课","教课"]},{"char":"教","pinyin":"jiào","words":["教室","教师","教育"]},{"char":"迎","pinyin":"","words":["欢迎","迎接","迎面"]},{"char":"嘴","pinyin":"","words":["嘴巴","嘴角","嘴唇"]},{"char":"龟","pinyin":"","words":["乌龟","海龟","龟壳"]},{"char":"披","pinyin":"","words":["披风","披上","披肩"]},{"char":"蹲","pinyin":"","words":["蹲下","蹲坐","蹲点"]},{"char":"肚","pinyin":"dù","words":["肚子","肚皮","肚腩"]},{"char":"鼓","pinyin":"","words":["打鼓","锣鼓","鼓起"]}]},{"name":"阅读2","shizi":[{"char":"汽","pinyin":"","words":["汽水","汽车","蒸汽"]},{"char":"越","pinyin":"","words":["越过","超越","越发"]},{"char":"温","pinyin":"","words":["温暖","温和","温度"]},{"char":"滴","pinyin":"","words":["水滴","滴落","雨滴"]},{"char":"奔","pinyin":"bēn","words":["奔跑","飞奔","奔驰"]},{"char":"海","pinyin":"","words":["大海","海面","深海"]},{"char":"洋","pinyin":"","words":["海洋","大洋","洋流"]},{"char":"发","pinyin":"fā","words":["出发","发现","分发"]},{"char":"坏","pinyin":"","words":["坏人","破坏","损坏"]},{"char":"没","pinyin":"mò","words":["淹没","沉没","埋没"]},{"char":"没","pinyin":"méi","words":["没有","没人","没空"]},{"char":"庄","pinyin":"","words":["村庄","农庄","庄园"]},{"char":"稼","pinyin":"","words":["庄稼","稼穑","农稼"]},{"char":"屋","pinyin":"","words":["房屋","屋子","屋顶"]},{"char":"带","pinyin":"","words":["带领","皮带","携带"]},{"char":"灾","pinyin":"","words":["灾难","灾害","水灾"]},{"char":"种","pinyin":"zhǒng","words":["种子","播种","品种"]},{"char":"种","pinyin":"zhòng","words":["种地","种植","栽种"]},{"char":"管","pinyin":"","words":["管理","看管","水管"]}]},{"name":"阅读3","shizi":[{"char":"植","pinyin":"","words":["植物","植树","绿植"]},{"char":"如","pinyin":"","words":["如果","假如","如同"]},{"char":"脚","pinyin":"","words":["脚步","脚丫","脚尖"]},{"char":"旅","pinyin":"","words":["旅行","旅途","旅游"]},{"char":"准","pinyin":"","words":["准备","准时","准确"]},{"char":"备","pinyin":"","words":["备用","防备","备课"]},{"char":"送","pinyin":"","words":["送别","送货","赠送"]},{"char":"纷","pinyin":"","words":["纷飞","纷纷","缤纷"]},{"char":"挂","pinyin":"","words":["悬挂","挂念","挂钩"]},{"char":"挺","pinyin":"","words":["挺拔","挺立","挺好"]},{"char":"钻","pinyin":"zuān","words":["钻进","钻研","钻探"]},{"char":"底","pinyin":"","words":["底下","海底","底细"]},{"char":"炸","pinyin":"zhà","words":["爆炸","炸开","炸弹"]},{"char":"离","pinyin":"","words":["离开","离别","分离"]},{"char":"粗","pinyin":"","words":["粗壮","粗心","粗细"]},{"char":"得","pinyin":"dé","words":["得到","心得","取得"]},{"char":"得","pinyin":"de","words":["跑得快","跳得高","做得棒"]},{"char":"得","pinyin":"děi","words":["得亏","非得","总得"]}]},{"name":"语文园地一","shizi":[{"char":"朗","pinyin":"","words":["晴朗","朗读","明朗"]},{"char":"雾","pinyin":"","words":["大雾","雾气","浓雾"]},{"char":"暴","pinyin":"","words":["暴雨","暴风","暴躁"]},{"char":"雷","pinyin":"","words":["雷声","打雷","雷雨"]},{"char":"阵","pinyin":"","words":["阵雨","方阵","阵地"]},{"char":"冻","pinyin":"","words":["冰冻","冷冻","霜冻"]},{"char":"夹","pinyin":"jiā","words":["夹子","夹板","夹杂"]}]}]},{"name":"第二单元","lessons":[{"name":"识字1","shizi":[{"char":"帆","pinyin":"","words":["帆船","帆布","船帆"]},{"char":"港","pinyin":"","words":["港口","港湾","海港"]},{"char":"湾","pinyin":"","words":["海湾","水湾","河湾"]},{"char":"塘","pinyin":"","words":["池塘","鱼塘","水塘"]},{"char":"稻","pinyin":"","words":["水稻","稻田","稻谷"]},{"char":"行","pinyin":"háng","words":["一行","银行","商行"]},{"char":"行","pinyin":"xíng","words":["行走","进行","出行"]},{"char":"垂","pinyin":"","words":["垂柳","垂直","下垂"]},{"char":"园","pinyin":"","words":["花园","园林","公园"]},{"char":"溪","pinyin":"","words":["小溪","溪水","溪流"]},{"char":"丛","pinyin":"","words":["草丛","花丛","丛林"]},{"char":"翠","pinyin":"","words":["翠绿","翠鸟","青翠"]},{"char":"群","pinyin":"","words":["羊群","人群","群体"]},{"char":"队","pinyin":"","words":["队伍","队长","排队"]},{"char":"号","pinyin":"hào","words":["口号","号码","学号"]}]},{"name":"识字2","shizi":[{"char":"榕","pinyin":"","words":["榕树","榕叶","榕城"]},{"char":"壮","pinyin":"","words":["强壮","壮大","粗壮"]},{"char":"梧","pinyin":"","words":["梧桐","梧桐叶","梧桐树"]},{"char":"桐","pinyin":"","words":["梧桐","泡桐","桐油"]},{"char":"掌","pinyin":"","words":["手掌","掌心","巴掌"]},{"char":"枫","pinyin":"","words":["枫叶","枫树","枫林"]},{"char":"松","pinyin":"","words":["松树","松柏","青松"]},{"char":"柏","pinyin":"bǎi","words":["柏树","柏木","松柏"]},{"char":"桦","pinyin":"","words":["白桦","桦树","桦木"]},{"char":"守","pinyin":"","words":["守护","看守","遵守"]},{"char":"银","pinyin":"","words":["银色","白银","银河"]},{"char":"杏","pinyin":"","words":["杏花","杏子","杏树"]},{"char":"杉","pinyin":"","words":["杉木","杉树","水杉"]},{"char":"化","pinyin":"","words":["融化","变化","化石"]},{"char":"桂","pinyin":"","words":["桂花","桂树","桂圆"]}]},{"name":"识字3","shizi":[{"char":"世","pinyin":"","words":["世界","世间","世代"]},{"char":"界","pinyin":"","words":["边界","界限","外界"]},{"char":"孔","pinyin":"","words":["孔雀","针孔","桥孔"]},{"char":"雀","pinyin":"","words":["麻雀","雀跃","云雀"]},{"char":"锦","pinyin":"","words":["锦缎","锦绣","锦鸡"]},{"char":"雄","pinyin":"","words":["雄壮","英雄","雄伟"]},{"char":"鹰","pinyin":"","words":["老鹰","雄鹰","老鹰"]},{"char":"翔","pinyin":"","words":["飞翔","滑翔","翱翔"]},{"char":"雁","pinyin":"","words":["大雁","雁群","雁阵"]},{"char":"深","pinyin":"","words":["深浅","深海","深厚"]},{"char":"猛","pinyin":"","words":["凶猛","猛烈","勇猛"]},{"char":"灵","pinyin":"","words":["灵活","机灵","灵气"]},{"char":"休","pinyin":"","words":["休息","午休","休假"]},{"char":"猫","pinyin":"","words":["小猫","花猫","野猫"]}]},{"name":"识字4","shizi":[{"char":"季","pinyin":"","words":["季节","四季","季度"]},{"char":"蝴","pinyin":"","words":["蝴蝶","蝴蝶结","蝴蝶兰"]},{"char":"蝶","pinyin":"","words":["蝴蝶","彩蝶","蝶翼"]},{"char":"麦","pinyin":"","words":["麦子","小麦","麦田"]},{"char":"嫩","pinyin":"","words":["嫩绿","鲜嫩","细嫩"]},{"char":"肥","pinyin":"","words":["肥胖","肥料","肥沃"]},{"char":"农","pinyin":"","words":["农民","农田","农业"]},{"char":"勤","pinyin":"","words":["勤劳","勤快","勤奋"]},{"char":"归","pinyin":"","words":["归来","回归","归家"]},{"char":"戴","pinyin":"","words":["穿戴","爱戴","佩戴"]},{"char":"场","pinyin":"cháng","words":["一场雨","场院","打场"]},{"char":"场","pinyin":"chǎng","words":["操场","场地","广场"]},{"char":"谷","pinyin":"","words":["稻谷","山谷","谷物"]},{"char":"虽","pinyin":"","words":["虽然","虽说","虽则"]},{"char":"辛","pinyin":"","words":["辛苦","辛劳","艰辛"]},{"char":"苦","pinyin":"","words":["吃苦","苦味","苦难"]},{"char":"制","pinyin":"","words":["制作","制度","制约"]}]},{"name":"语文园地二","shizi":[{"char":"丑","pinyin":"","words":["丑陋","丑事","丑恶"]},{"char":"恨","pinyin":"","words":["仇恨","怨恨","悔恨"]},{"char":"诚","pinyin":"","words":["诚实","诚恳","真诚"]},{"char":"虚","pinyin":"","words":["虚心","虚假","空虚"]},{"char":"假","pinyin":"jiǎ","words":["真假","假话","假象"]},{"char":"漠","pinyin":"","words":["沙漠","冷漠","荒漠"]},{"char":"助","pinyin":"","words":["帮助","助力","互助"]},{"char":"贫","pinyin":"","words":["贫穷","贫困","贫苦"]},{"char":"富","pinyin":"","words":["富裕","富足","财富"]},{"char":"饥","pinyin":"","words":["饥饿","饥荒","饥寒"]}]}]},{"name":"第三单元","lessons":[{"name":"阅读4","shizi":[{"char":"虹","pinyin":"","words":["彩虹","霓虹","虹桥"]},{"char":"浇","pinyin":"","words":["浇水","浇灌","浇花"]},{"char":"壶","pinyin":"","words":["水壶","茶壶","暖壶"]},{"char":"提","pinyin":"tí","words":["提醒","手提","提起"]},{"char":"洒","pinyin":"","words":["洒水","洒落","泼洒"]},{"char":"挑","pinyin":"tiāo","words":["挑水","挑选","挑担子"]},{"char":"镜","pinyin":"","words":["镜子","镜面","铜镜"]},{"char":"拿","pinyin":"","words":["拿走","拿手","拿捏"]},{"char":"系","pinyin":"jì","words":["系鞋带","系扣子","系腰带"]},{"char":"荡","pinyin":"","words":["飘荡","荡漾","荡秋千"]},{"char":"裙","pinyin":"","words":["裙子","长裙","围裙"]}]},{"name":"阅读5","shizi":[{"char":"婆","pinyin":"","words":["外婆","婆婆","婆家"]},{"char":"候","pinyin":"","words":["时候","等候","气候"]},{"char":"趣","pinyin":"","words":["有趣","趣味","趣事"]},{"char":"舅","pinyin":"","words":["舅舅","舅妈","舅父"]},{"char":"或","pinyin":"","words":["或者","或许","抑或"]},{"char":"留","pinyin":"","words":["留下","停留","保留"]},{"char":"份","pinyin":"","words":["份额","份数","身份"]},{"char":"喂","pinyin":"","words":["喂食","喂饭","喂养"]},{"char":"逃","pinyin":"","words":["逃跑","逃走","逃离"]},{"char":"曲","pinyin":"qǔ","words":["歌曲","曲子","乐曲"]},{"char":"者","pinyin":"","words":["作者","读者","长者"]},{"char":"服","pinyin":"","words":["衣服","服装","服从"]},{"char":"扑","pinyin":"","words":["扑向","扑倒","扑打"]},{"char":"鼻","pinyin":"","words":["鼻子","鼻梁","鼻孔"]}]},{"name":"阅读6","shizi":[{"char":"珍","pinyin":"","words":["珍珠","珍贵","珍宝"]},{"char":"撒","pinyin":"sǎ","words":["撒种","撒落","撒粉"]},{"char":"碧","pinyin":"","words":["碧绿","碧玉","碧空"]},{"char":"靠","pinyin":"","words":["依靠","靠近","可靠"]},{"char":"仰","pinyin":"","words":["仰望","仰头","敬仰"]},{"char":"颗","pinyin":"","words":["颗粒","一颗星","一颗糖"]},{"char":"距","pinyin":"","words":["距离","间距","相距"]},{"char":"变","pinyin":"","words":["变化","改变","变动"]},{"char":"祖","pinyin":"","words":["祖先","祖国","祖宗"]},{"char":"勺","pinyin":"","words":["勺子","饭勺","汤勺"]},{"char":"绕","pinyin":"","words":["围绕","环绕","绕行"]},{"char":"转","pinyin":"zhuàn","words":["转圈","转椅","转动"]},{"char":"转","pinyin":"zhuǎn","words":["转告","转眼","转身"]},{"char":"楚","pinyin":"","words":["清楚","楚国","苦楚"]},{"char":"汉","pinyin":"","words":["汉字","汉语","汉族"]},{"char":"刻","pinyin":"","words":["刻度","立刻","雕刻"]},{"char":"研","pinyin":"","words":["研究","钻研","研发"]}]},{"name":"语文园地三","shizi":[{"char":"弹","pinyin":"tán","words":["弹琴","弹开","弹跳"]},{"char":"钢","pinyin":"","words":["钢铁","钢材","钢笔"]},{"char":"琴","pinyin":"","words":["钢琴","琴声","提琴"]},{"char":"捏","pinyin":"","words":["捏紧","捏泥","拿捏"]},{"char":"泥","pinyin":"","words":["泥土","泥巴","水泥"]},{"char":"围","pinyin":"","words":["包围","围墙","周围"]},{"char":"滚","pinyin":"","words":["滚动","打滚","翻滚"]},{"char":"铁","pinyin":"","words":["铁钉","铁锅","铁块"]},{"char":"环","pinyin":"","words":["圆环","环境","环球"]},{"char":"滑","pinyin":"","words":["滑梯","光滑","滑倒"]},{"char":"梯","pinyin":"","words":["楼梯","梯子","电梯"]}]}]},{"name":"第四单元","lessons":[{"name":"课文7","shizi":[{"char":"登","pinyin":"","words":["登山","登高","登上"]},{"char":"唐","pinyin":"","words":["唐朝","唐诗","唐代"]},{"char":"依","pinyin":"","words":["依靠","依旧","依据"]},{"char":"尽","pinyin":"","words":["尽头","尽力","尽兴"]},{"char":"欲","pinyin":"","words":["欲望","想要","食欲"]},{"char":"穷","pinyin":"","words":["贫穷","穷苦","无穷"]},{"char":"层","pinyin":"","words":["楼层","层次","云层"]},{"char":"瀑","pinyin":"","words":["瀑布","飞瀑","瀑流"]},{"char":"布","pinyin":"","words":["布匹","布料","分布"]},{"char":"炉","pinyin":"","words":["火炉","香炉","电炉"]},{"char":"紫","pinyin":"","words":["紫色","紫红","紫荆"]},{"char":"烟","pinyin":"","words":["烟火","烟雾","烟花"]},{"char":"遥","pinyin":"","words":["遥远","遥望","遥控"]}]},{"name":"课文8","shizi":[{"char":"闻","pinyin":"","words":["听闻","闻名","新闻"]},{"char":"景","pinyin":"","words":["景色","风景","景物"]},{"char":"区","pinyin":"","words":["地区","区域","小区"]},{"char":"省","pinyin":"shěng","words":["省份","省会","省事"]},{"char":"秀","pinyin":"","words":["秀丽","优秀","秀气"]},{"char":"神","pinyin":"","words":["神仙","神气","精神"]},{"char":"仙","pinyin":"","words":["仙境","仙女","仙雾"]},{"char":"盘","pinyin":"","words":["盘子","圆盘","盘旋"]},{"char":"指","pinyin":"","words":["手指","指引","指导"]},{"char":"巨","pinyin":"","words":["巨大","巨人","巨型"]},{"char":"伸","pinyin":"","words":["伸手","伸展","拉伸"]},{"char":"都","pinyin":"dū","words":["都市","首都","都城"]},{"char":"都","pinyin":"dōu","words":["全都","都有","都行"]},{"char":"著","pinyin":"","words":["著名","著作","名著"]},{"char":"抢","pinyin":"","words":["抢夺","抢先","争抢"]},{"char":"状","pinyin":"","words":["形状","状况","奖状"]},{"char":"岩","pinyin":"","words":["岩石","岩层","岩洞"]}]},{"name":"课文9","shizi":[{"char":"潭","pinyin":"","words":["水潭","深潭","潭水"]},{"char":"茂","pinyin":"","words":["茂盛","繁茂","茂密"]},{"char":"盛","pinyin":"shèng","words":["盛开","兴盛","旺盛"]},{"char":"央","pinyin":"","words":["中央","央求","未央"]},{"char":"岛","pinyin":"","words":["海岛","岛屿","小岛"]},{"char":"隐","pinyin":"","words":["隐藏","隐约","隐身"]},{"char":"约","pinyin":"","words":["大约","约定","合约"]},{"char":"倒","pinyin":"dào","words":["倒映","倒车","倒退"]},{"char":"映","pinyin":"","words":["映照","放映","映衬"]},{"char":"整","pinyin":"","words":["整齐","整理","整体"]},{"char":"童","pinyin":"","words":["儿童","童年","孩童"]},{"char":"吸","pinyin":"","words":["吸收","呼吸","吸气"]},{"char":"引","pinyin":"","words":["吸引","指引","引导"]},{"char":"客","pinyin":"","words":["客人","做客","宾客"]}]},{"name":"课文10","shizi":[{"char":"葡","pinyin":"","words":["葡萄","葡萄糖","葡萄干"]},{"char":"萄","pinyin":"","words":["葡萄","萄糖","萄酒"]},{"char":"沟","pinyin":"","words":["山沟","水沟","沟渠"]},{"char":"坡","pinyin":"","words":["山坡","斜坡","土坡"]},{"char":"密","pinyin":"","words":["茂密","秘密","密封"]},{"char":"枝","pinyin":"","words":["树枝","枝头","枝叶"]},{"char":"淡","pinyin":"","words":["清淡","淡水","淡雅"]},{"char":"好","pinyin":"hào","words":["好客","爱好","喜好"]},{"char":"好","pinyin":"hǎo","words":["正好","和好","好人"]},{"char":"族","pinyin":"","words":["民族","家族","族群"]},{"char":"够","pinyin":"","words":["足够","能够","够用"]},{"char":"收","pinyin":"","words":["收获","收取","收拾"]},{"char":"市","pinyin":"","words":["市场","城市","市区"]},{"char":"干","pinyin":"gān","words":["干净","干枯","干果"]},{"char":"干","pinyin":"gàn","words":["枝干","才干","干活"]},{"char":"钉","pinyin":"dīng","words":["铁钉","钉子","图钉"]},{"char":"分","pinyin":"fèn","words":["过分","分外","本分"]},{"char":"分","pinyin":"fēn","words":["分开","分别","分配"]},{"char":"颜","pinyin":"","words":["颜色","容颜","颜料"]},{"char":"味","pinyin":"","words":["味道","香味","口味"]}]},{"name":"语文园地四","shizi":[{"char":"订","pinyin":"","words":["订购","订正","预订"]},{"char":"效","pinyin":"","words":["效果","效率","成效"]},{"char":"丰","pinyin":"","words":["丰收","丰盛","丰满"]},{"char":"昌","pinyin":"","words":["昌盛","昌隆","荣昌"]},{"char":"付","pinyin":"","words":["付出","支付","托付"]},{"char":"卧","pinyin":"","words":["卧室","卧倒","仰卧"]},{"char":"铺","pinyin":"pù","words":["店铺","床铺","铺面"]},{"char":"改","pinyin":"","words":["改正","改动","修改"]},{"char":"签","pinyin":"","words":["签名","签字","竹签"]},{"char":"退","pinyin":"","words":["后退","退出","退步"]},{"char":"更","pinyin":"gēng","words":["更换","自力更生","更新"]},{"char":"更","pinyin":"gèng","words":["更加","更进一步","更好"]},{"char":"维","pinyin":"","words":["维护","维持","维度"]},{"char":"码","pinyin":"","words":["号码","码头","页码"]}]}]},{"name":"第五单元","lessons":[{"name":"课文11","shizi":[{"char":"观","pinyin":"","words":["观看","观察","观光"]},{"char":"沿","pinyin":"","words":["边沿","沿着","沿岸"]},{"char":"渴","pinyin":"","words":["口渴","干渴","渴求"]},{"char":"话","pinyin":"","words":["说话","话语","谈话"]},{"char":"弄","pinyin":"","words":["捉弄","摆弄","玩弄"]},{"char":"错","pinyin":"","words":["错误","对错","差错"]},{"char":"际","pinyin":"","words":["边际","国际","交际"]},{"char":"抬","pinyin":"","words":["抬头","抬水","抬举"]},{"char":"信","pinyin":"","words":["相信","信用","书信"]}]},{"name":"课文12","shizi":[{"char":"号","pinyin":"háo","words":["号叫","嚎号","号哭"]},{"char":"号","pinyin":"hào","words":["口号","记号","称号"]},{"char":"当","pinyin":"dàng","words":["上当","适当","妥当"]},{"char":"当","pinyin":"dāng","words":["每当","当然","应当"]},{"char":"鹊","pinyin":"","words":["喜鹊","鹊桥","鹊鸟"]},{"char":"寻","pinyin":"","words":["寻找","寻觅","搜寻"]},{"char":"枯","pinyin":"","words":["干枯","枯黄","枯萎"]},{"char":"却","pinyin":"","words":["退却","忘却","冷却"]},{"char":"劝","pinyin":"","words":["劝说","劝告","劝阻"]},{"char":"刮","pinyin":"","words":["刮风","刮掉","刮擦"]},{"char":"死","pinyin":"","words":["死亡","生死","枯死"]},{"char":"将","pinyin":"jiāng","words":["将来","将要","将军"]},{"char":"且","pinyin":"","words":["而且","暂且","况且"]},{"char":"狂","pinyin":"","words":["狂风","疯狂","狂野"]},{"char":"冷","pinyin":"","words":["寒冷","冰冷","冷清"]},{"char":"重","pinyin":"chóng","words":["重复","重新","重来"]},{"char":"复","pinyin":"","words":["反复","回复","复原"]},{"char":"哀","pinyin":"","words":["哀求","哀伤","悲哀"]},{"char":"唤","pinyin":"","words":["呼唤","叫唤","唤醒"]}]},{"name":"课文13","shizi":[{"char":"葫","pinyin":"","words":["葫芦","葫芦瓜","西葫芦"]},{"char":"芦","pinyin":"","words":["芦苇","芦草","芦笛"]},{"char":"谢","pinyin":"","words":["谢谢","感谢","凋谢"]},{"char":"以","pinyin":"","words":["以后","以前","可以"]},{"char":"盯","pinyin":"","words":["盯着","紧盯","盯防"]},{"char":"赛","pinyin":"","words":["比赛","赛跑","赛事"]},{"char":"怪","pinyin":"","words":["奇怪","怪物","怪事"]},{"char":"慢","pinyin":"","words":["缓慢","快慢","慢速"]}]},{"name":"语文园地五","shizi":[{"char":"轿","pinyin":"","words":["轿子","轿车","花轿"]},{"char":"救","pinyin":"","words":["救援","救命","救助"]},{"char":"摩","pinyin":"","words":["摩擦","按摩","摩托"]},{"char":"托","pinyin":"","words":["托付","托举","依托"]},{"char":"防","pinyin":"","words":["防止","防备","消防"]},{"char":"渔","pinyin":"","words":["渔民","渔业","渔船"]},{"char":"货","pinyin":"","words":["货物","百货","货车"]},{"char":"科","pinyin":"","words":["科学","科目","学科"]},{"char":"考","pinyin":"","words":["考试","考察","思考"]},{"char":"察","pinyin":"","words":["观察","察觉","侦察"]}]}]},{"name":"第六单元","lessons":[{"name":"课文14","shizi":[{"char":"楼","pinyin":"","words":["楼房","高楼","楼道"]},{"char":"艰","pinyin":"","words":["艰难","艰苦","艰辛"]},{"char":"斗","pinyin":"dǒu","words":["斗胆","北斗星","斗笠"]},{"char":"斗","pinyin":"dòu","words":["斗争","战斗","打斗"]},{"char":"代","pinyin":"","words":["时代","代替","古代"]},{"char":"临","pinyin":"","words":["临近","临时","光临"]},{"char":"腊","pinyin":"","words":["腊月","腊肉","腊梅"]},{"char":"军","pinyin":"","words":["军人","军队","海军"]},{"char":"薄","pinyin":"bó","words":["单薄","薄弱","薄雾"]},{"char":"章","pinyin":"","words":["文章","章节","印章"]},{"char":"握","pinyin":"","words":["握住","把握","握手"]},{"char":"凝","pinyin":"","words":["凝视","凝结","凝神"]},{"char":"觉","pinyin":"jué","words":["觉得","知觉","察觉"]},{"char":"觉","pinyin":"jiào","words":["睡觉","午觉","瞌睡"]},{"char":"油","pinyin":"","words":["石油","香油","油漆"]},{"char":"辉","pinyin":"","words":["光辉","辉煌","余晖"]},{"char":"革","pinyin":"","words":["革命","皮革","改革"]},{"char":"命","pinyin":"","words":["生命","命运","命令"]},{"char":"利","pinyin":"","words":["有利","顺利","利益"]}]},{"name":"课文15","shizi":[{"char":"朱","pinyin":"","words":["朱红","朱砂","朱门"]},{"char":"德","pinyin":"","words":["品德","德行","美德"]},{"char":"扁","pinyin":"biǎn","words":["扁担","扁平","扁豆"]},{"char":"担","pinyin":"dàn","words":["担子","重担","扁担"]},{"char":"同","pinyin":"","words":["同学","相同","共同"]},{"char":"志","pinyin":"","words":["志向","志气","同志"]},{"char":"伍","pinyin":"","words":["队伍","入伍","落伍"]},{"char":"敌","pinyin":"","words":["敌人","敌对","仇敌"]},{"char":"根","pinyin":"","words":["树根","根本","根部"]},{"char":"据","pinyin":"","words":["根据","依据","凭据"]},{"char":"抽","pinyin":"","words":["抽出","抽取","抽查"]},{"char":"陡","pinyin":"","words":["陡峭","陡坡","陡然"]},{"char":"鞋","pinyin":"","words":["鞋子","皮鞋","布鞋"]},{"char":"疼","pinyin":"","words":["疼痛","头疼","心疼"]},{"char":"敬","pinyin":"","words":["敬爱","尊敬","敬重"]}]},{"name":"课文16","shizi":[{"char":"泼","pinyin":"","words":["泼水","活泼","泼辣"]},{"char":"民","pinyin":"","words":["人民","民族","农民"]},{"char":"度","pinyin":"","words":["温度","度数","角度"]},{"char":"特","pinyin":"","words":["特别","特殊","独特"]},{"char":"周","pinyin":"","words":["周围","周末","四周"]},{"char":"恩","pinyin":"","words":["恩情","感恩","恩惠"]},{"char":"敲","pinyin":"","words":["敲打","敲门","敲击"]},{"char":"铺","pinyin":"pū","words":["铺开","铺满","铺展"]},{"char":"铺","pinyin":"pù","words":["床铺","店铺","商铺"]},{"char":"龙","pinyin":"","words":["巨龙","龙舟","龙王"]},{"char":"串","pinyin":"","words":["串联","一串","串通"]},{"char":"容","pinyin":"","words":["容易","容貌","包容"]},{"char":"踩","pinyin":"","words":["踩踏","踩水","踩点"]},{"char":"始","pinyin":"","words":["开始","起始","原始"]},{"char":"盛","pinyin":"chéng","words":["盛饭","盛下","盛汤"]},{"char":"盛","pinyin":"shèng","words":["盛开","茂盛","兴盛"]},{"char":"碗","pinyin":"","words":["饭碗","瓷碗","汤碗"]},{"char":"祝","pinyin":"","words":["祝福","祝愿","祝贺"]},{"char":"寿","pinyin":"","words":["长寿","寿命","祝寿"]}]},{"name":"课文17","shizi":[{"char":"刘","pinyin":"","words":["刘海","刘氏","刘家"]},{"char":"兰","pinyin":"","words":["兰花","兰草","玉兰"]},{"char":"派","pinyin":"","words":["派送","派别","分派"]},{"char":"由","pinyin":"","words":["理由","自由","由于"]},{"char":"于","pinyin":"","words":["于是","终于","对于"]},{"char":"卖","pinyin":"","words":["买卖","售卖","卖力"]},{"char":"员","pinyin":"","words":["队员","成员","人员"]},{"char":"捕","pinyin":"","words":["捕捉","抓捕","捕猎"]},{"char":"买","pinyin":"","words":["购买","买单","买卖"]},{"char":"似","pinyin":"sì","words":["相似","似乎","类似"]},{"char":"踏","pinyin":"","words":["踏步","踩踏","踏青"]},{"char":"烈","pinyin":"","words":["热烈","激烈","烈士"]},{"char":"荣","pinyin":"","words":["光荣","荣耀","荣华"]},{"char":"岁","pinyin":"","words":["岁月","年岁","周岁"]},{"char":"题","pinyin":"","words":["题目","习题","问题"]}]},{"name":"语文园地六","shizi":[{"char":"锋","pinyin":"","words":["锋利","刀锋","前锋"]},{"char":"蜜","pinyin":"","words":["蜂蜜","甜蜜","蜜糖"]},{"char":"峰","pinyin":"","words":["山峰","顶峰","高峰"]},{"char":"蜂","pinyin":"","words":["蜜蜂","黄蜂","蜂群"]},{"char":"爆","pinyin":"","words":["爆炸","爆发","爆竹"]},{"char":"争","pinyin":"","words":["争抢","争夺","斗争"]},{"char":"抄","pinyin":"","words":["抄写","摘抄","抄录"]},{"char":"炒","pinyin":"","words":["炒菜","炒饭","爆炒"]},{"char":"幕","pinyin":"","words":["幕布","夜幕","屏幕"]},{"char":"墓","pinyin":"","words":["墓地","坟墓","墓碑"]},{"char":"慕","pinyin":"","words":["羡慕","爱慕","仰慕"]}]}]},{"name":"第七单元","lessons":[{"name":"课文18","shizi":[{"char":"绝","pinyin":"","words":["绝句","绝对","杜绝"]},{"char":"径","pinyin":"","words":["小径","路径","直径"]},{"char":"踪","pinyin":"","words":["踪迹","行踪","踪影"]},{"char":"灭","pinyin":"","words":["消灭","熄灭","灭亡"]},{"char":"舟","pinyin":"","words":["小舟","扁舟","泛舟"]},{"char":"钓","pinyin":"","words":["钓鱼","垂钓","钓竿"]},{"char":"似","pinyin":"sì","words":["相似","似乎","好似"]},{"char":"似","pinyin":"shì","words":["似的"]},{"char":"庐","pinyin":"","words":["庐山","茅庐","草庐"]},{"char":"笼","pinyin":"lǒng","words":["笼罩","笼络","笼盖"]},{"char":"盖","pinyin":"","words":["盖子","锅盖","遮盖"]},{"char":"苍","pinyin":"","words":["苍茫","苍白","苍翠"]},{"char":"茫","pinyin":"","words":["迷茫","茫然","渺茫"]}]},{"name":"课文19","shizi":[{"char":"论","pinyin":"lùn","words":["议论","讨论","论点"]},{"char":"暗","pinyin":"","words":["黑暗","昏暗","暗处"]},{"char":"岸","pinyin":"","words":["岸边","河岸","海岸"]},{"char":"街","pinyin":"","words":["街道","大街","街区"]},{"char":"梁","pinyin":"","words":["桥梁","房梁","横梁"]},{"char":"甚","pinyin":"","words":["甚至","甚好","甚么"]},{"char":"至","pinyin":"","words":["至少","至于","到来"]},{"char":"切","pinyin":"qiè","words":["亲切","关切","切实"]},{"char":"躲","pinyin":"","words":["躲开","躲藏","躲避"]},{"char":"该","pinyin":"","words":["应该","不该","活该"]},{"char":"悠","pinyin":"","words":["悠闲","悠扬","悠然"]},{"char":"闲","pinyin":"","words":["空闲","休闲","清闲"]},{"char":"散","pinyin":"sàn","words":["散开","分散","解散"]},{"char":"失","pinyin":"","words":["失去","丢失","失败"]}]},{"name":"课文20","shizi":[{"char":"堆","pinyin":"","words":["土堆","堆积","堆放"]},{"char":"累","pinyin":"lěi","words":["积累","累积","累加"]},{"char":"添","pinyin":"","words":["添加","增添","添置"]},{"char":"柴","pinyin":"","words":["柴火","木柴","柴草"]},{"char":"烧","pinyin":"","words":["烧火","燃烧","烧烤"]},{"char":"旺","pinyin":"","words":["兴旺","旺盛","火旺"]},{"char":"闭","pinyin":"","words":["关闭","闭合","闭门"]},{"char":"哎","pinyin":"","words":["哎呀","哎哟","哎唷"]},{"char":"旁","pinyin":"","words":["旁边","身旁","两旁"]},{"char":"冲","pinyin":"chōng","words":["冲出","冲刺","冲洗"]},{"char":"哇","pinyin":"","words":["哇哇叫","好哇","哇塞"]},{"char":"终","pinyin":"","words":["终于","终点","最终"]},{"char":"浑","pinyin":"","words":["浑身","浑浊","浑厚"]},{"char":"淋","pinyin":"","words":["淋雨","淋湿","淋漓"]},{"char":"晒","pinyin":"","words":["晒太阳","晾晒","暴晒"]}]},{"name":"语文园地七","shizi":[{"char":"漱","pinyin":"","words":["漱口","洗漱","漱洗"]},{"char":"饿","pinyin":"","words":["饥饿","挨饿","饿肚子"]},{"char":"沼","pinyin":"","words":["沼泽","沼池","沼气"]},{"char":"泽","pinyin":"","words":["光泽","恩泽","湖泽"]},{"char":"宁","pinyin":"níng","words":["宁静","安宁","康宁"]},{"char":"杠","pinyin":"","words":["杠杆","木杠","单杠"]},{"char":"杆","pinyin":"gān","words":["旗杆","杆子","标杆"]},{"char":"栋","pinyin":"","words":["栋梁","一栋楼","栋宇"]},{"char":"库","pinyin":"","words":["仓库","车库","库房"]},{"char":"闸","pinyin":"","words":["闸门","水闸","闸口"]},{"char":"羔","pinyin":"","words":["羊羔","羔羊","羔皮"]},{"char":"蝗","pinyin":"","words":["蝗虫","蝗灾","飞蝗"]}]}]},{"name":"第八单元","lessons":[{"name":"课文21","shizi":[{"char":"称","pinyin":"chēng","words":["称赞","称呼","称号"]},{"char":"赞","pinyin":"","words":["赞美","夸赞","赞扬"]},{"char":"刺","pinyin":"","words":["刺猬","鱼刺","尖刺"]},{"char":"猬","pinyin":"","words":["刺猬","猬毛","猬鼠"]},{"char":"板","pinyin":"","words":["木板","黑板","板材"]},{"char":"凳","pinyin":"","words":["凳子","板凳","方凳"]},{"char":"但","pinyin":"","words":["但是","但凡","但愿"]},{"char":"极","pinyin":"","words":["北极","极致","积极"]},{"char":"傍","pinyin":"","words":["傍晚","依傍","傍边"]},{"char":"苹","pinyin":"","words":["苹果","苹果","苹风"]},{"char":"泄","pinyin":"","words":["泄气","发泄","排泄"]},{"char":"接","pinyin":"","words":["接住","连接","接待"]},{"char":"除","pinyin":"","words":["除去","除法","消除"]},{"char":"疲","pinyin":"","words":["疲劳","疲惫","疲乏"]},{"char":"劳","pinyin":"","words":["劳动","劳累","辛劳"]}]},{"name":"课文22","shizi":[{"char":"筝","pinyin":"","words":["风筝","古筝","筝弦"]},{"char":"鼠","pinyin":"","words":["老鼠","松鼠","鼠类"]},{"char":"折","pinyin":"zhé","words":["折纸","折断","折叠"]},{"char":"漂","pinyin":"piāo","words":["漂流","漂浮","漂泊"]},{"char":"扎","pinyin":"zhā","words":["扎针","扎根","扎进"]},{"char":"乘","pinyin":"chéng","words":["乘车","乘坐","乘风"]},{"char":"抓","pinyin":"","words":["抓住","抓捕","抓牢"]},{"char":"线","pinyin":"","words":["毛线","丝线","线条"]},{"char":"莓","pinyin":"","words":["草莓","蓝莓","树莓"]},{"char":"俩","pinyin":"liǎ","words":["咱俩","他俩","姐妹俩"]},{"char":"架","pinyin":"","words":["架子","支架","书架"]},{"char":"受","pinyin":"","words":["接受","难受","受益"]},{"char":"愿","pinyin":"","words":["愿望","心愿","愿意"]},{"char":"朝","pinyin":"cháo","words":["朝廷","朝向","朝拜"]},{"char":"朝","pinyin":"zhāo","words":["朝夕","朝霞","今朝"]},{"char":"取","pinyin":"","words":["取得","取出","获取"]}]},{"name":"课文23","shizi":[{"char":"撞","pinyin":"","words":["碰撞","撞击","撞见"]},{"char":"怨","pinyin":"","words":["埋怨","怨恨","怨气"]},{"char":"软","pinyin":"","words":["柔软","松软","软弱"]},{"char":"呜","pinyin":"","words":["呜咽","呜呜","呜呼"]},{"char":"慈","pinyin":"","words":["慈祥","慈爱","仁慈"]},{"char":"祥","pinyin":"","words":["吉祥","祥和","祥瑞"]},{"char":"量","pinyin":"liàng","words":["重量","分量","气量"]},{"char":"跌","pinyin":"","words":["跌倒","下跌","跌落"]},{"char":"摔","pinyin":"","words":["摔倒","摔破","摔打"]},{"char":"擦","pinyin":"","words":["擦拭","擦桌","擦洗"]},{"char":"咱","pinyin":"zán","words":["咱们","咱俩","咱家"]},{"char":"推","pinyin":"","words":["推开","推动","推车"]},{"char":"驶","pinyin":"","words":["行驶","驾驶","驶入"]},{"char":"坚","pinyin":"","words":["坚持","坚固","坚定"]},{"char":"硬","pinyin":"","words":["坚硬","硬朗","硬件"]}]},{"name":"语文园地八","shizi":[{"char":"狼","pinyin":"","words":["野狼","狼狗","狼嚎"]},{"char":"猩","pinyin":"","words":["猩猩","猩红","大猩猩"]},{"char":"鹤","pinyin":"","words":["仙鹤","白鹤","丹顶鹤"]},{"char":"蛇","pinyin":"","words":["毒蛇","蟒蛇","蛇皮"]},{"char":"鸽","pinyin":"","words":["鸽子","白鸽","信鸽"]},{"char":"蚕","pinyin":"","words":["蚕丝","蚕茧","养蚕"]},{"char":"蚯","pinyin":"","words":["蚯蚓","蚯穴","蚯土"]},{"char":"蚓","pinyin":"","words":["蚯蚓","蚓粪","土蚓"]},{"char":"骆","pinyin":"","words":["骆驼","骆马","骆队"]},{"char":"驼","pinyin":"","words":["骆驼","驼峰","驼铃"]},{"char":"狮","pinyin":"","words":["狮子","雄狮","狮王"]}]}]}]}</script>
+
 <script>
     const { pinyin } = window.pinyinPro || {};
     function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
@@ -591,11 +1032,7 @@
 
     const STORAGE_KEY = 'handwrite_dict_v25';
     const REVIEW_INTERVALS = [1, 3, 5, 7, 9, 15, 30];
-    let defaultWords = [
-        { id:'1', word:'原因', pinyin:'yuán yīn', context:'天气yuán yīn，我们要注意保暖。', correctCount:0, wrongCount:0, firstWrong:false, status:'learning', reviewDates:[], pendingReview:false, pendingReviewDate:null, handwritingData:null, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 },
-        { id:'2', word:'块头', pinyin:'kuài tóu', context:'他的kuài tóu很大。', correctCount:0, wrongCount:0, firstWrong:false, status:'learning', reviewDates:[], pendingReview:false, pendingReviewDate:null, handwritingData:null, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 },
-        { id:'3', word:'捧花', pinyin:'pěng huā', context:'新娘拿着pěng huā。', correctCount:0, wrongCount:0, firstWrong:false, status:'learning', reviewDates:[], pendingReview:false, pendingReviewDate:null, handwritingData:null, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 }
-    ];
+    let defaultWords = [];
 
     let app = Vue.createApp({
         data() {
@@ -609,6 +1046,8 @@
                 todayCompletedCount: 0,
                 sessionTaskList: [],
                 sessionCurrentIdx: 0,
+                sessionCurrentWordIdx: 0,
+                sessionCharHadTrace: false,
                 sessionCorrectCount: 0,
                 sessionTimerSeconds: 0,
                 timerInterval: null,
@@ -618,20 +1057,11 @@
                 sessionCanvasData: [],    // 批量提交用：保存每个词的canvas数据
                 sessionBatchSubmitted: false, // 是否已提交AI批改
                 sessionWrongWordIds: [], // 本次session中写错的词ID（供家长复核后生成错字复习）
-                todayWrongReviewWords: [], // 今日错字复习列表（家长复核后生成）
-                wrongReviewTaskList: [], // 错字复习任务列表
-                wrongReviewCurrentIdx: 0,
-                wrongReviewTimerSeconds: 0,
-                wrongReviewTimerInterval: null,
-                wrongReviewFinished: false,
-                wrongReviewCanvasData: [], // 错字复习的canvas数据
-                wrongReviewBatchSubmitted: false, // 是否已提交AI批改
-                wrongReviewCorrectCount: 0,
-                wrongReviewSessionWrongIds: [], // 本次错字复习中写错的词ID
+                todayWrongReviewWords: [], // (不再使用，保留向后兼容)
                 eraserActive: false, // 橡皮擦模式
-                isWrongReviewMode: false, // 是否处于错字复习模式
                 parentPassword: '8899',
                 wordBankFilter: 'all',
+                wordBankSelected: [],
                 reviewFilter: 'all',
                 wrongWordsFilter: 'all',
                 wizardStep: 1,
@@ -645,7 +1075,7 @@
                 resultModalCallback: null,
                 ocrBusy: false,
                 useBaiduOCR: true,
-                baiduAccounts: [{ name: '账号1', token: '', used: 0 }],
+                baiduAccounts: [{ name: '账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }],
                 baiduActiveIdx: 0,
                 baiduResetMonth: '',
                 githubToken: '',
@@ -660,6 +1090,7 @@
                 vocabularyLoaded: false,
                 vocabLoading: false,
                 vocabUsage: {},
+                vocabSource: 'xiezhi',
                 vocabSelectedLessons: [],
                 vocabSelectedChars: [],
                 expandedLessons: [],
@@ -675,13 +1106,14 @@
             // 今日正确词数 / 错误词数（按词统计，不是按次数）
             reviewTotalCorrect() { return this.todayPlanWords.filter(w => w.wrongCount === 0).length; },
             reviewTotalWrong() { return this.todayPlanWords.filter(w => w.wrongCount > 0).length; },
-            // 复核列表：显示所有今日计划中的词语
+            // 复核列表：只显示今日计划中待复核的词（已纠正的也保留，直到点确认提交）
             reviewList() { 
-                return this.todayPlanWords.map(w => ({ 
-                    word: w, 
-                    handwritingImages: w.handwritingData, 
-                    showCorrectionHint: false
-                }));
+                return this.todayPlanWords
+                    .filter(w => w.pendingReview === true && w.handwritingData)
+                    .map(w => ({ 
+                        word: w, 
+                        handwritingImages: w.handwritingData
+                    }));
             },
             // 按分类筛选后的复核列表
             filteredReviewList() {
@@ -737,6 +1169,10 @@
                 if(this.wordBankFilter === 'initial') return this.words.filter(w => w.wrongCount === 1 && w.status !== 'mastered');
                 if(this.wordBankFilter === 'mastered') return this.words.filter(w => w.status === 'mastered');
                 return this.words;
+            },
+            wordBankAllSelected() {
+                const filtered = this.filteredWordBank;
+                return filtered.length > 0 && this.wordBankSelected.length === filtered.length;
             },
             textbookWordCount() {
                 let count = 0;
@@ -797,11 +1233,12 @@
             sessionPendingCount() { return this.sessionPendingQueue.length; },
             formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
             currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
-            // 错字复习相关的计算属性
-            wrongReviewTotalCount() { return this.wrongReviewTaskList.length; },
-            wrongReviewRemainCount() { return this.wrongReviewTotalCount - this.wrongReviewCurrentIdx; },
-            formattedWrongReviewTimer() { let m=Math.floor(this.wrongReviewTimerSeconds/60); let s=this.wrongReviewTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
-            currentWrongReviewWord() { return this.wrongReviewTaskList[this.wrongReviewCurrentIdx] || null; },
+            // 累计错字卡片显示（最多20个）
+            allWrongWordsDisplay() {
+                const list = this.wrongWordsList;
+                if(list.length <= 20) return list;
+                return list.slice(0, 20);
+            },
         },
         watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' } },
         mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); },
@@ -829,9 +1266,11 @@
             },
             showConfirm(title, message, onConfirm, onCancel) {
                 this.customModal = { visible: true, title, message, inputType: false, showCancel: true, onConfirm: () => { this.customModal.visible = false; onConfirm?.(); }, onCancel: () => { this.customModal.visible = false; onCancel?.(); } };
+                this.$nextTick(() => { if(this.$refs.confirmModal) this.$refs.confirmModal.focus(); });
             },
             showPrompt(title, message, placeholder, onConfirm) {
                 this.customModal = { visible: true, title, message, inputType: true, inputValue: '', placeholder, showCancel: true, onConfirm: () => { let val = this.customModal.inputValue; this.customModal.visible = false; onConfirm(val); }, onCancel: () => { this.customModal.visible = false; } };
+                this.$nextTick(() => { if(this.$refs.confirmModal) this.$refs.confirmModal.focus(); });
             },
             showResultModal(correct, word, pinyin, context, msg, nextText, callback) {
                 this.resultModalData = { correct, word, pinyin, context, message: msg, nextText };
@@ -845,7 +1284,63 @@
             },
             addAccount() {
                 const n = this.baiduAccounts.length + 1;
-                this.baiduAccounts.push({ name: '账号' + n, token: '', used: 0 });
+                this.baiduAccounts.push({ name: '账号' + n, apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 });
+            },
+            saveBaiduToken(i) {
+                const acc = this.baiduAccounts[i];
+                // 如果用户手动粘贴了 token 但 tokenExpiresAt 为 0，默认设 30 天
+                if(acc.token && !acc.tokenExpiresAt) {
+                    acc.tokenExpiresAt = Date.now() + 2592000000; // 30天
+                }
+                this.saveData();
+                this.showAlert('已保存', `「${this.baiduAccounts[i].name}」的 access_token 已保存`);
+            },
+            async refreshBaiduToken(i, silent) {
+                const acc = this.baiduAccounts[i];
+                if (!acc.apiKey || !acc.secretKey) {
+                    if(!silent) this.showAlert('提示', '请先填入 API Key 和 Secret Key');
+                    return false;
+                }
+                try {
+                    // 先用 POST（官方方式）
+                    const res = await fetch('https://aip.baidubce.com/oauth/2.0/token', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'grant_type=client_credentials&client_id=' + encodeURIComponent(acc.apiKey) + '&client_secret=' + encodeURIComponent(acc.secretKey)
+                    });
+                    if(!res.ok) throw new Error('HTTP ' + res.status);
+                    const data = await res.json();
+                    if (data.access_token) {
+                        acc.token = data.access_token;
+                        acc.tokenExpiresAt = Date.now() + (data.expires_in || 2592000) * 1000;
+                        this.saveData();
+                        if(!silent) {
+                            const expireDate = new Date(acc.tokenExpiresAt);
+                            this.showAlert('成功', `已获取 access_token，有效期至 ${expireDate.toLocaleDateString('zh-CN')}`);
+                        }
+                        return true;
+                    } else {
+                        if(!silent) this.showAlert('失败', data.error_description || '获取 token 失败，请检查 API Key 和 Secret Key');
+                    }
+                } catch(e) {
+                    // CORS 或网络问题 → 给用户手动获取的链接
+                    if(!silent) {
+                        const manualUrl = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=' + encodeURIComponent(acc.apiKey) + '&client_secret=' + encodeURIComponent(acc.secretKey);
+                        this.showConfirm('无法自动获取', '浏览器安全限制导致无法直接调用百度接口。\n\n是否复制手动获取链接到剪贴板？\n（在浏览器新标签页打开，返回的 JSON 中找到 access_token 字段，粘贴到 token 输入框即可）', () => {
+                            const ta = document.createElement('textarea');
+                            ta.value = manualUrl;
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(ta);
+                            this.showAlert('已复制', '链接已复制，请在新标签页打开获取 access_token');
+                        });
+                    }
+                }
+                return false;
+            },
+            isBaiduTokenExpired(acc) {
+                return !acc.token || Date.now() >= (acc.tokenExpiresAt || 0) - 86400000; // 提前1天视为过期
             },
             removeAccount(i) {
                 if(this.baiduAccounts.length <= 1) return;
@@ -854,7 +1349,13 @@
             },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR || false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }                 this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; }  
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR !== false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }                 this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; }  
+                // 迁移旧账号字段
+                this.baiduAccounts.forEach(a => {
+                    if(a.apiKey === undefined) a.apiKey = '';
+                    if(a.secretKey === undefined) a.secretKey = '';
+                    if(a.tokenExpiresAt === undefined) a.tokenExpiresAt = 0;
+                });
                 // 月初重置百度账号用量
                 const now = new Date();
                 const thisMonth = now.getFullYear() + '-' + (now.getMonth()+1);
@@ -863,7 +1364,7 @@
                     this.baiduResetMonth = thisMonth;
                 }
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
-                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; }); 
+                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
                 this.saveData(); 
             },
             saveData() { 
@@ -1046,13 +1547,12 @@
             // 家长纠正单个词（适配 127）
             correctWord(wordObj) {
                 if(wordObj.wrongCount <= 0) return;
-                // 先在 reviewList 中找到对应的项（存引用用于显示提示，必须在清 pendingReview 前）
-                const reviewItem = this.reviewList.find(r => r.word.id === wordObj.id);
                 // 递减错字次数
                 wordObj.wrongCount--;
                 wordObj.correctCount = (wordObj.correctCount || 0) + 1;
+                wordObj.reviewCorrected = true;
                 if(wordObj.wrongCount === 0) {
-                    // 错误归零 → 首次默对 → 标记为已掌握
+                    // 错误归零 → 标记为已掌握
                     wordObj.firstWrong = false;
                     wordObj.status = 'mastered';
                     wordObj._127_day7Entry = null;
@@ -1065,117 +1565,93 @@
                     wordObj.status = 'learning';
                     this.generateReviewDates(wordObj);
                 }
-                wordObj.pendingReview = false;  // 仅清除待复核标记，保留手写图片供查看
-                wordObj.pendingReviewDate = null;
                 this.saveData();
-                // 显示提示（利用之前存的引用）
-                if(reviewItem) reviewItem.showCorrectionHint = true;
-                setTimeout(() => {
-                    if(reviewItem) reviewItem.showCorrectionHint = false;
-                    this.$forceUpdate();
-                }, 2000);
+                this.$forceUpdate();
+            },
+            undoCorrectWord(wordObj) {
+                wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
+                wordObj.correctCount = Math.max(0, (wordObj.correctCount || 0) - 1);
+                wordObj.reviewCorrected = false;
+                // 恢复状态
+                if(wordObj.wrongCount > 0) {
+                    wordObj.status = 'learning';
+                    wordObj.firstWrong = wordObj.wrongCount === 1;
+                } else {
+                    wordObj.status = 'mastered';
+                    wordObj.firstWrong = false;
+                }
+                this.generateReviewDates(wordObj);
+                this.saveData();
                 this.$forceUpdate();
             },
             startHandwriteSession() { 
                 if(this.todayPlanWords.length===0){ this.showAlert('提示', '暂无今日计划，请家长录入词语'); return; } 
                 this.sessionTaskList = JSON.parse(JSON.stringify(this.todayPlanWords)); 
-                this.sessionCurrentIdx=0; 
-                this.sessionCorrectCount=0; 
-                this.todayCompletedCount=0; 
-                this.sessionTimerSeconds=0; 
-                this.sessionFinished=false; 
-                this.sessionAnswer=''; 
-                this.sessionPendingQueue=[]; 
-                this.sessionCanvasData=[]; 
-                this.sessionBatchSubmitted=false; 
-                this.sessionWrongWordIds=[]; 
-                if(this.timerInterval) clearInterval(this.timerInterval); 
-                this.timerInterval = setInterval(()=>{ if(!this.sessionFinished) this.sessionTimerSeconds++; },1000); 
-                this.currentView='dictateView'; 
-                this.$nextTick(()=>{ this.initCanvasForCurrent(); }); 
+                this.sessionCurrentIdx=0;
+                this.sessionCharHadTrace=false;
+                this.sessionCorrectCount=0;
+                this.todayCompletedCount=0;
+                this.sessionTimerSeconds=0;
+                this.sessionFinished=false;
+                this.sessionAnswer='';
+                this.sessionPendingQueue=[];
+                this.sessionCanvasData=[];
+                this.sessionBatchSubmitted=false;
+                this.sessionWrongWordIds=[];
+                if(this.timerInterval) clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(()=>{ if(!this.sessionFinished) this.sessionTimerSeconds++; },1000);
+                this.currentView='dictateView';
+                this.$nextTick(()=>{ this.initCanvasForCurrent(); });
             },
-            startWrongReviewSession() { 
-                if(this.todayWrongReviewWords.length===0){ this.showAlert('提示', '暂无错字复习'); return; } 
-                this.wrongReviewTaskList = JSON.parse(JSON.stringify(this.todayWrongReviewWords)); 
-                this.wrongReviewCurrentIdx=0; 
-                this.wrongReviewCorrectCount=0; 
-                this.wrongReviewTimerSeconds=0; 
-                this.wrongReviewFinished=false; 
-                this.wrongReviewCanvasData=[]; 
-                this.wrongReviewBatchSubmitted=false; 
-                this.wrongReviewSessionWrongIds=[]; 
-                if(this.wrongReviewTimerInterval) clearInterval(this.wrongReviewTimerInterval); 
-                this.wrongReviewTimerInterval = setInterval(()=>{ if(!this.wrongReviewFinished) this.wrongReviewTimerSeconds++; },1000); 
-                this.isWrongReviewMode=true; 
-                this.eraserActive = false;
-                this.currentView='dictateView'; 
-                this.$nextTick(()=>{ this.initWrongReviewCanvas(); }); 
-            },
-            initWrongReviewCanvas() { 
-                let word = this.currentWrongReviewWord; if(!word) return; 
-                for(let copy = 0; copy < 3; copy++) {
-                    word.word.split('').forEach((_,idx)=>{ 
-                        const cid = `tg_wr_${copy}_${idx}`;
-                        let canvas = document.getElementById(cid); 
-                        if(canvas){ 
-                            let ctx = canvas.getContext('2d'); 
-                            ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
-                            ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
-                            ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
-                            ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
-                            this.enableDrawing(canvas); 
-                        } 
-                    });
-                }
-            },
-            wrongReviewNextWord() {
-                // 一次性保存当前词全部3遍的canvas数据
-                for(let copy = 0; copy < 3; copy++) {
-                    const mergedCanvas = this.getWrongReviewMergedCanvas(copy);
-                    const dataURL = mergedCanvas.toDataURL();
-                    this.wrongReviewCanvasData.push({
-                        wordId: this.currentWrongReviewWord.id,
-                        word: this.currentWrongReviewWord.word,
-                        pinyin: this.currentWrongReviewWord.pinyin,
-                        context: this.currentWrongReviewWord.context,
-                        canvasDataURL: dataURL,
-                        copyIdx: copy
-                    });
-                }
-                // 移动到下一个词
-                this.wrongReviewCurrentIdx++;
-                this.eraserActive = false; // 退出橡皮擦模式
-                if(this.wrongReviewCurrentIdx >= this.wrongReviewTaskList.length) {
-                    this.wrongReviewFinished = true;
-                } else {
-                    this.$nextTick(()=>{ this.initWrongReviewCanvas(); });
-                }
-            },
-            getWrongReviewMergedCanvas(copyIdx) {
-                let word = this.currentWrongReviewWord;
-                let canvases = [];
-                for(let i=0;i<word.word.length;i++){ let c=document.getElementById(`tg_wr_${copyIdx}_${i}`); if(c) canvases.push(c); }
-                const totalWidth = canvases.length * 240;
-                const merged = document.createElement('canvas');
-                merged.width = totalWidth;
-                merged.height = 240;
-                const ctx = merged.getContext('2d');
-                for(let i=0;i<canvases.length;i++) ctx.drawImage(canvases[i], i*240, 0);
-                return merged;
+            // 练习所有错字：复用三词连练流程
+            practiceAllWrongWords() {
+                const wrongWords = this.wrongWordsList;
+                if(wrongWords.length === 0){ this.showAlert('提示', '暂无错字'); return; }
+                this.sessionTaskList = JSON.parse(JSON.stringify(wrongWords));
+                this.sessionCurrentIdx=0;
+                this.sessionCharHadTrace=false;
+                this.sessionCorrectCount=0;
+                this.todayCompletedCount=0;
+                this.sessionTimerSeconds=0;
+                this.sessionFinished=false;
+                this.sessionAnswer='';
+                this.sessionPendingQueue=[];
+                this.sessionCanvasData=[];
+                this.sessionBatchSubmitted=false;
+                this.sessionWrongWordIds=[];
+                if(this.timerInterval) clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(()=>{ if(!this.sessionFinished) this.sessionTimerSeconds++; },1000);
+                this.currentView='dictateView';
+                this.$nextTick(()=>{ this.initCanvasForCurrent(); });
             },
             initCanvasForCurrent() { 
                 let word = this.currentSessionWord; if(!word) return; 
-                word.word.split('').forEach((_,idx)=>{ 
-                    let canvas = document.getElementById(`tg_${idx}`); 
-                    if(canvas){ 
-                        let ctx = canvas.getContext('2d'); 
-                        ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
-                        ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
-                        ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
-                        ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
-                        this.enableDrawing(canvas); 
-                    } 
-                }); 
+                this.traceMode = false; // 新开canvas时退出描摹模式
+                let canvas = document.getElementById('tg_c'); 
+                if(canvas){ 
+                    let ctx = canvas.getContext('2d'); 
+                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
+                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
+                    ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
+                    ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
+                    this.enableDrawing(canvas); 
+                } 
+            },
+            drawTraceCharacter(canvas, char) {
+                let ctx = canvas.getContext('2d');
+                // 先清除canvas并画出米字格
+                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240);
+                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240);
+                ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke();
+                ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke();
+                // 画浅色字供描摹
+                ctx.fillStyle = "rgba(249, 115, 22, 0.25)"; // 浅橙色半透明
+                ctx.font = "160px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(char, 120, 130);
+                // 重新绑定绘制事件（在浅色字上继续画）
+                this.enableDrawing(canvas);
             },
             enableDrawing(canvas) { 
                 let ctx = canvas.getContext('2d');
@@ -1214,25 +1690,10 @@
                 canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', end);
             },
             clearCurrentCanvas() { 
-                if(this.isWrongReviewMode) {
-                    // 错字复习没有单遍橡皮擦按钮，调用清除所有
-                    this.clearAllCanvas();
-                } else {
-                    let word = this.currentSessionWord;
-                    if(word) word.word.split('').forEach((_,idx)=>this.clearCanvasCell(`tg_${idx}`));
-                }
+                this.clearCanvasCell('tg_c');
             },
             clearAllCanvas() { 
-                let word = this.isWrongReviewMode ? this.currentWrongReviewWord : this.currentSessionWord;
-                if(word) {
-                    const copyCount = this.isWrongReviewMode ? 3 : 1;
-                    for(let copy = 0; copy < (this.isWrongReviewMode ? 3 : 1); copy++) {
-                        word.word.split('').forEach((_,idx)=>{
-                            const cid = this.isWrongReviewMode ? `tg_wr_${copy}_${idx}` : `tg_${idx}`;
-                            this.clearCanvasCell(cid);
-                        });
-                    }
-                }
+                this.clearCanvasCell('tg_c');
             },
             toggleEraser() {
                 this.eraserActive = !this.eraserActive;
@@ -1248,104 +1709,126 @@
                 } 
             },
             getMergedCanvas() {
-                let word = this.currentSessionWord;
-                let canvases = [];
-                for(let i=0;i<word.word.length;i++){ let c=document.getElementById(`tg_${i}`); if(c) canvases.push(c); }
-                const totalWidth = canvases.length * 240;
-                const merged = document.createElement('canvas');
-                merged.width = totalWidth;
-                merged.height = 240;
-                const ctx = merged.getContext('2d');
-                for(let i=0;i<canvases.length;i++) ctx.drawImage(canvases[i], i*240, 0);
-                return merged;
+                let canvas = document.getElementById('tg_c');
+                if(!canvas) {
+                    const fallback = document.createElement('canvas');
+                    fallback.width = 240;
+                    fallback.height = 240;
+                    return fallback;
+                }
+                return canvas;
             },
             async recognizeAndSubmit() {
-                // 保存当前词手写，直接进入下一个（不OCR）
-                const mergedCanvas = this.getMergedCanvas();
-                const dataURL = mergedCanvas.toDataURL();
-                // 保存到手写数据
+                const canvas = document.getElementById('tg_c');
+                const dataURL = canvas ? canvas.toDataURL() : '';
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
-                if(wordObj) wordObj.handwritingData = [dataURL];
-                // 存入批量提交队列
+                if(wordObj && canvas) wordObj.handwritingData = [dataURL];
+                // 存入批量提交队列，带上charId和wordIndex
                 this.sessionCanvasData.push({
-                    wordId: this.currentSessionWord.id,
-                    word: this.currentSessionWord.word,
+                    charId: this.currentSessionWord.id,
+                    char: this.currentSessionWord.word,
+                    word: (this.currentSessionWord.words || [this.currentSessionWord.word])[this.sessionCurrentWordIdx],
+                    wordIndex: this.sessionCurrentWordIdx,
                     pinyin: this.currentSessionWord.pinyin,
-                    context: this.currentSessionWord.context,
                     canvasDataURL: dataURL
                 });
                 this.totalDictateTimes++;
-                this.todayCompletedCount++; // 写一个算一个，实时更新首页进度
+                this.todayCompletedCount++;
                 this.saveData();
-                // 从任务列表移除，移到下一个
-                this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
-                if(this.sessionTaskList.length === 0) {
-                    if(this.timerInterval) clearInterval(this.timerInterval);
-                    this.sessionFinished = true;
-                } else {
+                // 退出描摹模式（如果有）
+                this.traceMode = false;
+                // 点过"不会"→描摹的字走完3个组词；没点过的直接跳到下个字
+                if(this.sessionCharHadTrace && this.sessionCurrentWordIdx < 2) {
+                    this.sessionCurrentWordIdx++;
                     this.$nextTick(()=>{ this.initCanvasForCurrent(); });
+                } else {
+                    this.sessionCurrentWordIdx = 0;
+                    this.sessionCharHadTrace = false;
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
+                    if(this.sessionTaskList.length === 0) {
+                        if(this.timerInterval) clearInterval(this.timerInterval);
+                        this.sessionFinished = true;
+                    } else {
+                        this.$nextTick(()=>{ this.initCanvasForCurrent(); });
+                    }
                 }
             },
-            // ---- 批量 AI 批改 ----
+            // ---- 批量 AI 批改（按字分组，三词连练） ----
             async batchSubmitAll() {
                 this.ocrBusy = true;
                 this.sessionCorrectCount = 0;
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
-                for(let i = 0; i < this.sessionCanvasData.length; i++) {
+                // 按 charId 分组
+                const groups = {};
+                for(const item of this.sessionCanvasData) {
+                    if(!groups[item.charId]) groups[item.charId] = { charId: item.charId, char: item.char, items: [] };
+                    groups[item.charId].items.push(item);
+                }
+                for(const charId in groups) {
                     try {
-                        const item = this.sessionCanvasData[i];
-                        const wordObj = this.words.find(w => w.id === item.wordId);
+                        const group = groups[charId];
+                        const wordObj = this.words.find(w => w.id === group.charId);
                         if(!wordObj) continue;
-                        // OCR 识别
-                        const base64 = item.canvasDataURL.split(',')[1];
-                        let recognized = '';
-                        try {
-                            let useTesseract = true;
-                            if(this.useBaiduOCR) {
-                                for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
-                                    const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
-                                    const acc = this.baiduAccounts[idx];
-                                    if(acc && acc.token && acc.used < 500) {
-                                        const body = new URLSearchParams({ image: base64 });
-                                        const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                        const ocrData = await ocrRes.json();
-                                        acc.used++;
-                                        if(ocrData.error_code === 17 || ocrData.error_code === 110) {
-                                            acc.used = 500;
-                                            this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                            continue;
+                        let anyCorrect = false;
+                        for(const item of group.items) {
+                            const base64 = item.canvasDataURL.split(',')[1];
+                            let recognized = '';
+                            try {
+                                let useTesseract = true;
+                                if(this.useBaiduOCR) {
+                                    for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
+                                        const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
+                                        const acc = this.baiduAccounts[idx];
+                                        if(acc && acc.used < 500) {
+                                            // 自动续期：token 过期且填了 API Key 时自动刷新（静默）
+                                            if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) {
+                                                await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true);
+                                            }
+                                            if(!acc.token) continue;
+                                            const body = new URLSearchParams({ image: base64 });
+                                            const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                            const ocrData = await ocrRes.json();
+                                            acc.used++;
+                                            if(ocrData.error_code === 17 || ocrData.error_code === 110) {
+                                                acc.used = 500;
+                                                this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                                                continue;
+                                            }
+                                            if(ocrData.words_result && ocrData.words_result.length > 0) {
+                                                recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, '');
+                                                useTesseract = false;
+                                                break;
+                                            }
                                         }
-                                        if(ocrData.words_result && ocrData.words_result.length > 0) {
-                                            recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, '');
-                                            useTesseract = false;
-                                            break;
-                                        }
+                                        this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                                     }
-                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                                 }
+                                if(useTesseract) {
+                                    const img = new Image();
+                                    img.src = item.canvasDataURL;
+                                    await Promise.race([
+                                        new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }),
+                                        new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))
+                                    ]);
+                                    const { data: { text } } = await Promise.race([
+                                        Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }),
+                                        new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))
+                                    ]);
+                                    recognized = text.trim().replace(/\s/g, '');
+                                }
+                            } catch(e) {
+                                console.log('OCR识别失败:', e);
+                                recognized = '';
                             }
-                            if(useTesseract) {
-                                const img = new Image();
-                                img.src = item.canvasDataURL;
-                                await Promise.race([
-                                    new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }),
-                                    new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))
-                                ]);
-                                const { data: { text } } = await Promise.race([
-                                    Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }),
-                                    new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))
-                                ]);
-                                recognized = text.trim().replace(/\s/g, '');
+                            // 识别结果与目标字（而非组词）比较
+                            const expectedChar = item.char || group.char || '';
+                            if(this.isRecognitionMatch(recognized || '', expectedChar)) {
+                                anyCorrect = true;
                             }
-                        } catch(e) {
-                            console.log('OCR识别失败:', e);
-                            recognized = '';
                         }
-                        // 判对错 & 更新状态
-                        const isCorrect = this.isRecognitionMatch(recognized || '', item.word || '');
-                        wordObj.handwritingData = [item.canvasDataURL];
-                        if(isCorrect) {
+                        wordObj.handwritingData = [group.items[0]?.canvasDataURL];
+                        if(anyCorrect) {
                             wordObj.correctCount = (wordObj.correctCount || 0) + 1;
                             if(wordObj._127_day7Entry) {
                                 wordObj.status = 'mastered';
@@ -1379,11 +1862,11 @@
                             wordObj.pendingReview = true;
                             wordObj.pendingReviewDate = today;
                             this.generateReviewDates(wordObj);
-                            this.sessionWrongWordIds.push(item.wordId);
+                            this.sessionWrongWordIds.push(group.charId);
                         }
                     } catch(e) {
-                        console.log('处理词语时出错:', e);
-                        if(item && item.wordId) this.sessionWrongWordIds.push(item.wordId);
+                        console.log('处理字符时出错:', e);
+                        if(group && group.charId) this.sessionWrongWordIds.push(group.charId);
                     }
                 }
                 this.ocrBusy = false;
@@ -1392,88 +1875,7 @@
                 this.generateTodayPlan();
             },
             // ---- 错字复习批量 AI 批改（每词3遍） ----
-            async submitWrongReviewBatch() {
-                this.ocrBusy = true;
-                this.wrongReviewCorrectCount = 0;
-                const wrongIdsStillWrong = [];
-                // 按 wordId 分组（每词3遍）
-                const groups = {};
-                for(const item of this.wrongReviewCanvasData) {
-                    if(!groups[item.wordId]) groups[item.wordId] = { wordId: item.wordId, word: item.word, items: [] };
-                    groups[item.wordId].items.push(item);
-                }
-                for(const wordId in groups) {
-                    const group = groups[wordId];
-                    const wordObj = this.words.find(w => w.id === group.wordId);
-                    if(!wordObj) continue;
-                    let allPassed = true;
-                    for(const item of group.items) {
-                        const base64 = item.canvasDataURL.split(',')[1];
-                        let recognized = '';
-                        try {
-                            let useTesseract = true;
-                            if(this.useBaiduOCR) {
-                                for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
-                                    const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
-                                    const acc = this.baiduAccounts[idx];
-                                    if(acc && acc.token && acc.used < 500) {
-                                        const body = new URLSearchParams({ image: base64 });
-                                        const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                        const ocrData = await ocrRes.json();
-                                        acc.used++;
-                                        if(ocrData.error_code === 17 || ocrData.error_code === 110) {
-                                            acc.used = 500;
-                                            this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                            continue;
-                                        }
-                                        if(ocrData.words_result && ocrData.words_result.length > 0) {
-                                            recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, '');
-                                            useTesseract = false;
-                                            break;
-                                        }
-                                    }
-                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                }
-                            }
-                            if(useTesseract) {
-                                const img = new Image();
-                                img.src = item.canvasDataURL;
-                                await Promise.race([
-                                    new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }),
-                                    new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))
-                                ]);
-                                const { data: { text } } = await Promise.race([
-                                    Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }),
-                                    new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))
-                                ]);
-                                recognized = text.trim().replace(/\s/g, '');
-                            }
-                        } catch(e) {
-                            console.log('OCR识别失败:', e);
-                            recognized = '';
-                        }
-                        if(!this.isRecognitionMatch(recognized, item.word)) {
-                            allPassed = false;
-                        }
-                    }
-                    if(allPassed) {
-                        this.wrongReviewCorrectCount++;
-                    } else {
-                        wrongIdsStillWrong.push(group.wordId);
-                    }
-                }
-                // 处理结果：正确的词从今日错字复习中移除，错误的保留
-                if(wrongIdsStillWrong.length === 0) {
-                    this.todayWrongReviewWords = [];
-                } else {
-                    this.todayWrongReviewWords = this.todayWrongReviewWords.filter(w => wrongIdsStillWrong.includes(w.id));
-                }
-                this.wrongReviewFinished = true;
-                this.ocrBusy = false;
-                this.sessionBatchSubmitted = true;
-                this.sessionCorrectCount = this.wrongReviewCorrectCount;
-                this.saveData();
-            },
+            // wrong review session removed
             processAnswer(recognized) {
                 let isCorrect = this.isRecognitionMatch(recognized, this.currentSessionWord.word);
                 const currentInfo = {
@@ -1547,33 +1949,32 @@
                 }
             },
             handleDontKnow() {
-                const currentInfo = {
-                    word: this.currentSessionWord.word,
-                    pinyin: this.currentSessionWord.pinyin,
-                    context: this.currentSessionWord.context
-                };
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
-                if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
-                    wordObj.firstWrong = true;
+                if(!wordObj) return;
+                // 如果已在描摹模式，只刷新浅色字，不重复加wrongCount
+                if(!this.traceMode) {
+                    this.sessionCharHadTrace = true;  // 标记本字需要走完3个组词
+                    // wrongCount 同一字只加1次（在wordIndex=0时加）
+                    if(this.sessionCurrentWordIdx === 0) {
+                        if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
+                            wordObj.firstWrong = true;
+                        }
+                        wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
+                        wordObj._127_rollingStreak = 0;
+                        wordObj._127_day7Entry = null;
+                        wordObj.status = 'learning';
+                        wordObj.pendingReview = true;
+                        wordObj.pendingReviewDate = new Date().toISOString().slice(0,10);
+                        this.generateReviewDates(wordObj);
+                    }
                 }
-                // 不会 = 错误，重置 127 状态回滚动池
-                wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
-                wordObj._127_rollingStreak = 0;
-                wordObj._127_day7Entry = null;
-                wordObj.status = 'learning';
-                const mergedCanvas = this.getMergedCanvas();
-                wordObj.handwritingData = [mergedCanvas.toDataURL()];
-                wordObj.pendingReview = true;
-                wordObj.pendingReviewDate = new Date().toISOString().slice(0,10);
-                this.generateReviewDates(wordObj);
+                // 进入描摹模式：在canvas上画浅色字供描摹（刷新画布）
+                this.traceMode = true;
+                const canvas = document.getElementById('tg_c');
+                if(canvas) {
+                    this.drawTraceCharacter(canvas, this.currentSessionWord.word);
+                }
                 this.saveData();
-                const currentWordCopy = JSON.parse(JSON.stringify(this.currentSessionWord));
-                this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
-                this.sessionTaskList.push(currentWordCopy);
-                this.showResultModal(false, currentInfo.word, currentInfo.pinyin, currentInfo.context, "不会也没关系，再试一次。", "下一个 >", () => { 
-                    if(this.sessionTaskList.length === 0) this.finishSession();
-                    else this.moveToNext();
-                });
             },
             moveToNext() { 
                 this.$nextTick(()=>{ this.initCanvasForCurrent(); }); 
@@ -1584,17 +1985,47 @@
                 this.generateTodayPlan(); 
             },
             finishAndGoHome() { 
-                this.isWrongReviewMode = false;
                 this.currentView='childHome'; 
                 this.sessionFinished=false; 
-                this.wrongReviewFinished = false;
+                this.cleanupDictateSession();
                 this.generateTodayPlan(); 
             },
             abortDictate() { 
                 if(this.timerInterval) clearInterval(this.timerInterval); 
-                if(this.wrongReviewTimerInterval) clearInterval(this.wrongReviewTimerInterval); 
-                this.isWrongReviewMode = false;
-                this.currentView='childHome'; 
+                // OCR 正在跑，先不清数据，等它完成
+                if(this.ocrBusy) {
+                    this.currentView = 'childHome';
+                    return;
+                }
+                // 有已保存但未批改的数据 → 问用户是否先批改再退出
+                if(this.sessionCanvasData.length > 0 && !this.sessionBatchSubmitted) {
+                    this.showConfirm('退出', `有 ${this.sessionCanvasData.length} 个字已保存但尚未批改，是否先提交批改再退出？`, () => {
+                        // 确认 → 先批改
+                        this.batchSubmitAll().then(() => {
+                            this.cleanupDictateSession();
+                            this.currentView='childHome';
+                        }).catch(() => {
+                            this.cleanupDictateSession();
+                            this.currentView='childHome';
+                        });
+                    }, () => {
+                        // 取消 → 直接退出，清空计数
+                        this.cleanupDictateSession();
+                        this.currentView='childHome';
+                    });
+                } else {
+                    this.cleanupDictateSession();
+                    this.currentView='childHome';
+                }
+            },
+            cleanupDictateSession() {
+                this.sessionCanvasData = [];
+                this.sessionBatchSubmitted = false;
+                this.sessionWrongWordIds = [];
+                this.sessionFinished = false;
+                this.todayCompletedCount = 0;
+                this.sessionCorrectCount = 0;
+                this.timerInterval = null;
             },
             showParentPasswordModal() {
                 this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
@@ -1620,7 +2051,7 @@
             },
             openWordBankView(){ this.wordBankFilter='all'; this.currentView='wordBank'; },
             openWrongWordsView(){ this.wrongWordsFilter='all'; this.currentView='wrongWordsView'; },
-            openWrongReviewView(){ this.startWrongReviewSession(); },
+
             relativeDateStr(dateStr){
                 if(!dateStr) return '';
                 const today = new Date().toISOString().slice(0,10);
@@ -1636,23 +2067,64 @@
             openReviewParentView(){ this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
             commitParentReview(){
-                // 清除所有待复核标记，表示家长已确认 AI 的判定
+                // 清除已纠正词的待复核标记（未纠正的保留，下次继续）
                 this.words.forEach(w => {
-                    if(w.pendingReview) {
+                    if(w.pendingReview && w.reviewCorrected) {
                         w.pendingReview = false;
                         w.pendingReviewDate = null;
+                        w.reviewCorrected = false;
                     }
                 });
-                // 生成今日错字复习列表：session中写错且家长复核后仍未归零的词
-                const wrongIds = [...new Set(this.sessionWrongWordIds)];
-                this.todayWrongReviewWords = wrongIds
-                    .map(id => this.words.find(w => w.id === id))
-                    .filter(w => w && w.wrongCount > 0);
                 // 重置 session 错字记录
                 this.sessionWrongWordIds = [];
                 this.saveData();
                 this.currentView='parentHome';
-                this.showAlert('完成', '复核已处理。今日错字复习已生成：' + this.todayWrongReviewWords.length + '词');
+                this.showAlert('完成', '复核已处理。错字本已更新。');
+            },
+            // 从错字本中删除（同步重置127状态）
+            removeFromWrongWords(word) {
+                const wordObj = this.words.find(w => w.id === word.id);
+                if(wordObj) {
+                    wordObj.wrongCount = 0;
+                    wordObj._127_rollingStreak = 0;
+                    wordObj._127_day7Entry = null;
+                    wordObj.status = wordObj.correctCount > 0 ? 'mastered' : 'learning';
+                    wordObj.pendingReview = false;
+                    wordObj.pendingReviewDate = null;
+                    wordObj.firstWrong = false;
+                    wordObj.reviewDates = [];
+                }
+                this.saveData();
+                this.generateTodayPlan();
+                this.showAlert('已删除', `「${word.word}」已从错字本移除，127状态已重置。`);
+            },
+            // 新增错字
+            openAddWrongWordModal() {
+                this.showPrompt('新增错字', '输入要加入错字本的字（单个汉字）', '例如：两', (inputVal) => {
+                    const char = inputVal.trim();
+                    if(!char) return;
+                    // 在words中查找
+                    const wordObj = this.words.find(w => w.word === char || w.char === char);
+                    if(!wordObj) {
+                        this.showAlert('未找到', `「${char}」不在当前词库中，请先用课本选词添加。`);
+                        return;
+                    }
+                    if(wordObj.wrongCount > 0) {
+                        this.showAlert('已存在', `「${char}」已在错字本中（错了 ${wordObj.wrongCount} 次）。`);
+                        return;
+                    }
+                    // 设为错字状态，同步127
+                    wordObj.wrongCount = 1;
+                    wordObj._127_rollingStreak = 0;
+                    wordObj._127_day7Entry = null;
+                    wordObj.status = 'learning';
+                    wordObj.pendingReview = true;
+                    wordObj.pendingReviewDate = new Date().toISOString().slice(0,10);
+                    this.generateReviewDates(wordObj);
+                    this.saveData();
+                    this.generateTodayPlan();
+                    this.showAlert('已新增', `「${char}」已加入错字本，今日复习列表中。`);
+                });
             },
             fillPinyin(item){
                 if(!item.example) { item.example = item.pinyin; return; }
@@ -1664,7 +2136,7 @@
                 let added=0, exists=[];
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
-                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
+                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
                         added++;
                     } else exists.push(it.word);
                 }
@@ -1710,6 +2182,43 @@
             confirmDeleteWord(word){
                 this.showConfirm('删除词语', `确定要删除“${word.word}”吗？`, () => {
                     this.words = this.words.filter(w=>w.id !== word.id);
+                    this.saveData();
+                    this.generateTodayPlan();
+                });
+            },
+            toggleWordSelection(id) {
+                const idx = this.wordBankSelected.indexOf(id);
+                if(idx >= 0) this.wordBankSelected.splice(idx, 1);
+                else this.wordBankSelected.push(id);
+            },
+            toggleAllWords() {
+                if(this.wordBankAllSelected) {
+                    this.wordBankSelected = [];
+                } else {
+                    this.wordBankSelected = this.filteredWordBank.map(w => w.id);
+                }
+            },
+            clearSelection() {
+                this.wordBankSelected = [];
+            },
+            confirmBatchDelete() {
+                const count = this.wordBankSelected.length;
+                if(!count) return;
+                this.showConfirm('批量删除', `确定删除选中的 ${count} 个词语吗？`, () => {
+                    const ids = new Set(this.wordBankSelected);
+                    this.words = this.words.filter(w => !ids.has(w.id));
+                    this.wordBankSelected = [];
+                    this.saveData();
+                    this.generateTodayPlan();
+                });
+            },
+            confirmDeleteAll() {
+                const words = this.filteredWordBank;
+                if(!words.length) return;
+                this.showConfirm('清空词库', `确定删除全部 ${words.length} 个词语吗？此操作不可撤销！`, () => {
+                    const ids = new Set(words.map(w => w.id));
+                    this.words = this.words.filter(w => !ids.has(w.id));
+                    this.wordBankSelected = [];
                     this.saveData();
                     this.generateTodayPlan();
                 });
@@ -1807,6 +2316,7 @@
                                 status: 'learning',
                                 reviewDates: [],
                                 pendingReview: false,
+                                reviewCorrected: false,
                                 pendingReviewDate: null,
                                 handwritingData: null,
                                 _127_rollingStreak: 0,
@@ -1902,14 +2412,13 @@
             async fetchVocabulary(skipCache) {
                 if(this.vocabularyData) return;
                 this.vocabLoading = true;
-                // 先从 localStorage 读取缓存（除非强制跳过）
                 var CACHE_KEY = 'moxie_vocab_cache';
                 if(!skipCache) {
                     try {
                         var cached = localStorage.getItem(CACHE_KEY);
                         if(cached) {
                             var parsed = JSON.parse(cached);
-                            if(parsed && parsed.units && parsed.version) {
+                            if(parsed && parsed.units) {
                                 this.vocabularyData = parsed;
                                 this.vocabularyLoaded = true;
                                 this.vocabLoading = false;
@@ -1918,15 +2427,22 @@
                         }
                     } catch(e) {}
                 }
-                // 缓存没有或跳过缓存，从网络加载
+                // 优先从内嵌数据加载
+                if(window.VOCABULARY_EMBEDDED && window.VOCABULARY_EMBEDDED.units) {
+                    this.vocabularyData = window.VOCABULARY_EMBEDDED;
+                    this.vocabularyLoaded = true;
+                    try { localStorage.setItem(CACHE_KEY, JSON.stringify(this.vocabularyData)); } catch(e) {}
+                    this.vocabLoading = false;
+                    return;
+                }
                 try {
                     const res = await fetch('./vocabulary.json?' + Date.now());
                     if(!res.ok) throw new Error();
-                    this.vocabularyData = await res.json();
+                    let text = await res.text();
+                    if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+                    this.vocabularyData = JSON.parse(text);
                     this.vocabularyLoaded = true;
-                    // 写入缓存
                     try { localStorage.setItem(CACHE_KEY, JSON.stringify(this.vocabularyData)); } catch(e) {}
-                    // 版本标记
                     if(this.vocabularyData.version) {
                         var VERSION_KEY = 'moxie_vocab_version';
                         var oldVer = localStorage.getItem(VERSION_KEY);
@@ -1965,10 +2481,33 @@
                 if(!this.vocabularyLoaded && !this.vocabLoading) {
                     this.fetchVocabulary();
                 }
+                this.vocabSource = 'xiezhi';
+                this.vocabularyData = window.VOCABULARY_EMBEDDED?.units ? window.VOCABULARY_EMBEDDED : this.vocabularyData;
+                this.vocabularyLoaded = !!(this.vocabularyData?.units);
                 this.vocabSelectedLessons = [];
                 this.vocabSelectedChars = [];
                 this.expandedLessons = [];
                 this.currentView = 'vocabSelector';
+            },
+            switchVocabSource(source) {
+                if(source === this.vocabSource) return;
+                if(source === 'xiezhi') {
+                    if(window.VOCABULARY_EMBEDDED && window.VOCABULARY_EMBEDDED.units) {
+                        this.vocabularyData = window.VOCABULARY_EMBEDDED;
+                        this.vocabularyLoaded = true;
+                    } else if(!this.vocabularyData) {
+                        this.fetchVocabulary();
+                    }
+                } else if(source === 'shizi') {
+                    if(window.VOCABULARY_SHIZI_EMBEDDED && window.VOCABULARY_SHIZI_EMBEDDED.units) {
+                        this.vocabularyData = window.VOCABULARY_SHIZI_EMBEDDED;
+                        this.vocabularyLoaded = true;
+                    }
+                }
+                this.vocabSource = source;
+                this.vocabSelectedLessons = [];
+                this.vocabSelectedChars = [];
+                this.expandedLessons = [];
             },
             toggleLessonExpand(key) {
                 const idx = this.expandedLessons.indexOf(key);
@@ -2025,6 +2564,7 @@
                 this.vocabularyData = null;
                 this.vocabularyLoaded = false;
                 this.vocabLoading = true;
+                this.vocabSource = 'xiezhi';
                 this.fetchVocabulary(true).then(() => {
                     var cnt = 0, unitCnt = 0;
                     if(this.vocabularyData && this.vocabularyData.units) {
@@ -2043,7 +2583,6 @@
             },
             confirmVocabSelect() {
                 let selectedChars = [];
-                // 收集整课勾选的
                 for(let lessonKey of this.vocabSelectedLessons) {
                     for(let unit of (this.vocabularyData?.units || [])) {
                         for(let lesson of unit.lessons) {
@@ -2058,7 +2597,6 @@
                         }
                     }
                 }
-                // 收集单字勾选的
                 for(let key of this.vocabSelectedChars) {
                     const parts = key.split('_');
                     const unitName = parts[0];
@@ -2079,39 +2617,46 @@
                     this.showAlert('提示', '请先选择至少一个字');
                     return;
                 }
-                // 去重（同一个字可能同时被整课和单字选中）
                 const seen = new Set();
                 selectedChars = selectedChars.filter(item => {
                     if(seen.has(item.ch.char)) return false;
                     seen.add(item.ch.char);
                     return true;
                 });
-                // 交替选组词，填入 pendingWords 跳转到确认页面
-                this.pendingWords = [];
+                // 生成 char entry，直接加入词库（跳过确认页）
+                let added = 0, exists = 0;
                 for(let item of selectedChars) {
                     const ch = item.ch;
-                    const lastUsed = this.vocabUsage[ch.char];
-                    let pick;
-                    if(!lastUsed) {
-                        pick = Math.random() < 0.5 ? 'word1' : 'word2';
-                    } else {
-                        pick = lastUsed === 'word1' ? 'word2' : 'word1';
+                    const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + ch.char;
+                    if(this.words.some(w => w.id === charId)) {
+                        exists++;
+                        continue;
                     }
-                    this.vocabUsage[ch.char] = pick;
-                    const pickedWord = ch[pick];
-                    const pickedPinyin = toPinyinWithTone(pickedWord);
-                    let example = ch.sentence || '';
-                    if(example.includes(pickedWord)) {
-                        example = example.split(pickedWord).join(pickedPinyin);
-                    }
-                    this.pendingWords.push({
-                        word: pickedWord,
-                        pinyin: pickedPinyin,
-                        example: example
+                    const charPinyin = toPinyinWithTone(ch.char);
+                    this.words.push({
+                        id: charId,
+                        word: ch.char,
+                        char: ch.char,
+                        pinyin: charPinyin,
+                        words: ch.words || [ch.word1, ch.word2, ch.word3].filter(Boolean),
+                        correctCount: 0,
+                        wrongCount: 0,
+                        status: 'learning',
+                        reviewCorrected: false,
+                        _127_rollingStreak: 0,
+                        _127_day7Entry: null,
+                        _127_randomCheckWeek: 0,
+                        reviewDates: [],
+                        pendingReview: false,
+                        pendingReviewDate: null,
+                        handwritingData: null
                     });
+                    added++;
                 }
-                this.currentView = 'addWizard';
-                this.wizardStep = 2;
+                this.saveData();
+                this.generateTodayPlan();
+                this.showAlert('成功', `已添加 ${added} 个生字${exists ? '，'+exists+' 个字已存在已跳过' : ''}，每个配3个组词`);
+                this.currentView = 'parentHome';
             },
         }
     }).mount('#app');
