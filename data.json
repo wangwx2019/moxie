@@ -61,19 +61,27 @@
         "两旁"
       ],
       "correctCount": 0,
-      "wrongCount": 0,
+      "wrongCount": 4,
       "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
-      "pendingReview": false,
-      "pendingReviewDate": null,
+      "reviewDates": [
+        "2026-07-09",
+        "2026-07-10",
+        "2026-07-11",
+        "2026-07-12",
+        "2026-07-13",
+        "2026-07-14",
+        "2026-07-15"
+      ],
+      "pendingReview": true,
+      "pendingReviewDate": "2026-07-08",
       "handwritingData": [
         "data:image/png;base64,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"
       ],
-      "firstWrong": false
+      "firstWrong": true
     }
   ],
   "checkinDays": 1,
@@ -85,8 +93,8 @@
       "token": "24.50851ff5a0f0384e97d9eb7d0a566d6b.2592000.1782568772.282335-123506560",
       "used": 0,
       "apiKey": "HzC9ACSpL9QF4TodXcQOvL5O",
-      "secretKey": "EmEjVU5ZnSD0Q8SX7UyyUPwhgWehTkeN",
-      "tokenExpiresAt": 1786108832298
+      "secretKey": " EmEjVU5ZnSD0Q8SX7UyyUPwhgWehTkeN",
+      "tokenExpiresAt": 1786117377335
     },
     {
       "name": "账号2",
