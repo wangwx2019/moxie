@@ -1048,6 +1048,20 @@
 
 <script>
     const { pinyin } = window.pinyinPro || {};
+    // 简繁体转换映射表（模块级常量，避免放进 methods 触发 Vue 警告）
+    const _s2tMap = {
+        '干':'幹', '后':'後', '发':'髮', '里':'裡', '面':'麵',
+        '么':'麼', '余':'餘', '郁':'鬱', '制':'製', '胡':'鬍',
+        '帘':'簾', '咸':'鹹', '秋':'鞦', '伙':'夥', '保':'寶',
+        '充':'衝', '合':'閤', '杰':'傑', '霉':'黴',
+        '淀':'澱', '台':'臺', '致':'緻', '丑':'醜', '洒':'灑',
+        '松':'鬆', '表':'錶', '御':'禦', '划':'劃', '帅':'帥',
+        '尝':'嚐', '夺':'奪', '须':'鬚', '脏':'臟', '网':'網',
+        '购':'購', '节':'節', '卫':'衛', '复':'複', '蜡':'蠟',
+        '痒':'癢', '听':'聽', '静':'靜', '干净':'乾淨',
+        '头发':'頭髮', '里面':'裡面', '这里':'這裡', '那里':'那裡'
+    };
+    const _t2sMap = {};
     function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
     function generateExample(word, pinyinStr) { return ''; }
 
@@ -1080,6 +1094,7 @@
                 sessionWrongWordIds: [], // 本次session中写错的词ID（供家长复核后生成错字复习）
                 todayWrongReviewWords: [], // (不再使用，保留向后兼容)
                 eraserActive: false, // 橡皮擦模式
+                traceMode: false, // 描摹（不会→看浅色字）模式
                 parentPassword: '8899',
                 wordBankFilter: 'all',
                 wordBankSelected: [],
@@ -1406,31 +1421,17 @@
                 }
             },
             // ---- 127 辅助方法 ----
-            // 简繁体转换映射表
-            _s2tMap: {
-                '干':'幹', '后':'後', '发':'髮', '里':'裡', '面':'麵',
-                '么':'麼', '余':'餘', '郁':'鬱', '制':'製', '胡':'鬍',
-                '帘':'簾', '咸':'鹹', '秋':'鞦', '伙':'夥', '保':'寶',
-                '充':'衝', '合':'閤', '杰':'傑', '帘':'簾', '霉':'黴',
-                '淀':'澱', '台':'臺', '致':'緻', '丑':'醜', '洒':'灑',
-                '松':'鬆', '表':'錶', '御':'禦', '划':'劃', '帅':'帥',
-                '尝':'嚐', '夺':'奪', '须':'鬚', '脏':'臟', '网':'網',
-                '购':'購', '节':'節', '卫':'衛', '复':'複', '蜡':'蠟',
-                '痒':'癢', '洒':'灑', '听':'聽', '静':'靜', '干净':'乾淨',
-                '头发':'頭髮', '里面':'裡面', '这里':'這裡', '那里':'那裡'
-            },
-            _t2sMap: {},
             // 初始化繁体转简体映射
             initCharMaps() {
-                if(Object.keys(this._t2sMap).length > 0) return;
-                for(let [s, t] of Object.entries(this._s2tMap)) {
-                    this._t2sMap[t] = s;
+                if(Object.keys(_t2sMap).length > 0) return;
+                for(let [s, t] of Object.entries(_s2tMap)) {
+                    _t2sMap[t] = s;
                 }
             },
             // 字符归一化：统一简繁体
             normalizeChar(c) {
                 this.initCharMaps();
-                return this._t2sMap[c] || this._s2tMap[c] || c;
+                return _t2sMap[c] || _s2tMap[c] || c;
             },
             // 判断两个字符是否匹配（考虑OCR常见误差）
             charsMatch(recognized, expected) {
@@ -1669,25 +1670,67 @@
                 // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
                 this.speakCurrentWord();
             },
-            // 语音播报：读"两个的两"这种格式
+            // 语音播报：读"两个的两"这种格式，优先百度TTS，失败降级原生
             speakCurrentWord() {
                 try {
-                    if(!('speechSynthesis' in window)) return;
                     const word = this.currentSessionWord;
                     if(!word) return;
                     const curWord = (word.words || [word.word])[this.sessionCurrentWordIdx] || word.word;
                     const text = curWord + '的' + word.word;
+                    this.speakWithBaidu(text);
+                } catch(e) { console.error('语音播报失败:', e); this.speakFallback(text); }
+            },
+            // 百度语音合成（神经网络女声，清晰）
+            async speakWithBaidu(text) {
+                try {
+                    const acc = this.baiduAccounts[this.baiduActiveIdx];
+                    if(!acc || !acc.apiKey || !acc.secretKey) { this.speakFallback(text); return; }
+                    // token 过期自动静默刷新
+                    if(this.isBaiduTokenExpired(acc)) {
+                        const ok = await this.refreshBaiduToken(this.baiduActiveIdx, true);
+                        if(!ok) { this.speakFallback(text); return; }
+                    }
+                    const tok = this.baiduAccounts[this.baiduActiveIdx].token;
+                    if(!tok) { this.speakFallback(text); return; }
+                    const params = new URLSearchParams({
+                        tex: text,
+                        tok: tok,
+                        cuid: 'moxie',
+                        ctp: '1',
+                        lan: 'zh',
+                        per: '5003',   // 度小甜 神经网络女声（更自然清晰）
+                        spd: '5',   // 语速
+                        pit: '5',   // 音调
+                        vol: '5',
+                        aue: '3'    // mp3
+                    });
+                    const res = await fetch('https://tsn.baidubce.com/text2audio?' + params.toString());
+                    if(!res.ok) { console.warn('⚠️降级原生: 百度HTTP', res.status); this.speakFallback(text); return; }
+                    const blob = await res.blob();
+                    if(blob.size < 100) { console.warn('⚠️降级原生: 百度返回非音频', blob.size); this.speakFallback(text); return; } // 出错返回json而非音频
+                    console.log('✅百度语音播报, blob大小', blob.size);
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    audio.play().catch(()=>{ console.warn('⚠️降级原生: audio.play失败'); this.speakFallback(text); });
+                } catch(e) {
+                    console.error('百度语音失败:', e);
+                    this.speakFallback(text);
+                }
+            },
+            // 降级：浏览器原生 TTS
+            speakFallback(text) {
+                try {
+                    if(!('speechSynthesis' in window)) return;
                     window.speechSynthesis.cancel();
                     const u = new SpeechSynthesisUtterance(text);
                     u.lang = 'zh-CN';
                     u.rate = 0.6;
                     u.pitch = 1.1;
-                    // 尽量选中文女声
                     const voices = window.speechSynthesis.getVoices();
                     const zh = voices.find(v => /zh|Chinese|中文|普通话/i.test(v.lang + v.name));
                     if(zh) u.voice = zh;
                     window.speechSynthesis.speak(u);
-                } catch(e) { console.error('语音播报失败:', e); }
+                } catch(e) { console.error('降级语音也失败:', e); }
             },
             drawTraceCharacter(canvas, char) {
                 let ctx = canvas.getContext('2d');
