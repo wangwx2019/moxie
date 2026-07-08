@@ -521,6 +521,42 @@
             </div>
         </div>
         <div class="card-white">
+            <div class="flex-between"><span>🔊 语音播报声音</span><span class="badge" style="font-size:0.7rem;">当前: {{ ttsVoiceCatalog.find(v => v.id === ttsVoiceId)?.name || '未知' }}</span></div>
+            <div class="text-small" style="margin:8px 0 12px; color:#b45309;">选择默写时朗读生字的声音，点击喇叭可试听</div>
+            <div style="background:#fff7ed; border-radius:20px; padding:12px; margin-bottom:12px; border:1px solid #ffca9a;">
+                <div style="font-weight:700; font-size:0.85rem; color:#92400e; margin-bottom:6px;">🔑 语音合成 Token（TTS专用）</div>
+                <div class="text-small" style="margin-bottom:8px; color:#b45309;">
+                    百度云控制台 → 语音合成 → 创建应用 → 拿到 API Key/Secret Key → 获取 Token<br>
+                    <span style="color:#16a34a;" v-if="ttsToken">✅ 已配置 Token: {{ ttsToken.substring(0,15) }}...</span>
+                    <span style="color:#dc2626;" v-else>❌ 未配置（试听和播报需要此 Token）</span>
+                </div>
+                <input type="text" v-model="ttsToken" placeholder="粘贴 access_token（24.开头的字符串）"
+                    style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:10px 16px; font-size:0.85rem; background:white; box-sizing:border-box; margin-bottom:6px;">
+                <div class="text-small" style="color:#a16207;">提示：可以在百度云控制台用 API Key 和 Secret Key 自动获取，或手动粘贴</div>
+            </div>
+            <div style="max-height:45vh; overflow-y:auto;">
+                <div v-for="voice in ttsVoiceCatalog" :key="voice.id"
+                     @click="ttsVoiceId = voice.id"
+                     style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:16px; margin-bottom:6px; cursor:pointer; transition:all 0.15s; border:2px solid transparent;"
+                     :style="{ background: ttsVoiceId === voice.id ? '#fff0e0' : '#fef9f2', borderColor: ttsVoiceId === voice.id ? '#f97316' : 'transparent' }">
+                    <span style="font-size:1.5rem;">{{ voice.gender === 'female' ? '👩' : '👨' }}</span>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-weight:700; font-size:0.9rem; color:#1c1917;">{{ voice.name }}</div>
+                        <div style="font-size:0.75rem; color:#92400e;">{{ voice.desc }}</div>
+                    </div>
+                    <span v-if="ttsVoiceId === voice.id" style="color:#f97316; font-weight:700;">✓</span>
+                    <button @click.stop="previewVoice(voice.id)"
+                            style="padding:6px 12px; border-radius:40px; font-size:0.78rem; cursor:pointer; white-space:nowrap; font-weight:600; border:1px solid #ffca9a;"
+                            :style="{ background: ttsPreviewingVoiceId === voice.id ? '#f97316' : '#fff7ed', color: ttsPreviewingVoiceId === voice.id ? 'white' : '#f97316' }">
+                        {{ ttsPreviewingVoiceId === voice.id ? '⏹ 停止' : '🔊 试听' }}
+                    </button>
+                </div>
+            </div>
+            <div class="text-small" style="margin-top:10px; text-align:center; color:#a16207;">
+                💡 需要百度语音账号才能试听和使用。部分声音需要高级权限。
+            </div>
+        </div>
+        <div class="card-white">
             <div class="flex-between"><span>📦 数据同步</span></div>
             <button class="cute-btn-sm" @click="exportData">导出 data.json</button>
             <button class="cute-btn-sm" @click="importData">导入 JSON</button>
@@ -1130,6 +1166,23 @@
                 vocabSelectedLessons: [],
                 vocabSelectedChars: [],
                 expandedLessons: [],
+                // TTS 语音选择
+                ttsVoiceId: '5003',
+                ttsToken: '',
+                ttsPreviewing: false,
+                ttsPreviewingVoiceId: null,
+                ttsPreviewAudio: null,
+                ttsVoiceCatalog: [
+                    { id: '0', name: '声音 0', desc: '请试听选择', gender: 'female' },
+                    { id: '1', name: '声音 1', desc: '请试听选择', gender: 'female' },
+                    { id: '2', name: '声音 2', desc: '请试听选择', gender: 'female' },
+                    { id: '3', name: '声音 3', desc: '请试听选择', gender: 'female' },
+                    { id: '4', name: '声音 4', desc: '请试听选择', gender: 'female' },
+                    { id: '5', name: '声音 5', desc: '请试听选择', gender: 'female' },
+                    { id: '103', name: '英文女声', desc: 'English', gender: 'female' },
+                    { id: '106', name: '英文男声', desc: 'English', gender: 'male' },
+                    { id: '5003', name: '度小甜', desc: '请试听选择', gender: 'female' },
+                ],
             }
         },
         computed: {
@@ -1285,7 +1338,7 @@
                 return list.slice(0, 20);
             },
         },
-        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' } },
+        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' }, ttsVoiceId:'saveData', ttsToken:'saveData' },
         mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
         methods: {
             async fetchRemoteData() {
@@ -1394,7 +1447,7 @@
             },
             loadData() { 
                 let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR !== false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }                 this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; }  
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR !== false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }                 this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; this.ttsVoiceId = d.ttsVoiceId || '5003'; this.ttsToken = d.ttsToken || ''; }  
                 // 迁移旧账号字段
                 this.baiduAccounts.forEach(a => {
                     if(a.apiKey === undefined) a.apiKey = '';
@@ -1412,8 +1465,8 @@
                 this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
                 this.saveData(); 
             },
-            saveData() { 
-                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords };
+            saveData() {
+                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken };
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
                 } catch(e) {
@@ -1672,55 +1725,47 @@
             },
             // 语音播报：读"两个的两"这种格式，优先百度TTS，失败降级原生
             speakCurrentWord() {
-                try {
-                    const word = this.currentSessionWord;
-                    if(!word) return;
-                    const curWord = (word.words || [word.word])[this.sessionCurrentWordIdx] || word.word;
-                    const text = curWord + '的' + word.word;
-                    this.speakWithBaidu(text);
-                } catch(e) { console.error('语音播报失败:', e); this.speakFallback(text); }
+                const word = this.currentSessionWord;
+                if(!word) return;
+                const curWord = (word.words || [word.word])[this.sessionCurrentWordIdx] || word.word;
+                const text = curWord + '的' + word.word;
+                this.speakWithBaidu(text);
             },
-            // 百度语音合成（神经网络女声，清晰）
+            // 百度语音合成
             async speakWithBaidu(text) {
                 try {
-                    const acc = this.baiduAccounts[this.baiduActiveIdx];
-                    if(!acc || !acc.apiKey || !acc.secretKey) { this.speakFallback(text); return; }
-                    // token 过期自动静默刷新
-                    if(this.isBaiduTokenExpired(acc)) {
-                        const ok = await this.refreshBaiduToken(this.baiduActiveIdx, true);
-                        if(!ok) { this.speakFallback(text); return; }
+                    // 停止上一次播放
+                    if(this._currentTtsAudio) { this._currentTtsAudio.pause(); this._currentTtsAudio = null; }
+                    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+                    let tok = this.ttsToken;
+                    if(!tok) {
+                        const acc = this.baiduAccounts[this.baiduActiveIdx];
+                        if(!acc || !acc.token) { this.speakFallback(text); return; }
+                        if(acc.apiKey && acc.secretKey && this.isBaiduTokenExpired(acc)) {
+                            const ok = await this.refreshBaiduToken(this.baiduActiveIdx, true);
+                            if(!ok) { this.speakFallback(text); return; }
+                        }
+                        tok = acc.token;
                     }
-                    const tok = this.baiduAccounts[this.baiduActiveIdx].token;
                     if(!tok) { this.speakFallback(text); return; }
-                    const params = new URLSearchParams({
-                        tex: text,
-                        tok: tok,
-                        cuid: 'moxie',
-                        ctp: '1',
-                        lan: 'zh',
-                        per: '5003',   // 度小甜 神经网络女声（更自然清晰）
-                        spd: '5',   // 语速
-                        pit: '5',   // 音调
-                        vol: '5',
-                        aue: '3'    // mp3
-                    });
-                    const res = await fetch('https://tsn.baidubce.com/text2audio?' + params.toString());
-                    if(!res.ok) { console.warn('⚠️降级原生: 百度HTTP', res.status); this.speakFallback(text); return; }
+                    const url = 'https://tsn.baidubce.com/text2audio?tex=' + encodeURIComponent(text) + '&tok=' + encodeURIComponent(tok) + '&cuid=moxie&ctp=1&lan=zh&per=' + encodeURIComponent(this.ttsVoiceId || '0') + '&spd=3&pit=5&vol=5&aue=3';
+                    const res = await fetch(url);
+                    const ct = res.headers.get('content-type') || '';
+                    if(!res.ok || ct.includes('json')) { console.warn('百度TTS失败:', ct, res.status); this.speakFallback(text); return; }
                     const blob = await res.blob();
-                    if(blob.size < 100) { console.warn('⚠️降级原生: 百度返回非音频', blob.size); this.speakFallback(text); return; } // 出错返回json而非音频
-                    console.log('✅百度语音播报, blob大小', blob.size);
-                    const url = URL.createObjectURL(blob);
-                    const audio = new Audio(url);
-                    audio.play().catch(()=>{ console.warn('⚠️降级原生: audio.play失败'); this.speakFallback(text); });
-                } catch(e) {
-                    console.error('百度语音失败:', e);
-                    this.speakFallback(text);
-                }
+                    if(blob.size < 200) { console.warn('百度TTS返回过小:', blob.size); this.speakFallback(text); return; }
+                    const audioUrl = URL.createObjectURL(blob);
+                    const audio = new Audio(audioUrl);
+                    this._currentTtsAudio = audio;
+                    audio.onended = () => { this._currentTtsAudio = null; URL.revokeObjectURL(audioUrl); };
+                    audio.onerror = () => { this._currentTtsAudio = null; URL.revokeObjectURL(audioUrl); };
+                    await audio.play();
+                } catch(e) { console.error('百度语音失败:', e); this.speakFallback(text); }
             },
             // 降级：浏览器原生 TTS
             speakFallback(text) {
                 try {
-                    if(!('speechSynthesis' in window)) return;
+                    if(!('speechSynthesis' in window) || !text) return;
                     window.speechSynthesis.cancel();
                     const u = new SpeechSynthesisUtterance(text);
                     u.lang = 'zh-CN';
@@ -1731,6 +1776,68 @@
                     if(zh) u.voice = zh;
                     window.speechSynthesis.speak(u);
                 } catch(e) { console.error('降级语音也失败:', e); }
+            },
+            // 试听语音
+            async previewVoice(voiceId) {
+                // 如果正在播放同一个声音 → 停止
+                if(this.ttsPreviewingVoiceId === voiceId) {
+                    if(this.ttsPreviewAudio) { this.ttsPreviewAudio.pause(); this.ttsPreviewAudio = null; }
+                    this.ttsPreviewingVoiceId = null;
+                    this.ttsPreviewing = false;
+                    return;
+                }
+                // 停止之前的播放
+                if(this.ttsPreviewAudio) { this.ttsPreviewAudio.pause(); this.ttsPreviewAudio = null; }
+                this.ttsPreviewingVoiceId = voiceId;
+                this.ttsPreviewing = true;
+                const previewText = '小朋友们，今天我们来学习新的生字，准备好了吗？';
+                try {
+                    let tok = this.ttsToken;
+                    if(!tok) {
+                        const acc = this.baiduAccounts[this.baiduActiveIdx];
+                        if(acc && acc.apiKey && acc.secretKey && this.isBaiduTokenExpired(acc)) {
+                            await this.refreshBaiduToken(this.baiduActiveIdx, true);
+                        }
+                        tok = (this.baiduAccounts[this.baiduActiveIdx] || {}).token || '';
+                    }
+                    if(!tok) {
+                        this.showAlert('试听失败', '请先在上方「语音合成 Token」输入框粘贴百度 TTS Token（24.开头的字符串）');
+                        this.ttsPreviewingVoiceId = null;
+                        this.ttsPreviewing = false;
+                        return;
+                    }
+                    const url = 'https://tsn.baidubce.com/text2audio?tex=' + encodeURIComponent(previewText) + '&tok=' + encodeURIComponent(tok) + '&cuid=moxie_preview&ctp=1&lan=zh&per=' + encodeURIComponent(voiceId) + '&spd=3&pit=5&vol=5&aue=3';
+                    const res = await fetch(url);
+                    const ct = res.headers.get('content-type') || '';
+                    if(!res.ok || ct.includes('json')) {
+                        const errText = await res.text().catch(() => '');
+                        let detail = '';
+                        try { const j = JSON.parse(errText); detail = j.err_detail || j.err_msg || errText; } catch(e) { detail = errText; }
+                        console.warn('百度TTS试听失败:', ct, res.status, detail);
+                        this.showAlert('试听失败', '百度语音返回错误:\n' + detail);
+                        this.ttsPreviewingVoiceId = null;
+                        this.ttsPreviewing = false;
+                        return;
+                    }
+                    const blob = await res.blob();
+                    if(blob.size < 200) {
+                        this.showAlert('试听失败', '返回音频数据异常（大小: ' + blob.size + ' 字节）');
+                        this.ttsPreviewingVoiceId = null;
+                        this.ttsPreviewing = false;
+                        return;
+                    }
+                    const audioUrl = URL.createObjectURL(blob);
+                    const audio = new Audio(audioUrl);
+                    this.ttsPreviewAudio = audio;
+                    audio.onended = () => { this.ttsPreviewingVoiceId = null; this.ttsPreviewing = false; this.ttsPreviewAudio = null; URL.revokeObjectURL(audioUrl); };
+                    audio.onerror = () => { this.ttsPreviewingVoiceId = null; this.ttsPreviewing = false; this.ttsPreviewAudio = null; URL.revokeObjectURL(audioUrl); };
+                    await audio.play();
+                } catch(e) {
+                    console.error('试听失败:', e);
+                    this.showAlert('试听失败', '网络错误: ' + (e.message || '请检查网络'));
+                    this.ttsPreviewingVoiceId = null;
+                    this.ttsPreviewing = false;
+                }
             },
             drawTraceCharacter(canvas, char) {
                 let ctx = canvas.getContext('2d');
