@@ -207,30 +207,51 @@
             <span>✨ 余{{ sessionRemainCount }}</span>
             <span class="review-link" @click="goToReviewFromChild">💾 待复核 {{ pendingReviewCount }}</span>
         </div>
-        <!-- 三词连练模式 -->
+        <!-- 默写模式 -->
         <div class="dictate-main-card" v-else-if="currentSessionWord">
             <!-- 拼音大号居中 -->
-            <div style="text-align:center; margin-bottom:20px;">
-                <div style="font-size:3.5rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">🔊 {{ currentSessionWord.pinyin }}</div>
+            <div style="text-align:center; margin-bottom:12px;">
+                <div style="font-size:3.5rem; font-weight:700; color:#f97316; line-height:1.2;">{{ currentSessionWord.pinyin }}</div>
+                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @click="speakCurrentWord">🔊 重播</button>
             </div>
-            <!-- 3个组词卡片 -->
+            <!-- 词语逐字显示：目标字空白田字格，其他字显示内容 -->
             <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px; flex-wrap:wrap;">
-                <div v-for="(w, idx) in (currentSessionWord.words || [currentSessionWord.word])" :key="idx"
+                <div v-for="(item, idx) in currentDictateWordChars" :key="idx"
                      :style="{
-                         padding: '10px 20px',
-                         borderRadius: '16px',
-                         border: idx === sessionCurrentWordIdx ? '3px solid #f97316' : '2px solid #e5e7eb',
-                         background: idx === sessionCurrentWordIdx ? '#fff7ed' : '#f9fafb',
-                         color: idx === sessionCurrentWordIdx ? '#c2410c' : '#9ca3af',
-                         fontWeight: idx === sessionCurrentWordIdx ? 700 : 400,
-                         fontSize: '1.2rem',
-                         transition: 'all 0.2s',
-                         cursor: 'default'
+                         width: '72px',
+                         height: '72px',
+                         border: item.isTarget ? '3px solid #f97316' : '2px solid #d1d5db',
+                         borderRadius: '10px',
+                         background: item.isTarget ? '#fff7ed' : '#f9fafb',
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'center',
+                         fontSize: '1.8rem',
+                         fontWeight: 700,
+                         color: item.isTarget ? '#f97316' : '#4b5563',
+                         position: 'relative'
                      }">
-                    {{ w }}
+                    <!-- 目标字：显示米字格 + "?" -->
+                    <template v-if="item.isTarget">
+                        <svg style="position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;" viewBox="0 0 72 72">
+                            <line x1="0" y1="36" x2="72" y2="36" stroke="#fbc48d" stroke-width="0.5"/>
+                            <line x1="36" y1="0" x2="36" y2="72" stroke="#fbc48d" stroke-width="0.5"/>
+                            <line x1="0" y1="0" x2="72" y2="72" stroke="#fbc48d" stroke-width="0.5"/>
+                            <line x1="72" y1="0" x2="0" y2="72" stroke="#fbc48d" stroke-width="0.5"/>
+                        </svg>
+                        <span style="opacity:0.35; font-size:1.5rem;">?</span>
+                    </template>
+                    <!-- 非目标字：显示字 + 十字格 -->
+                    <template v-else>
+                        <svg style="position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;" viewBox="0 0 72 72">
+                            <line x1="0" y1="36" x2="72" y2="36" stroke="#f0e4d0" stroke-width="0.5"/>
+                            <line x1="36" y1="0" x2="36" y2="72" stroke="#f0e4d0" stroke-width="0.5"/>
+                        </svg>
+                        <span>{{ item.char }}</span>
+                    </template>
                 </div>
             </div>
-            <!-- 单字田字格canvas -->
+            <!-- 写字的田字格canvas -->
             <div style="display:flex; justify-content:center; margin-bottom:16px;">
                 <div class="tian-ge-cell">
                     <canvas id="tg_c" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;"></canvas>
@@ -242,7 +263,7 @@
                 <button class="cute-btn" @click="clearAllCanvas">🗑️ 清除</button>
                 <button class="cute-btn primary" @click="recognizeAndSubmit">✨ {{ traceMode ? '保存并继续' : '保存并继续' }}</button>
             </div>
-            <div class="text-small" v-if="!traceMode">✏️ 写出「<span style="color:#f97316; font-weight:700;">{{ (currentSessionWord.words || [currentSessionWord.word])[sessionCurrentWordIdx] }}</span>」中的「{{ currentSessionWord.word }}」字。写对任意一个即算通过。</div>
+            <div class="text-small" v-if="!traceMode">✏️ 看拼音，在下方田字格写出带 <span style="color:#f97316; font-weight:700;">?</span> 的字。写对任意一个即算通过。</div>
             <div class="text-small" v-else style="color:#d97706;">✏️ 照着浅色字描摹，然后点击「保存并继续」。</div>
             <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
         </div>
@@ -1233,6 +1254,15 @@
             sessionPendingCount() { return this.sessionPendingQueue.length; },
             formattedTimer() { let m=Math.floor(this.sessionTimerSeconds/60); let s=this.sessionTimerSeconds%60; return `${m}:${s<10?'0'+s:s}`; },
             currentSessionWord() { return this.sessionTaskList[this.sessionCurrentIdx] || null; },
+            // 把当前词拆成逐字数组，标记目标字（需要默写的是空白田字格，其他字显示）
+            currentDictateWordChars() {
+                const word = this.currentSessionWord;
+                if(!word) return [];
+                const words = word.words || [word.word];
+                const currentWordStr = words[this.sessionCurrentWordIdx] || word.word;
+                const targetChar = word.word;
+                return currentWordStr.split('').map(ch => ({ char: ch, isTarget: ch === targetChar }));
+            },
             // 累计错字卡片显示（最多20个）
             allWrongWordsDisplay() {
                 const list = this.wrongWordsList;
@@ -1241,7 +1271,7 @@
             },
         },
         watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' } },
-        mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); },
+        mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
         methods: {
             async fetchRemoteData() {
                 try {
@@ -1636,6 +1666,28 @@
                     ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
                     this.enableDrawing(canvas); 
                 } 
+                // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
+                this.speakCurrentWord();
+            },
+            // 语音播报：读"两个的两"这种格式
+            speakCurrentWord() {
+                try {
+                    if(!('speechSynthesis' in window)) return;
+                    const word = this.currentSessionWord;
+                    if(!word) return;
+                    const curWord = (word.words || [word.word])[this.sessionCurrentWordIdx] || word.word;
+                    const text = curWord + '的' + word.word;
+                    window.speechSynthesis.cancel();
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'zh-CN';
+                    u.rate = 0.6;
+                    u.pitch = 1.1;
+                    // 尽量选中文女声
+                    const voices = window.speechSynthesis.getVoices();
+                    const zh = voices.find(v => /zh|Chinese|中文|普通话/i.test(v.lang + v.name));
+                    if(zh) u.voice = zh;
+                    window.speechSynthesis.speak(u);
+                } catch(e) { console.error('语音播报失败:', e); }
             },
             drawTraceCharacter(canvas, char) {
                 let ctx = canvas.getContext('2d');
@@ -1653,7 +1705,16 @@
                 // 重新绑定绘制事件（在浅色字上继续画）
                 this.enableDrawing(canvas);
             },
-            enableDrawing(canvas) { 
+            enableDrawing(canvas) {
+                // 先移除该 canvas 上旧的监听器，避免反复绑定导致监听器累积、页面卡死
+                if(canvas._tgHandlers) {
+                    canvas.removeEventListener('touchstart', canvas._tgHandlers.start);
+                    canvas.removeEventListener('touchmove', canvas._tgHandlers.draw);
+                    canvas.removeEventListener('touchend', canvas._tgHandlers.end);
+                    canvas.removeEventListener('mousedown', canvas._tgHandlers.start);
+                    canvas.removeEventListener('mousemove', canvas._tgHandlers.draw);
+                    canvas.removeEventListener('mouseup', canvas._tgHandlers.end);
+                }
                 let ctx = canvas.getContext('2d');
                 ctx.strokeStyle = '#000000'; ctx.lineWidth = 12; ctx.lineCap = 'round';
                 let drawing = false;
@@ -1688,6 +1749,7 @@
                 const end = () => { drawing=false; };
                 canvas.addEventListener('touchstart', start); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', end);
                 canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', end);
+                canvas._tgHandlers = { start, draw, end };
             },
             clearCurrentCanvas() { 
                 this.clearCanvasCell('tg_c');
@@ -1719,38 +1781,46 @@
                 return canvas;
             },
             async recognizeAndSubmit() {
-                const canvas = document.getElementById('tg_c');
-                const dataURL = canvas ? canvas.toDataURL() : '';
-                const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
-                if(wordObj && canvas) wordObj.handwritingData = [dataURL];
-                // 存入批量提交队列，带上charId和wordIndex
-                this.sessionCanvasData.push({
-                    charId: this.currentSessionWord.id,
-                    char: this.currentSessionWord.word,
-                    word: (this.currentSessionWord.words || [this.currentSessionWord.word])[this.sessionCurrentWordIdx],
-                    wordIndex: this.sessionCurrentWordIdx,
-                    pinyin: this.currentSessionWord.pinyin,
-                    canvasDataURL: dataURL
-                });
-                this.totalDictateTimes++;
-                this.todayCompletedCount++;
-                this.saveData();
-                // 退出描摹模式（如果有）
-                this.traceMode = false;
-                // 点过"不会"→描摹的字走完3个组词；没点过的直接跳到下个字
-                if(this.sessionCharHadTrace && this.sessionCurrentWordIdx < 2) {
-                    this.sessionCurrentWordIdx++;
-                    this.$nextTick(()=>{ this.initCanvasForCurrent(); });
-                } else {
-                    this.sessionCurrentWordIdx = 0;
-                    this.sessionCharHadTrace = false;
-                    this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
-                    if(this.sessionTaskList.length === 0) {
-                        if(this.timerInterval) clearInterval(this.timerInterval);
-                        this.sessionFinished = true;
-                    } else {
+                try {
+                    const canvas = document.getElementById('tg_c');
+                    const dataURL = canvas ? canvas.toDataURL() : '';
+                    const cur = this.currentSessionWord;
+                    if(!cur) return;
+                    const wordObj = this.words.find(w=>w.id===cur.id);
+                    if(wordObj && canvas) wordObj.handwritingData = [dataURL];
+                    // 存入批量提交队列，带上charId和wordIndex
+                    this.sessionCanvasData.push({
+                        charId: cur.id,
+                        char: cur.word,
+                        word: (cur.words || [cur.word])[this.sessionCurrentWordIdx],
+                        wordIndex: this.sessionCurrentWordIdx,
+                        pinyin: cur.pinyin,
+                        canvasDataURL: dataURL
+                    });
+                    this.totalDictateTimes++;
+                    this.todayCompletedCount++;
+                    this.saveData();
+                    // 退出描摹模式（如果有）
+                    this.traceMode = false;
+                    // 点过"不会"→描摹的字走完3个组词；没点过的直接跳到下个字
+                    if(this.sessionCharHadTrace && this.sessionCurrentWordIdx < 2) {
+                        this.sessionCurrentWordIdx++;
                         this.$nextTick(()=>{ this.initCanvasForCurrent(); });
+                    } else {
+                        this.sessionCurrentWordIdx = 0;
+                        this.sessionCharHadTrace = false;
+                        this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
+                        if(this.sessionTaskList.length === 0) {
+                            if(this.timerInterval) clearInterval(this.timerInterval);
+                            this.sessionFinished = true;
+                        } else {
+                            this.$nextTick(()=>{ this.initCanvasForCurrent(); });
+                        }
                     }
+                } catch(e) {
+                    console.error('保存并继续出错:', e);
+                    this.showAlert('出错', '处理失败：' + (e.message || e) + '\n请刷新页面后重试');
+                    this.traceMode = false;
                 }
             },
             // ---- 批量 AI 批改（按字分组，三词连练） ----
