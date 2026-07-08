@@ -82,8 +82,19 @@
   "baiduAccounts": [
     {
       "name": "账号1",
+      "token": "24.50851ff5a0f0384e97d9eb7d0a566d6b.2592000.1782568772.282335-123506560",
+      "used": 0,
+      "apiKey": "HzC9ACSpL9QF4TodXcQOvL5O",
+      "secretKey": "EmEjVU5ZnSD0Q8SX7UyyUPwhgWehTkeN",
+      "tokenExpiresAt": 1786108832298
+    },
+    {
+      "name": "账号2",
       "token": "",
-      "used": 0
+      "used": 0,
+      "apiKey": "",
+      "secretKey": "",
+      "tokenExpiresAt": 0
     }
   ],
   "baiduActiveIdx": 0
