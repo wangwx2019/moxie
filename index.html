@@ -196,6 +196,7 @@
             </div>
             <div v-if="usingTextbookPlan" style="margin-top:8px; font-size:0.8rem; color:#f97316; text-align:center;">✅ 当前使用课本计划</div>
         </div>
+        <div class="card-white" @click="openAddWizard" style="cursor:pointer;"><div class="flex-between"><span>🎤 录入词语</span><span>批量/语音</span></div></div>
     </div>
 
     <!-- 手写默写界面 -->
@@ -311,7 +312,6 @@
         <div class="card-white" @click="openWordBankView" style="cursor:pointer;"><div class="flex-between"><span>📚 词库管理 & 复习周期</span><span>→</span></div></div>
         <div class="card-white" @click="openReviewParentView" style="cursor:pointer;"><div class="flex-between"><span>📋 复核默写</span><span>待复核 {{ pendingReviewCount }} →</span></div></div>
         <div class="card-white" @click="openPlanCalendarView" style="cursor:pointer;"><div class="flex-between"><span>📅 复习计划看板</span><span>查看每日计划 →</span></div></div>
-        <div class="card-white" @click="openAddWizard" style="cursor:pointer;"><div class="flex-between"><span>🎤 录入词语</span><span>批量/语音</span></div></div>
         <div class="card-white" @click="openTextbookManage" style="cursor:pointer;"><div class="flex-between"><span>📖 课本管理</span><span>导入/选词</span></div></div>
         <div class="card-white" @click="openSettingsView" style="cursor:pointer;"><div class="flex-between"><span>⚙️ 设置</span><span>密码/识别引擎/数据</span></div></div>
     </div>
@@ -1902,11 +1902,11 @@
                 const word = this.currentSessionWord;
                 if(!word) return;
                 if(this.sessionMode === 'word') {
-                    // 词语模式：直接读词语拼音
                     this.speakWithBaidu(word.word);
                 } else {
-                    const curWord = (word.words || [word.word])[this.sessionCurrentWordIdx] || word.word;
-                    const text = curWord + '的' + word.word;
+                    // 单字模式：读所有组词，如"花朵的花，荷花的花，花瓣的花"
+                    const words = word.words || [word.word];
+                    const text = words.map(w => w + '的' + word.word).join('，');
                     this.speakWithBaidu(text);
                 }
             },
@@ -2619,7 +2619,7 @@
                 let added=0, exists=[];
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
-                        this.words.push({ id:Date.now()+it.word, word:it.word, pinyin:it.pinyin, context:it.example, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
+                        this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
                         added++;
                     } else exists.push(it.word);
                 }
