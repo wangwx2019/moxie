@@ -38,7 +38,8 @@
         .nav-back { display: inline-flex; align-items: center; gap: 6px; background: #fff2e6; padding: 6px 14px; border-radius: 40px; font-weight: 500; cursor: pointer; color: #f97316; margin-bottom: 20px; }
         .card-white { background: #fffef7; border-radius: 32px; padding: 1rem 1.2rem; margin-bottom: 1rem; border: 1px solid #ffe2cc; }
         .tian-ge-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin: 20px 0; }
-        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 24px; cursor: crosshair; width: 240px; height: 240px; }
+        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 24px; cursor: crosshair; width: 240px; height: 240px; touch-action: none; }
+        .tian-ge-cell { display: flex; justify-content: center; align-items: center; }
         .dictate-header-stats { background: #ffefe2; padding: 10px 18px; border-radius: 48px; margin: 8px 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 700; }
         .stat-chip { background: white; padding: 4px 16px; border-radius: 40px; font-size: 0.8rem; }
         .timer { background: #fbbf24; color: white; padding: 4px 14px; border-radius: 40px; }
@@ -226,7 +227,6 @@
             <div class="text-small">✏️ 看拼音，在田字格中写出这个词语</div>
             <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
         </div>
-        <!-- 单字默写模式 -->
         <div class="dictate-main-card" v-else-if="currentSessionWord">
             <!-- 拼音大号居中 -->
             <div style="text-align:center; margin-bottom:12px;">
@@ -1758,8 +1758,10 @@
             startHandwriteSession() {
                 const charWords = this.todayPlanWords.filter(w => !w.isWord);
                 if(charWords.length===0){ this.showAlert('提示', '暂无单字默写计划'); return; }
-                this.sessionTaskList = JSON.parse(JSON.stringify(charWords)); 
+                this.sessionMode='dictate';
+                this.sessionTaskList = JSON.parse(JSON.stringify(charWords));
                 this.sessionCurrentIdx=0;
+                this.sessionCurrentWordIdx=0;
                 this.sessionCharHadTrace=false;
                 this.sessionCorrectCount=0;
                 this.todayCompletedCount=0;
@@ -1831,14 +1833,21 @@
                 let word = this.currentSessionWord; if(!word) return; 
                 this.traceMode = false; // 新开canvas时退出描摹模式
                 let canvas = document.getElementById('tg_c'); 
-                if(canvas){ 
-                    let ctx = canvas.getContext('2d'); 
-                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
-                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
-                    ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
-                    ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
-                    this.enableDrawing(canvas);
+                if(!canvas) { 
+                    // canvas还没渲染，等下一帧重试
+                    requestAnimationFrame(() => this.initCanvasForCurrent());
+                    return;
                 }
+                let ctx = canvas.getContext('2d'); 
+                if(!ctx) { 
+                    requestAnimationFrame(() => this.initCanvasForCurrent());
+                    return;
+                }
+                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
+                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
+                ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
+                ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
+                this.enableDrawing(canvas);
                 // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
                 this.speakCurrentWord();
             },
@@ -2043,9 +2052,10 @@
                     canvas.removeEventListener('mousedown', canvas._tgHandlers.start);
                     canvas.removeEventListener('mousemove', canvas._tgHandlers.draw);
                     canvas.removeEventListener('mouseup', canvas._tgHandlers.end);
+                    canvas.removeEventListener('mouseleave', canvas._tgHandlers.leave);
                 }
                 let ctx = canvas.getContext('2d');
-                ctx.strokeStyle = '#000000'; ctx.lineWidth = 12; ctx.lineCap = 'round';
+                ctx.strokeStyle = '#000000'; ctx.lineWidth = 6; ctx.lineCap = 'round';
                 let drawing = false;
                 let lastX, lastY;
                 const getCoord = (e, rect) => { 
@@ -2065,7 +2075,7 @@
                     drawing=true; 
                     let rect=canvas.getBoundingClientRect(); 
                     let {x,y}=getCoord(e, rect); 
-                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 12; ctx.lineCap = 'round';
+                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 6; ctx.lineCap = 'round';
                     ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+1,y+1); ctx.stroke(); 
                     lastX=x; lastY=y;
                 };
@@ -2076,9 +2086,10 @@
                     ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); 
                 };
                 const end = () => { drawing=false; };
-                canvas.addEventListener('touchstart', start); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', end);
-                canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', end);
-                canvas._tgHandlers = { start, draw, end };
+                const leave = () => { drawing=false; };
+                canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); canvas.addEventListener('touchend', end, { passive: false });
+                canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', leave);
+                canvas._tgHandlers = { start, draw, end, leave };
             },
             clearCurrentCanvas() { 
                 this.clearCanvasCell('tg_c');
@@ -2508,6 +2519,8 @@
                 this.sessionFinished = false;
                 this.todayCompletedCount = 0;
                 this.sessionCorrectCount = 0;
+                this.sessionCurrentWordIdx = 0;
+                this.sessionCharHadTrace = false;
                 this.timerInterval = null;
             },
             showParentPasswordModal() {
