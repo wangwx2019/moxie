@@ -156,6 +156,7 @@
             <div class="flex-between"><strong>📖 今日默写计划</strong><span class="badge">{{ todayPlanWords.length }} 个</span></div>
             <div style="margin: 10px 0;">✨ 已完成: {{ todayCompletedCount }} / {{ todayPlanWords.length }}</div>
             <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession" :disabled="todayPlanWords.length === 0">✍️ 田字格手写默写</button>
+            <button class="cute-btn" style="width:100%; margin-top:8px; background:#fef3c7; color:#92400e; border:2px solid #fbbf24;" @click="startWordDictateSession">📝 词语听写{{ todayWordPlanWords.length > 0 ? '（' + todayWordPlanWords.length + ' 个词语）' : '（去选词）' }}</button>
         </div>
         <div class="card-white" @click="openWrongWordsView" style="cursor:pointer;">
             <div class="flex-between">
@@ -207,7 +208,24 @@
             <span>✨ 余{{ sessionRemainCount }}</span>
             <span class="review-link" @click="goToReviewFromChild">💾 待复核 {{ pendingReviewCount }}</span>
         </div>
-        <!-- 默写模式 -->
+        <!-- 词语听写模式 -->
+        <div class="dictate-main-card" v-if="sessionMode === 'word' && currentSessionWord">
+            <div style="text-align:center; margin-bottom:12px;">
+                <div style="font-size:2.8rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">{{ currentSessionWord.pinyin }}</div>
+                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @click="speakCurrentWord">🔊 重播</button>
+            </div>
+            <div style="display:flex; justify-content:center; margin-bottom:16px;" id="word_canvas_container">
+                <!-- 由 initWordCanvas 动态创建 -->
+            </div>
+            <div class="action-row">
+                <button class="cute-btn" @click="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" @click="clearAllCanvas">🗑️ 清除</button>
+                <button class="cute-btn primary" @click="recognizeAndSubmit">✨ 保存并继续</button>
+            </div>
+            <div class="text-small">✏️ 看拼音，在田字格中写出这个词语</div>
+            <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
+        </div>
+        <!-- 单字默写模式 -->
         <div class="dictate-main-card" v-else-if="currentSessionWord">
             <!-- 拼音大号居中 -->
             <div style="text-align:center; margin-bottom:12px;">
@@ -416,8 +434,9 @@
         <div class="nav-back" @click="currentView='addWizard'; wizardStep=1">← 返回</div>
         <h3>📖 从生词库选择</h3>
         <div style="display:flex; gap:8px; margin-bottom:12px; background:#fef5e8; border-radius:40px; padding:4px;">
-            <span :style="{flex:1, textAlign:'center', padding:'8px 12px', borderRadius:'40px', fontWeight:'600', fontSize:'0.9rem', cursor:'pointer', transition:'all 0.15s', background: vocabSource === 'xiezhi' ? '#f97316' : 'transparent', color: vocabSource === 'xiezhi' ? 'white' : '#92400e'}" @click="switchVocabSource('xiezhi')">✍️ 写字表（会写字）</span>
-            <span :style="{flex:1, textAlign:'center', padding:'8px 12px', borderRadius:'40px', fontWeight:'600', fontSize:'0.9rem', cursor:'pointer', transition:'all 0.15s', background: vocabSource === 'shizi' ? '#f97316' : 'transparent', color: vocabSource === 'shizi' ? 'white' : '#92400e'}" @click="switchVocabSource('shizi')">👀 识字表（会认字）</span>
+            <span :style="{flex:1, textAlign:'center', padding:'8px 12px', borderRadius:'40px', fontWeight:'600', fontSize:'0.9rem', cursor:'pointer', transition:'all 0.15s', background: vocabSource === 'xiezhi' ? '#f97316' : 'transparent', color: vocabSource === 'xiezhi' ? 'white' : '#92400e'}" @click="switchVocabSource('xiezhi')">✍️ 写字表</span>
+            <span :style="{flex:1, textAlign:'center', padding:'8px 12px', borderRadius:'40px', fontWeight:'600', fontSize:'0.9rem', cursor:'pointer', transition:'all 0.15s', background: vocabSource === 'shizi' ? '#f97316' : 'transparent', color: vocabSource === 'shizi' ? 'white' : '#92400e'}" @click="switchVocabSource('shizi')">👀 识字表</span>
+            <span :style="{flex:1, textAlign:'center', padding:'8px 12px', borderRadius:'40px', fontWeight:'600', fontSize:'0.9rem', cursor:'pointer', transition:'all 0.15s', background: vocabSource === 'ciyu' ? '#f97316' : 'transparent', color: vocabSource === 'ciyu' ? 'white' : '#92400e'}" @click="switchVocabSource('ciyu')">📝 词语表</span>
         </div>
         <div v-if="!vocabularyLoaded" style="text-align:center; padding:40px 0;">
             <div v-if="vocabLoading" class="text-small">加载生词库中...</div>
@@ -430,7 +449,7 @@
         </div>
         <div v-else>
             <div class="vocab-summary">
-                <span>已选 {{ vocabSelectedChars.length + vocabSelectedLessons.reduce((sum,ln)=>sum+(vocabLessonCharCount(ln)||0),0) }} 个字</span>
+                <span>已选 {{ vocabSelectedChars.length + vocabSelectedLessons.reduce((sum,ln)=>sum+(vocabLessonCharCount(ln)||0),0) }} {{ vocabSource === 'ciyu' ? '个词' : '个字' }}</span>
                 <div style="display:flex; gap:8px;">
                     <button class="cute-btn" style="padding:8px 14px; font-size:0.78rem;" @click="hardRefreshVocab" title="词库有更新时点此刷新">🔄 刷新词库</button>
                     <button class="cute-btn primary" style="padding:8px 20px;" @click="confirmVocabSelect">下一步：确认词语</button>
@@ -444,10 +463,20 @@
                             <span class="expand-icon" :class="{open: expandedLessons.includes(unit.name + lesson.name)}">▶</span>
                             <div class="vocab-lesson-check" :class="{checked: vocabSelectedLessons.includes(unit.name + '||' + lesson.name)}" @click.stop="toggleVocabLesson(unit.name, lesson)">✓</div>
                             <span style="flex:1; font-weight:600;">{{ lesson.name }}</span>
-                            <span class="text-small" style="color:#b45309;">{{ (lesson.shizi||[]).length + (lesson.xiezhi||[]).length }} 字</span>
+                            <span class="text-small" style="color:#b45309;">{{ vocabSource === 'ciyu' ? (lesson.words||[]).length + ' 词' : (lesson.shizi||[]).length + (lesson.xiezhi||[]).length + ' 字' }}</span>
                         </div>
                         <div v-if="expandedLessons.includes(unit.name + lesson.name)" class="vocab-lesson-body">
-                            <div v-if="lesson.shizi && lesson.shizi.length">
+                            <!-- 词语表模式 -->
+                            <div v-if="vocabSource === 'ciyu' && lesson.words && lesson.words.length">
+                                <div class="vocab-cat-label">词语（{{ lesson.words.length }} 个）</div>
+                                <div class="vocab-char-grid">
+                                    <div v-for="w in lesson.words" :key="'yw_'+w" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'ciyu', w)}" @click="toggleVocabChar(unit.name, lesson.name, 'ciyu', {char:w})">
+                                        <span class="char-word">{{ w }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 识字表/写字表模式 -->
+                            <div v-if="vocabSource !== 'ciyu' && lesson.shizi && lesson.shizi.length">
                                 <div class="vocab-cat-label">会认（{{ lesson.shizi.length }} 个）</div>
                                 <div class="vocab-char-grid">
                                     <div v-for="ch in lesson.shizi" :key="'sz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'shizi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'shizi', ch)">
@@ -456,7 +485,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="lesson.xiezhi && lesson.xiezhi.length">
+                            <div v-if="vocabSource !== 'ciyu' && lesson.xiezhi && lesson.xiezhi.length">
                                 <div class="vocab-cat-label">会写（{{ lesson.xiezhi.length }} 个）</div>
                                 <div class="vocab-char-grid">
                                     <div v-for="ch in lesson.xiezhi" :key="'xz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'xiezhi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'xiezhi', ch)">
@@ -1081,6 +1110,51 @@
   ]
 };</script>
 <script>window.VOCABULARY_SHIZI_EMBEDDED = {"units":[{"name":"第一单元","lessons":[{"name":"阅读1","shizi":[{"char":"蝌","pinyin":"","words":["蝌蚪","蝌子","蝌蚪苗"]},{"char":"蚪","pinyin":"","words":["蝌蚪","蚪虫","墨蚪"]},{"char":"脑","pinyin":"","words":["脑袋","大脑","头脑"]},{"char":"袋","pinyin":"","words":["口袋","袋子","布袋"]},{"char":"灰","pinyin":"","words":["灰色","灰尘","灰暗"]},{"char":"甩","pinyin":"","words":["甩开","甩手","甩动"]},{"char":"活","pinyin":"","words":["活动","干活","活泼"]},{"char":"腿","pinyin":"","words":["大腿","腿脚","后腿"]},{"char":"教","pinyin":"jiāo","words":["教书","教课","教课"]},{"char":"教","pinyin":"jiào","words":["教室","教师","教育"]},{"char":"迎","pinyin":"","words":["欢迎","迎接","迎面"]},{"char":"嘴","pinyin":"","words":["嘴巴","嘴角","嘴唇"]},{"char":"龟","pinyin":"","words":["乌龟","海龟","龟壳"]},{"char":"披","pinyin":"","words":["披风","披上","披肩"]},{"char":"蹲","pinyin":"","words":["蹲下","蹲坐","蹲点"]},{"char":"肚","pinyin":"dù","words":["肚子","肚皮","肚腩"]},{"char":"鼓","pinyin":"","words":["打鼓","锣鼓","鼓起"]}]},{"name":"阅读2","shizi":[{"char":"汽","pinyin":"","words":["汽水","汽车","蒸汽"]},{"char":"越","pinyin":"","words":["越过","超越","越发"]},{"char":"温","pinyin":"","words":["温暖","温和","温度"]},{"char":"滴","pinyin":"","words":["水滴","滴落","雨滴"]},{"char":"奔","pinyin":"bēn","words":["奔跑","飞奔","奔驰"]},{"char":"海","pinyin":"","words":["大海","海面","深海"]},{"char":"洋","pinyin":"","words":["海洋","大洋","洋流"]},{"char":"发","pinyin":"fā","words":["出发","发现","分发"]},{"char":"坏","pinyin":"","words":["坏人","破坏","损坏"]},{"char":"没","pinyin":"mò","words":["淹没","沉没","埋没"]},{"char":"没","pinyin":"méi","words":["没有","没人","没空"]},{"char":"庄","pinyin":"","words":["村庄","农庄","庄园"]},{"char":"稼","pinyin":"","words":["庄稼","稼穑","农稼"]},{"char":"屋","pinyin":"","words":["房屋","屋子","屋顶"]},{"char":"带","pinyin":"","words":["带领","皮带","携带"]},{"char":"灾","pinyin":"","words":["灾难","灾害","水灾"]},{"char":"种","pinyin":"zhǒng","words":["种子","播种","品种"]},{"char":"种","pinyin":"zhòng","words":["种地","种植","栽种"]},{"char":"管","pinyin":"","words":["管理","看管","水管"]}]},{"name":"阅读3","shizi":[{"char":"植","pinyin":"","words":["植物","植树","绿植"]},{"char":"如","pinyin":"","words":["如果","假如","如同"]},{"char":"脚","pinyin":"","words":["脚步","脚丫","脚尖"]},{"char":"旅","pinyin":"","words":["旅行","旅途","旅游"]},{"char":"准","pinyin":"","words":["准备","准时","准确"]},{"char":"备","pinyin":"","words":["备用","防备","备课"]},{"char":"送","pinyin":"","words":["送别","送货","赠送"]},{"char":"纷","pinyin":"","words":["纷飞","纷纷","缤纷"]},{"char":"挂","pinyin":"","words":["悬挂","挂念","挂钩"]},{"char":"挺","pinyin":"","words":["挺拔","挺立","挺好"]},{"char":"钻","pinyin":"zuān","words":["钻进","钻研","钻探"]},{"char":"底","pinyin":"","words":["底下","海底","底细"]},{"char":"炸","pinyin":"zhà","words":["爆炸","炸开","炸弹"]},{"char":"离","pinyin":"","words":["离开","离别","分离"]},{"char":"粗","pinyin":"","words":["粗壮","粗心","粗细"]},{"char":"得","pinyin":"dé","words":["得到","心得","取得"]},{"char":"得","pinyin":"de","words":["跑得快","跳得高","做得棒"]},{"char":"得","pinyin":"děi","words":["得亏","非得","总得"]}]},{"name":"语文园地一","shizi":[{"char":"朗","pinyin":"","words":["晴朗","朗读","明朗"]},{"char":"雾","pinyin":"","words":["大雾","雾气","浓雾"]},{"char":"暴","pinyin":"","words":["暴雨","暴风","暴躁"]},{"char":"雷","pinyin":"","words":["雷声","打雷","雷雨"]},{"char":"阵","pinyin":"","words":["阵雨","方阵","阵地"]},{"char":"冻","pinyin":"","words":["冰冻","冷冻","霜冻"]},{"char":"夹","pinyin":"jiā","words":["夹子","夹板","夹杂"]}]}]},{"name":"第二单元","lessons":[{"name":"识字1","shizi":[{"char":"帆","pinyin":"","words":["帆船","帆布","船帆"]},{"char":"港","pinyin":"","words":["港口","港湾","海港"]},{"char":"湾","pinyin":"","words":["海湾","水湾","河湾"]},{"char":"塘","pinyin":"","words":["池塘","鱼塘","水塘"]},{"char":"稻","pinyin":"","words":["水稻","稻田","稻谷"]},{"char":"行","pinyin":"háng","words":["一行","银行","商行"]},{"char":"行","pinyin":"xíng","words":["行走","进行","出行"]},{"char":"垂","pinyin":"","words":["垂柳","垂直","下垂"]},{"char":"园","pinyin":"","words":["花园","园林","公园"]},{"char":"溪","pinyin":"","words":["小溪","溪水","溪流"]},{"char":"丛","pinyin":"","words":["草丛","花丛","丛林"]},{"char":"翠","pinyin":"","words":["翠绿","翠鸟","青翠"]},{"char":"群","pinyin":"","words":["羊群","人群","群体"]},{"char":"队","pinyin":"","words":["队伍","队长","排队"]},{"char":"号","pinyin":"hào","words":["口号","号码","学号"]}]},{"name":"识字2","shizi":[{"char":"榕","pinyin":"","words":["榕树","榕叶","榕城"]},{"char":"壮","pinyin":"","words":["强壮","壮大","粗壮"]},{"char":"梧","pinyin":"","words":["梧桐","梧桐叶","梧桐树"]},{"char":"桐","pinyin":"","words":["梧桐","泡桐","桐油"]},{"char":"掌","pinyin":"","words":["手掌","掌心","巴掌"]},{"char":"枫","pinyin":"","words":["枫叶","枫树","枫林"]},{"char":"松","pinyin":"","words":["松树","松柏","青松"]},{"char":"柏","pinyin":"bǎi","words":["柏树","柏木","松柏"]},{"char":"桦","pinyin":"","words":["白桦","桦树","桦木"]},{"char":"守","pinyin":"","words":["守护","看守","遵守"]},{"char":"银","pinyin":"","words":["银色","白银","银河"]},{"char":"杏","pinyin":"","words":["杏花","杏子","杏树"]},{"char":"杉","pinyin":"","words":["杉木","杉树","水杉"]},{"char":"化","pinyin":"","words":["融化","变化","化石"]},{"char":"桂","pinyin":"","words":["桂花","桂树","桂圆"]}]},{"name":"识字3","shizi":[{"char":"世","pinyin":"","words":["世界","世间","世代"]},{"char":"界","pinyin":"","words":["边界","界限","外界"]},{"char":"孔","pinyin":"","words":["孔雀","针孔","桥孔"]},{"char":"雀","pinyin":"","words":["麻雀","雀跃","云雀"]},{"char":"锦","pinyin":"","words":["锦缎","锦绣","锦鸡"]},{"char":"雄","pinyin":"","words":["雄壮","英雄","雄伟"]},{"char":"鹰","pinyin":"","words":["老鹰","雄鹰","老鹰"]},{"char":"翔","pinyin":"","words":["飞翔","滑翔","翱翔"]},{"char":"雁","pinyin":"","words":["大雁","雁群","雁阵"]},{"char":"深","pinyin":"","words":["深浅","深海","深厚"]},{"char":"猛","pinyin":"","words":["凶猛","猛烈","勇猛"]},{"char":"灵","pinyin":"","words":["灵活","机灵","灵气"]},{"char":"休","pinyin":"","words":["休息","午休","休假"]},{"char":"猫","pinyin":"","words":["小猫","花猫","野猫"]}]},{"name":"识字4","shizi":[{"char":"季","pinyin":"","words":["季节","四季","季度"]},{"char":"蝴","pinyin":"","words":["蝴蝶","蝴蝶结","蝴蝶兰"]},{"char":"蝶","pinyin":"","words":["蝴蝶","彩蝶","蝶翼"]},{"char":"麦","pinyin":"","words":["麦子","小麦","麦田"]},{"char":"嫩","pinyin":"","words":["嫩绿","鲜嫩","细嫩"]},{"char":"肥","pinyin":"","words":["肥胖","肥料","肥沃"]},{"char":"农","pinyin":"","words":["农民","农田","农业"]},{"char":"勤","pinyin":"","words":["勤劳","勤快","勤奋"]},{"char":"归","pinyin":"","words":["归来","回归","归家"]},{"char":"戴","pinyin":"","words":["穿戴","爱戴","佩戴"]},{"char":"场","pinyin":"cháng","words":["一场雨","场院","打场"]},{"char":"场","pinyin":"chǎng","words":["操场","场地","广场"]},{"char":"谷","pinyin":"","words":["稻谷","山谷","谷物"]},{"char":"虽","pinyin":"","words":["虽然","虽说","虽则"]},{"char":"辛","pinyin":"","words":["辛苦","辛劳","艰辛"]},{"char":"苦","pinyin":"","words":["吃苦","苦味","苦难"]},{"char":"制","pinyin":"","words":["制作","制度","制约"]}]},{"name":"语文园地二","shizi":[{"char":"丑","pinyin":"","words":["丑陋","丑事","丑恶"]},{"char":"恨","pinyin":"","words":["仇恨","怨恨","悔恨"]},{"char":"诚","pinyin":"","words":["诚实","诚恳","真诚"]},{"char":"虚","pinyin":"","words":["虚心","虚假","空虚"]},{"char":"假","pinyin":"jiǎ","words":["真假","假话","假象"]},{"char":"漠","pinyin":"","words":["沙漠","冷漠","荒漠"]},{"char":"助","pinyin":"","words":["帮助","助力","互助"]},{"char":"贫","pinyin":"","words":["贫穷","贫困","贫苦"]},{"char":"富","pinyin":"","words":["富裕","富足","财富"]},{"char":"饥","pinyin":"","words":["饥饿","饥荒","饥寒"]}]}]},{"name":"第三单元","lessons":[{"name":"阅读4","shizi":[{"char":"虹","pinyin":"","words":["彩虹","霓虹","虹桥"]},{"char":"浇","pinyin":"","words":["浇水","浇灌","浇花"]},{"char":"壶","pinyin":"","words":["水壶","茶壶","暖壶"]},{"char":"提","pinyin":"tí","words":["提醒","手提","提起"]},{"char":"洒","pinyin":"","words":["洒水","洒落","泼洒"]},{"char":"挑","pinyin":"tiāo","words":["挑水","挑选","挑担子"]},{"char":"镜","pinyin":"","words":["镜子","镜面","铜镜"]},{"char":"拿","pinyin":"","words":["拿走","拿手","拿捏"]},{"char":"系","pinyin":"jì","words":["系鞋带","系扣子","系腰带"]},{"char":"荡","pinyin":"","words":["飘荡","荡漾","荡秋千"]},{"char":"裙","pinyin":"","words":["裙子","长裙","围裙"]}]},{"name":"阅读5","shizi":[{"char":"婆","pinyin":"","words":["外婆","婆婆","婆家"]},{"char":"候","pinyin":"","words":["时候","等候","气候"]},{"char":"趣","pinyin":"","words":["有趣","趣味","趣事"]},{"char":"舅","pinyin":"","words":["舅舅","舅妈","舅父"]},{"char":"或","pinyin":"","words":["或者","或许","抑或"]},{"char":"留","pinyin":"","words":["留下","停留","保留"]},{"char":"份","pinyin":"","words":["份额","份数","身份"]},{"char":"喂","pinyin":"","words":["喂食","喂饭","喂养"]},{"char":"逃","pinyin":"","words":["逃跑","逃走","逃离"]},{"char":"曲","pinyin":"qǔ","words":["歌曲","曲子","乐曲"]},{"char":"者","pinyin":"","words":["作者","读者","长者"]},{"char":"服","pinyin":"","words":["衣服","服装","服从"]},{"char":"扑","pinyin":"","words":["扑向","扑倒","扑打"]},{"char":"鼻","pinyin":"","words":["鼻子","鼻梁","鼻孔"]}]},{"name":"阅读6","shizi":[{"char":"珍","pinyin":"","words":["珍珠","珍贵","珍宝"]},{"char":"撒","pinyin":"sǎ","words":["撒种","撒落","撒粉"]},{"char":"碧","pinyin":"","words":["碧绿","碧玉","碧空"]},{"char":"靠","pinyin":"","words":["依靠","靠近","可靠"]},{"char":"仰","pinyin":"","words":["仰望","仰头","敬仰"]},{"char":"颗","pinyin":"","words":["颗粒","一颗星","一颗糖"]},{"char":"距","pinyin":"","words":["距离","间距","相距"]},{"char":"变","pinyin":"","words":["变化","改变","变动"]},{"char":"祖","pinyin":"","words":["祖先","祖国","祖宗"]},{"char":"勺","pinyin":"","words":["勺子","饭勺","汤勺"]},{"char":"绕","pinyin":"","words":["围绕","环绕","绕行"]},{"char":"转","pinyin":"zhuàn","words":["转圈","转椅","转动"]},{"char":"转","pinyin":"zhuǎn","words":["转告","转眼","转身"]},{"char":"楚","pinyin":"","words":["清楚","楚国","苦楚"]},{"char":"汉","pinyin":"","words":["汉字","汉语","汉族"]},{"char":"刻","pinyin":"","words":["刻度","立刻","雕刻"]},{"char":"研","pinyin":"","words":["研究","钻研","研发"]}]},{"name":"语文园地三","shizi":[{"char":"弹","pinyin":"tán","words":["弹琴","弹开","弹跳"]},{"char":"钢","pinyin":"","words":["钢铁","钢材","钢笔"]},{"char":"琴","pinyin":"","words":["钢琴","琴声","提琴"]},{"char":"捏","pinyin":"","words":["捏紧","捏泥","拿捏"]},{"char":"泥","pinyin":"","words":["泥土","泥巴","水泥"]},{"char":"围","pinyin":"","words":["包围","围墙","周围"]},{"char":"滚","pinyin":"","words":["滚动","打滚","翻滚"]},{"char":"铁","pinyin":"","words":["铁钉","铁锅","铁块"]},{"char":"环","pinyin":"","words":["圆环","环境","环球"]},{"char":"滑","pinyin":"","words":["滑梯","光滑","滑倒"]},{"char":"梯","pinyin":"","words":["楼梯","梯子","电梯"]}]}]},{"name":"第四单元","lessons":[{"name":"课文7","shizi":[{"char":"登","pinyin":"","words":["登山","登高","登上"]},{"char":"唐","pinyin":"","words":["唐朝","唐诗","唐代"]},{"char":"依","pinyin":"","words":["依靠","依旧","依据"]},{"char":"尽","pinyin":"","words":["尽头","尽力","尽兴"]},{"char":"欲","pinyin":"","words":["欲望","想要","食欲"]},{"char":"穷","pinyin":"","words":["贫穷","穷苦","无穷"]},{"char":"层","pinyin":"","words":["楼层","层次","云层"]},{"char":"瀑","pinyin":"","words":["瀑布","飞瀑","瀑流"]},{"char":"布","pinyin":"","words":["布匹","布料","分布"]},{"char":"炉","pinyin":"","words":["火炉","香炉","电炉"]},{"char":"紫","pinyin":"","words":["紫色","紫红","紫荆"]},{"char":"烟","pinyin":"","words":["烟火","烟雾","烟花"]},{"char":"遥","pinyin":"","words":["遥远","遥望","遥控"]}]},{"name":"课文8","shizi":[{"char":"闻","pinyin":"","words":["听闻","闻名","新闻"]},{"char":"景","pinyin":"","words":["景色","风景","景物"]},{"char":"区","pinyin":"","words":["地区","区域","小区"]},{"char":"省","pinyin":"shěng","words":["省份","省会","省事"]},{"char":"秀","pinyin":"","words":["秀丽","优秀","秀气"]},{"char":"神","pinyin":"","words":["神仙","神气","精神"]},{"char":"仙","pinyin":"","words":["仙境","仙女","仙雾"]},{"char":"盘","pinyin":"","words":["盘子","圆盘","盘旋"]},{"char":"指","pinyin":"","words":["手指","指引","指导"]},{"char":"巨","pinyin":"","words":["巨大","巨人","巨型"]},{"char":"伸","pinyin":"","words":["伸手","伸展","拉伸"]},{"char":"都","pinyin":"dū","words":["都市","首都","都城"]},{"char":"都","pinyin":"dōu","words":["全都","都有","都行"]},{"char":"著","pinyin":"","words":["著名","著作","名著"]},{"char":"抢","pinyin":"","words":["抢夺","抢先","争抢"]},{"char":"状","pinyin":"","words":["形状","状况","奖状"]},{"char":"岩","pinyin":"","words":["岩石","岩层","岩洞"]}]},{"name":"课文9","shizi":[{"char":"潭","pinyin":"","words":["水潭","深潭","潭水"]},{"char":"茂","pinyin":"","words":["茂盛","繁茂","茂密"]},{"char":"盛","pinyin":"shèng","words":["盛开","兴盛","旺盛"]},{"char":"央","pinyin":"","words":["中央","央求","未央"]},{"char":"岛","pinyin":"","words":["海岛","岛屿","小岛"]},{"char":"隐","pinyin":"","words":["隐藏","隐约","隐身"]},{"char":"约","pinyin":"","words":["大约","约定","合约"]},{"char":"倒","pinyin":"dào","words":["倒映","倒车","倒退"]},{"char":"映","pinyin":"","words":["映照","放映","映衬"]},{"char":"整","pinyin":"","words":["整齐","整理","整体"]},{"char":"童","pinyin":"","words":["儿童","童年","孩童"]},{"char":"吸","pinyin":"","words":["吸收","呼吸","吸气"]},{"char":"引","pinyin":"","words":["吸引","指引","引导"]},{"char":"客","pinyin":"","words":["客人","做客","宾客"]}]},{"name":"课文10","shizi":[{"char":"葡","pinyin":"","words":["葡萄","葡萄糖","葡萄干"]},{"char":"萄","pinyin":"","words":["葡萄","萄糖","萄酒"]},{"char":"沟","pinyin":"","words":["山沟","水沟","沟渠"]},{"char":"坡","pinyin":"","words":["山坡","斜坡","土坡"]},{"char":"密","pinyin":"","words":["茂密","秘密","密封"]},{"char":"枝","pinyin":"","words":["树枝","枝头","枝叶"]},{"char":"淡","pinyin":"","words":["清淡","淡水","淡雅"]},{"char":"好","pinyin":"hào","words":["好客","爱好","喜好"]},{"char":"好","pinyin":"hǎo","words":["正好","和好","好人"]},{"char":"族","pinyin":"","words":["民族","家族","族群"]},{"char":"够","pinyin":"","words":["足够","能够","够用"]},{"char":"收","pinyin":"","words":["收获","收取","收拾"]},{"char":"市","pinyin":"","words":["市场","城市","市区"]},{"char":"干","pinyin":"gān","words":["干净","干枯","干果"]},{"char":"干","pinyin":"gàn","words":["枝干","才干","干活"]},{"char":"钉","pinyin":"dīng","words":["铁钉","钉子","图钉"]},{"char":"分","pinyin":"fèn","words":["过分","分外","本分"]},{"char":"分","pinyin":"fēn","words":["分开","分别","分配"]},{"char":"颜","pinyin":"","words":["颜色","容颜","颜料"]},{"char":"味","pinyin":"","words":["味道","香味","口味"]}]},{"name":"语文园地四","shizi":[{"char":"订","pinyin":"","words":["订购","订正","预订"]},{"char":"效","pinyin":"","words":["效果","效率","成效"]},{"char":"丰","pinyin":"","words":["丰收","丰盛","丰满"]},{"char":"昌","pinyin":"","words":["昌盛","昌隆","荣昌"]},{"char":"付","pinyin":"","words":["付出","支付","托付"]},{"char":"卧","pinyin":"","words":["卧室","卧倒","仰卧"]},{"char":"铺","pinyin":"pù","words":["店铺","床铺","铺面"]},{"char":"改","pinyin":"","words":["改正","改动","修改"]},{"char":"签","pinyin":"","words":["签名","签字","竹签"]},{"char":"退","pinyin":"","words":["后退","退出","退步"]},{"char":"更","pinyin":"gēng","words":["更换","自力更生","更新"]},{"char":"更","pinyin":"gèng","words":["更加","更进一步","更好"]},{"char":"维","pinyin":"","words":["维护","维持","维度"]},{"char":"码","pinyin":"","words":["号码","码头","页码"]}]}]},{"name":"第五单元","lessons":[{"name":"课文11","shizi":[{"char":"观","pinyin":"","words":["观看","观察","观光"]},{"char":"沿","pinyin":"","words":["边沿","沿着","沿岸"]},{"char":"渴","pinyin":"","words":["口渴","干渴","渴求"]},{"char":"话","pinyin":"","words":["说话","话语","谈话"]},{"char":"弄","pinyin":"","words":["捉弄","摆弄","玩弄"]},{"char":"错","pinyin":"","words":["错误","对错","差错"]},{"char":"际","pinyin":"","words":["边际","国际","交际"]},{"char":"抬","pinyin":"","words":["抬头","抬水","抬举"]},{"char":"信","pinyin":"","words":["相信","信用","书信"]}]},{"name":"课文12","shizi":[{"char":"号","pinyin":"háo","words":["号叫","嚎号","号哭"]},{"char":"号","pinyin":"hào","words":["口号","记号","称号"]},{"char":"当","pinyin":"dàng","words":["上当","适当","妥当"]},{"char":"当","pinyin":"dāng","words":["每当","当然","应当"]},{"char":"鹊","pinyin":"","words":["喜鹊","鹊桥","鹊鸟"]},{"char":"寻","pinyin":"","words":["寻找","寻觅","搜寻"]},{"char":"枯","pinyin":"","words":["干枯","枯黄","枯萎"]},{"char":"却","pinyin":"","words":["退却","忘却","冷却"]},{"char":"劝","pinyin":"","words":["劝说","劝告","劝阻"]},{"char":"刮","pinyin":"","words":["刮风","刮掉","刮擦"]},{"char":"死","pinyin":"","words":["死亡","生死","枯死"]},{"char":"将","pinyin":"jiāng","words":["将来","将要","将军"]},{"char":"且","pinyin":"","words":["而且","暂且","况且"]},{"char":"狂","pinyin":"","words":["狂风","疯狂","狂野"]},{"char":"冷","pinyin":"","words":["寒冷","冰冷","冷清"]},{"char":"重","pinyin":"chóng","words":["重复","重新","重来"]},{"char":"复","pinyin":"","words":["反复","回复","复原"]},{"char":"哀","pinyin":"","words":["哀求","哀伤","悲哀"]},{"char":"唤","pinyin":"","words":["呼唤","叫唤","唤醒"]}]},{"name":"课文13","shizi":[{"char":"葫","pinyin":"","words":["葫芦","葫芦瓜","西葫芦"]},{"char":"芦","pinyin":"","words":["芦苇","芦草","芦笛"]},{"char":"谢","pinyin":"","words":["谢谢","感谢","凋谢"]},{"char":"以","pinyin":"","words":["以后","以前","可以"]},{"char":"盯","pinyin":"","words":["盯着","紧盯","盯防"]},{"char":"赛","pinyin":"","words":["比赛","赛跑","赛事"]},{"char":"怪","pinyin":"","words":["奇怪","怪物","怪事"]},{"char":"慢","pinyin":"","words":["缓慢","快慢","慢速"]}]},{"name":"语文园地五","shizi":[{"char":"轿","pinyin":"","words":["轿子","轿车","花轿"]},{"char":"救","pinyin":"","words":["救援","救命","救助"]},{"char":"摩","pinyin":"","words":["摩擦","按摩","摩托"]},{"char":"托","pinyin":"","words":["托付","托举","依托"]},{"char":"防","pinyin":"","words":["防止","防备","消防"]},{"char":"渔","pinyin":"","words":["渔民","渔业","渔船"]},{"char":"货","pinyin":"","words":["货物","百货","货车"]},{"char":"科","pinyin":"","words":["科学","科目","学科"]},{"char":"考","pinyin":"","words":["考试","考察","思考"]},{"char":"察","pinyin":"","words":["观察","察觉","侦察"]}]}]},{"name":"第六单元","lessons":[{"name":"课文14","shizi":[{"char":"楼","pinyin":"","words":["楼房","高楼","楼道"]},{"char":"艰","pinyin":"","words":["艰难","艰苦","艰辛"]},{"char":"斗","pinyin":"dǒu","words":["斗胆","北斗星","斗笠"]},{"char":"斗","pinyin":"dòu","words":["斗争","战斗","打斗"]},{"char":"代","pinyin":"","words":["时代","代替","古代"]},{"char":"临","pinyin":"","words":["临近","临时","光临"]},{"char":"腊","pinyin":"","words":["腊月","腊肉","腊梅"]},{"char":"军","pinyin":"","words":["军人","军队","海军"]},{"char":"薄","pinyin":"bó","words":["单薄","薄弱","薄雾"]},{"char":"章","pinyin":"","words":["文章","章节","印章"]},{"char":"握","pinyin":"","words":["握住","把握","握手"]},{"char":"凝","pinyin":"","words":["凝视","凝结","凝神"]},{"char":"觉","pinyin":"jué","words":["觉得","知觉","察觉"]},{"char":"觉","pinyin":"jiào","words":["睡觉","午觉","瞌睡"]},{"char":"油","pinyin":"","words":["石油","香油","油漆"]},{"char":"辉","pinyin":"","words":["光辉","辉煌","余晖"]},{"char":"革","pinyin":"","words":["革命","皮革","改革"]},{"char":"命","pinyin":"","words":["生命","命运","命令"]},{"char":"利","pinyin":"","words":["有利","顺利","利益"]}]},{"name":"课文15","shizi":[{"char":"朱","pinyin":"","words":["朱红","朱砂","朱门"]},{"char":"德","pinyin":"","words":["品德","德行","美德"]},{"char":"扁","pinyin":"biǎn","words":["扁担","扁平","扁豆"]},{"char":"担","pinyin":"dàn","words":["担子","重担","扁担"]},{"char":"同","pinyin":"","words":["同学","相同","共同"]},{"char":"志","pinyin":"","words":["志向","志气","同志"]},{"char":"伍","pinyin":"","words":["队伍","入伍","落伍"]},{"char":"敌","pinyin":"","words":["敌人","敌对","仇敌"]},{"char":"根","pinyin":"","words":["树根","根本","根部"]},{"char":"据","pinyin":"","words":["根据","依据","凭据"]},{"char":"抽","pinyin":"","words":["抽出","抽取","抽查"]},{"char":"陡","pinyin":"","words":["陡峭","陡坡","陡然"]},{"char":"鞋","pinyin":"","words":["鞋子","皮鞋","布鞋"]},{"char":"疼","pinyin":"","words":["疼痛","头疼","心疼"]},{"char":"敬","pinyin":"","words":["敬爱","尊敬","敬重"]}]},{"name":"课文16","shizi":[{"char":"泼","pinyin":"","words":["泼水","活泼","泼辣"]},{"char":"民","pinyin":"","words":["人民","民族","农民"]},{"char":"度","pinyin":"","words":["温度","度数","角度"]},{"char":"特","pinyin":"","words":["特别","特殊","独特"]},{"char":"周","pinyin":"","words":["周围","周末","四周"]},{"char":"恩","pinyin":"","words":["恩情","感恩","恩惠"]},{"char":"敲","pinyin":"","words":["敲打","敲门","敲击"]},{"char":"铺","pinyin":"pū","words":["铺开","铺满","铺展"]},{"char":"铺","pinyin":"pù","words":["床铺","店铺","商铺"]},{"char":"龙","pinyin":"","words":["巨龙","龙舟","龙王"]},{"char":"串","pinyin":"","words":["串联","一串","串通"]},{"char":"容","pinyin":"","words":["容易","容貌","包容"]},{"char":"踩","pinyin":"","words":["踩踏","踩水","踩点"]},{"char":"始","pinyin":"","words":["开始","起始","原始"]},{"char":"盛","pinyin":"chéng","words":["盛饭","盛下","盛汤"]},{"char":"盛","pinyin":"shèng","words":["盛开","茂盛","兴盛"]},{"char":"碗","pinyin":"","words":["饭碗","瓷碗","汤碗"]},{"char":"祝","pinyin":"","words":["祝福","祝愿","祝贺"]},{"char":"寿","pinyin":"","words":["长寿","寿命","祝寿"]}]},{"name":"课文17","shizi":[{"char":"刘","pinyin":"","words":["刘海","刘氏","刘家"]},{"char":"兰","pinyin":"","words":["兰花","兰草","玉兰"]},{"char":"派","pinyin":"","words":["派送","派别","分派"]},{"char":"由","pinyin":"","words":["理由","自由","由于"]},{"char":"于","pinyin":"","words":["于是","终于","对于"]},{"char":"卖","pinyin":"","words":["买卖","售卖","卖力"]},{"char":"员","pinyin":"","words":["队员","成员","人员"]},{"char":"捕","pinyin":"","words":["捕捉","抓捕","捕猎"]},{"char":"买","pinyin":"","words":["购买","买单","买卖"]},{"char":"似","pinyin":"sì","words":["相似","似乎","类似"]},{"char":"踏","pinyin":"","words":["踏步","踩踏","踏青"]},{"char":"烈","pinyin":"","words":["热烈","激烈","烈士"]},{"char":"荣","pinyin":"","words":["光荣","荣耀","荣华"]},{"char":"岁","pinyin":"","words":["岁月","年岁","周岁"]},{"char":"题","pinyin":"","words":["题目","习题","问题"]}]},{"name":"语文园地六","shizi":[{"char":"锋","pinyin":"","words":["锋利","刀锋","前锋"]},{"char":"蜜","pinyin":"","words":["蜂蜜","甜蜜","蜜糖"]},{"char":"峰","pinyin":"","words":["山峰","顶峰","高峰"]},{"char":"蜂","pinyin":"","words":["蜜蜂","黄蜂","蜂群"]},{"char":"爆","pinyin":"","words":["爆炸","爆发","爆竹"]},{"char":"争","pinyin":"","words":["争抢","争夺","斗争"]},{"char":"抄","pinyin":"","words":["抄写","摘抄","抄录"]},{"char":"炒","pinyin":"","words":["炒菜","炒饭","爆炒"]},{"char":"幕","pinyin":"","words":["幕布","夜幕","屏幕"]},{"char":"墓","pinyin":"","words":["墓地","坟墓","墓碑"]},{"char":"慕","pinyin":"","words":["羡慕","爱慕","仰慕"]}]}]},{"name":"第七单元","lessons":[{"name":"课文18","shizi":[{"char":"绝","pinyin":"","words":["绝句","绝对","杜绝"]},{"char":"径","pinyin":"","words":["小径","路径","直径"]},{"char":"踪","pinyin":"","words":["踪迹","行踪","踪影"]},{"char":"灭","pinyin":"","words":["消灭","熄灭","灭亡"]},{"char":"舟","pinyin":"","words":["小舟","扁舟","泛舟"]},{"char":"钓","pinyin":"","words":["钓鱼","垂钓","钓竿"]},{"char":"似","pinyin":"sì","words":["相似","似乎","好似"]},{"char":"似","pinyin":"shì","words":["似的"]},{"char":"庐","pinyin":"","words":["庐山","茅庐","草庐"]},{"char":"笼","pinyin":"lǒng","words":["笼罩","笼络","笼盖"]},{"char":"盖","pinyin":"","words":["盖子","锅盖","遮盖"]},{"char":"苍","pinyin":"","words":["苍茫","苍白","苍翠"]},{"char":"茫","pinyin":"","words":["迷茫","茫然","渺茫"]}]},{"name":"课文19","shizi":[{"char":"论","pinyin":"lùn","words":["议论","讨论","论点"]},{"char":"暗","pinyin":"","words":["黑暗","昏暗","暗处"]},{"char":"岸","pinyin":"","words":["岸边","河岸","海岸"]},{"char":"街","pinyin":"","words":["街道","大街","街区"]},{"char":"梁","pinyin":"","words":["桥梁","房梁","横梁"]},{"char":"甚","pinyin":"","words":["甚至","甚好","甚么"]},{"char":"至","pinyin":"","words":["至少","至于","到来"]},{"char":"切","pinyin":"qiè","words":["亲切","关切","切实"]},{"char":"躲","pinyin":"","words":["躲开","躲藏","躲避"]},{"char":"该","pinyin":"","words":["应该","不该","活该"]},{"char":"悠","pinyin":"","words":["悠闲","悠扬","悠然"]},{"char":"闲","pinyin":"","words":["空闲","休闲","清闲"]},{"char":"散","pinyin":"sàn","words":["散开","分散","解散"]},{"char":"失","pinyin":"","words":["失去","丢失","失败"]}]},{"name":"课文20","shizi":[{"char":"堆","pinyin":"","words":["土堆","堆积","堆放"]},{"char":"累","pinyin":"lěi","words":["积累","累积","累加"]},{"char":"添","pinyin":"","words":["添加","增添","添置"]},{"char":"柴","pinyin":"","words":["柴火","木柴","柴草"]},{"char":"烧","pinyin":"","words":["烧火","燃烧","烧烤"]},{"char":"旺","pinyin":"","words":["兴旺","旺盛","火旺"]},{"char":"闭","pinyin":"","words":["关闭","闭合","闭门"]},{"char":"哎","pinyin":"","words":["哎呀","哎哟","哎唷"]},{"char":"旁","pinyin":"","words":["旁边","身旁","两旁"]},{"char":"冲","pinyin":"chōng","words":["冲出","冲刺","冲洗"]},{"char":"哇","pinyin":"","words":["哇哇叫","好哇","哇塞"]},{"char":"终","pinyin":"","words":["终于","终点","最终"]},{"char":"浑","pinyin":"","words":["浑身","浑浊","浑厚"]},{"char":"淋","pinyin":"","words":["淋雨","淋湿","淋漓"]},{"char":"晒","pinyin":"","words":["晒太阳","晾晒","暴晒"]}]},{"name":"语文园地七","shizi":[{"char":"漱","pinyin":"","words":["漱口","洗漱","漱洗"]},{"char":"饿","pinyin":"","words":["饥饿","挨饿","饿肚子"]},{"char":"沼","pinyin":"","words":["沼泽","沼池","沼气"]},{"char":"泽","pinyin":"","words":["光泽","恩泽","湖泽"]},{"char":"宁","pinyin":"níng","words":["宁静","安宁","康宁"]},{"char":"杠","pinyin":"","words":["杠杆","木杠","单杠"]},{"char":"杆","pinyin":"gān","words":["旗杆","杆子","标杆"]},{"char":"栋","pinyin":"","words":["栋梁","一栋楼","栋宇"]},{"char":"库","pinyin":"","words":["仓库","车库","库房"]},{"char":"闸","pinyin":"","words":["闸门","水闸","闸口"]},{"char":"羔","pinyin":"","words":["羊羔","羔羊","羔皮"]},{"char":"蝗","pinyin":"","words":["蝗虫","蝗灾","飞蝗"]}]}]},{"name":"第八单元","lessons":[{"name":"课文21","shizi":[{"char":"称","pinyin":"chēng","words":["称赞","称呼","称号"]},{"char":"赞","pinyin":"","words":["赞美","夸赞","赞扬"]},{"char":"刺","pinyin":"","words":["刺猬","鱼刺","尖刺"]},{"char":"猬","pinyin":"","words":["刺猬","猬毛","猬鼠"]},{"char":"板","pinyin":"","words":["木板","黑板","板材"]},{"char":"凳","pinyin":"","words":["凳子","板凳","方凳"]},{"char":"但","pinyin":"","words":["但是","但凡","但愿"]},{"char":"极","pinyin":"","words":["北极","极致","积极"]},{"char":"傍","pinyin":"","words":["傍晚","依傍","傍边"]},{"char":"苹","pinyin":"","words":["苹果","苹果","苹风"]},{"char":"泄","pinyin":"","words":["泄气","发泄","排泄"]},{"char":"接","pinyin":"","words":["接住","连接","接待"]},{"char":"除","pinyin":"","words":["除去","除法","消除"]},{"char":"疲","pinyin":"","words":["疲劳","疲惫","疲乏"]},{"char":"劳","pinyin":"","words":["劳动","劳累","辛劳"]}]},{"name":"课文22","shizi":[{"char":"筝","pinyin":"","words":["风筝","古筝","筝弦"]},{"char":"鼠","pinyin":"","words":["老鼠","松鼠","鼠类"]},{"char":"折","pinyin":"zhé","words":["折纸","折断","折叠"]},{"char":"漂","pinyin":"piāo","words":["漂流","漂浮","漂泊"]},{"char":"扎","pinyin":"zhā","words":["扎针","扎根","扎进"]},{"char":"乘","pinyin":"chéng","words":["乘车","乘坐","乘风"]},{"char":"抓","pinyin":"","words":["抓住","抓捕","抓牢"]},{"char":"线","pinyin":"","words":["毛线","丝线","线条"]},{"char":"莓","pinyin":"","words":["草莓","蓝莓","树莓"]},{"char":"俩","pinyin":"liǎ","words":["咱俩","他俩","姐妹俩"]},{"char":"架","pinyin":"","words":["架子","支架","书架"]},{"char":"受","pinyin":"","words":["接受","难受","受益"]},{"char":"愿","pinyin":"","words":["愿望","心愿","愿意"]},{"char":"朝","pinyin":"cháo","words":["朝廷","朝向","朝拜"]},{"char":"朝","pinyin":"zhāo","words":["朝夕","朝霞","今朝"]},{"char":"取","pinyin":"","words":["取得","取出","获取"]}]},{"name":"课文23","shizi":[{"char":"撞","pinyin":"","words":["碰撞","撞击","撞见"]},{"char":"怨","pinyin":"","words":["埋怨","怨恨","怨气"]},{"char":"软","pinyin":"","words":["柔软","松软","软弱"]},{"char":"呜","pinyin":"","words":["呜咽","呜呜","呜呼"]},{"char":"慈","pinyin":"","words":["慈祥","慈爱","仁慈"]},{"char":"祥","pinyin":"","words":["吉祥","祥和","祥瑞"]},{"char":"量","pinyin":"liàng","words":["重量","分量","气量"]},{"char":"跌","pinyin":"","words":["跌倒","下跌","跌落"]},{"char":"摔","pinyin":"","words":["摔倒","摔破","摔打"]},{"char":"擦","pinyin":"","words":["擦拭","擦桌","擦洗"]},{"char":"咱","pinyin":"zán","words":["咱们","咱俩","咱家"]},{"char":"推","pinyin":"","words":["推开","推动","推车"]},{"char":"驶","pinyin":"","words":["行驶","驾驶","驶入"]},{"char":"坚","pinyin":"","words":["坚持","坚固","坚定"]},{"char":"硬","pinyin":"","words":["坚硬","硬朗","硬件"]}]},{"name":"语文园地八","shizi":[{"char":"狼","pinyin":"","words":["野狼","狼狗","狼嚎"]},{"char":"猩","pinyin":"","words":["猩猩","猩红","大猩猩"]},{"char":"鹤","pinyin":"","words":["仙鹤","白鹤","丹顶鹤"]},{"char":"蛇","pinyin":"","words":["毒蛇","蟒蛇","蛇皮"]},{"char":"鸽","pinyin":"","words":["鸽子","白鸽","信鸽"]},{"char":"蚕","pinyin":"","words":["蚕丝","蚕茧","养蚕"]},{"char":"蚯","pinyin":"","words":["蚯蚓","蚯穴","蚯土"]},{"char":"蚓","pinyin":"","words":["蚯蚓","蚓粪","土蚓"]},{"char":"骆","pinyin":"","words":["骆驼","骆马","骆队"]},{"char":"驼","pinyin":"","words":["骆驼","驼峰","驼铃"]},{"char":"狮","pinyin":"","words":["狮子","雄狮","狮王"]}]}]}]}</script>
+<script>window.VOCABULARY_WORDS_EMBEDDED = {
+  units: [
+    { name: '第一单元·阅读', lessons: [
+      { name: '课文1', words: ['妈妈','身子','他们','看见','我们','哪里','那边','雪白','过去','孩子','什么'] },
+      { name: '课文2', words: ['太阳','天空','一起','冬天','花朵','池子','江河','海洋','许多','田地','工作','办法','你们'] },
+      { name: '课文3', words: ['如果','已经','长大','告别','四海为家','自己','出发','动物','胆子','肚子','那里','知识'] }
+    ]},
+    { name: '第二单元·识字', lessons: [
+      { name: '识字1', words: ['花园','飞鸟','红领巾','欢笑'] },
+      { name: '识字2', words: ['杨树','树叶','松柏','化石','开花'] },
+      { name: '识字3', words: ['拍手','世界','云彩','丛林','竹林','朋友','保护'] },
+      { name: '识字4', words: ['四季','春风','农事','月光','身体','辛苦','心里','大家'] }
+    ]},
+    { name: '第三单元·阅读', lessons: [
+      { name: '课文4', words: ['天上','美丽','爸爸','下来','不用','高兴','哥哥','秋千','彩云'] },
+      { name: '课文5', words: ['宝贝','干活','回来','一些','天气','欢快','它们','告诉','名字','出门'] },
+      { name: '课文6', words: ['星星','晚上','无数','奶奶','中间','总是','爷爷','北边','勺子','转动','这个','后来'] }
+    ]},
+    { name: '第四单元·阅读', lessons: [
+      { name: '课文8', words: ['那些','山顶','山头','云海','仙人','前方','仙女'] },
+      { name: '课文9', words: ['山区','群山','树木','灯光','中午','眼前','细雨','风光','中外'] },
+      { name: '课文10', words: ['地方','水果','月份','枝叶','五光十色','好客','老乡','有的','城市','空气','水分','这里','味道','有名'] }
+    ]},
+    { name: '第五单元·阅读', lessons: [
+      { name: '课文11', words: ['坐井观天','哪儿','回答','大话','不过','那么','抬头'] },
+      { name: '课文12', words: ['当作','前面','面对面','出去','过冬','知道','赶快','正好','明天','清早','好像','一样','天亮','出来'] },
+      { name: '课文13', words: ['从前','以后','多么','那个','叶子','虫子','自言自语','邻居','奇怪'] }
+    ]},
+    { name: '第六单元·阅读', lessons: [
+      { name: '课文14', words: ['年代','更加','明亮','星星之火','中国','胜利','道路'] },
+      { name: '课文15', words: ['同志','红军','敌人','生产','常常','来回','非常','战士','一块儿','白天'] },
+      { name: '课文16', words: ['难忘','火红','人民','因为','总理','人们','四面八方','为了','人群','欢乐','开心'] },
+      { name: '课文17', words: ['由于','年轻','共产党员','共产党','现在','一点儿','消息'] }
+    ]},
+    { name: '第七单元·阅读', lessons: [
+      { name: '课文19', words: ['于是','无论','船只','同时','行人','一切','上空','看来','不久','路上','出现','散步','消失'] },
+      { name: '课文20', words: ['空地','伙伴','唱歌','回家','一会儿','着火','火星','一边','连忙','树林','水汽','白云'] }
+    ]},
+    { name: '第八单元·阅读', lessons: [
+      { name: '课文21', words: ['果子','木工','身边','仔细','能干','椅子','怎么','自信','从来','这么'] },
+      { name: '课文22', words: ['上面','快乐','可是','难过','但是','和好'] },
+      { name: '课文23', words: ['眼泪','水花','青草','游戏','只有','可爱','可以','多少','咱们','田野','大地','远方'] }
+    ]}
+  ]
+};</script>
 
 <script>
     const { pinyin } = window.pinyinPro || {};
@@ -1099,6 +1173,7 @@
     };
     const _t2sMap = {};
     function toPinyinWithTone(ch) { try { if(pinyin) return pinyin(ch, { toneType:'symbol' }); } catch(e){} return ch; }
+    function toPinyinForWord(word) { try { if(pinyin) return word.split('').map(c => pinyin(c, { toneType:'symbol' })).join(' '); } catch(e){} return word; }
     function generateExample(word, pinyinStr) { return ''; }
 
     const STORAGE_KEY = 'handwrite_dict_v25';
@@ -1166,6 +1241,10 @@
                 vocabSelectedLessons: [],
                 vocabSelectedChars: [],
                 expandedLessons: [],
+                // 词语听写模式
+                sessionMode: 'dictate',
+                sessionWrongRetryQueue: [],
+                sessionRetryCount: {},
                 // TTS 语音选择
                 ttsVoiceId: '5003',
                 ttsToken: '',
@@ -1336,6 +1415,10 @@
                 const list = this.wrongWordsList;
                 if(list.length <= 20) return list;
                 return list.slice(0, 20);
+            },
+            // 今日词语计划（isWord===true 的词）
+            todayWordPlanWords() {
+                return this.todayPlanWords.filter(w => w.isWord === true);
             },
         },
         watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' }, ttsVoiceId:'saveData', ttsToken:'saveData' },
@@ -1576,18 +1659,22 @@
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
 
+                // 词语表：所有 isWord 的词始终纳入今日计划（不受课本计划影响）
+                let wordOnly = this.words.filter(w => w.isWord === true);
+                // 单字部分
                 // 1. 新课：所有从未默写过的词
                 let newWords = this.words.filter(w =>
-                    w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning'
+                    !w.isWord && w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning'
                 );
 
                 // 2. 滚动池：所有有错字记录、未毕业的词
                 let rollingWords = this.words.filter(w =>
-                    w.wrongCount > 0 && w.status !== 'mastered' && !w._127_day7Entry
+                    !w.isWord && w.wrongCount > 0 && w.status !== 'mastered' && !w._127_day7Entry
                 );
 
                 // 3. Day7 池：进入 Day7 满 7 天、还未掌握的
                 let day7Words = this.words.filter(w => {
+                    if (w.isWord) return false;
                     if (!w._127_day7Entry || w.status === 'mastered') return false;
                     const today = new Date();
                     const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -1596,12 +1683,12 @@
                 });
 
                 // 4. 已掌握随机抽查
-                let masteredWords = this.words.filter(w => w.status === 'mastered');
+                let masteredWords = this.words.filter(w => !w.isWord && w.status === 'mastered');
                 let randomCheck = this.selectRandomCheckWords(masteredWords, currentWeek);
 
                 // 错字优先（按错误次数排序），再排新课
                 rollingWords.sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0));
-                let combined = [...rollingWords, ...newWords, ...day7Words, ...randomCheck];
+                let combined = [...wordOnly, ...rollingWords, ...newWords, ...day7Words, ...randomCheck];
                 combined = [...new Map(combined.map(w=>[w.id,w])).values()];
 
                 this.todayPlanWords = combined;
@@ -1668,9 +1755,10 @@
                 this.saveData();
                 this.$forceUpdate();
             },
-            startHandwriteSession() { 
-                if(this.todayPlanWords.length===0){ this.showAlert('提示', '暂无今日计划，请家长录入词语'); return; } 
-                this.sessionTaskList = JSON.parse(JSON.stringify(this.todayPlanWords)); 
+            startHandwriteSession() {
+                const charWords = this.todayPlanWords.filter(w => !w.isWord);
+                if(charWords.length===0){ this.showAlert('提示', '暂无单字默写计划'); return; }
+                this.sessionTaskList = JSON.parse(JSON.stringify(charWords)); 
                 this.sessionCurrentIdx=0;
                 this.sessionCharHadTrace=false;
                 this.sessionCorrectCount=0;
@@ -1686,6 +1774,37 @@
                 this.timerInterval = setInterval(()=>{ if(!this.sessionFinished) this.sessionTimerSeconds++; },1000);
                 this.currentView='dictateView';
                 this.$nextTick(()=>{ this.initCanvasForCurrent(); });
+            },
+            // 词语听写会话
+            startWordDictateSession() {
+                const wordPlan = this.todayWordPlanWords;
+                if(wordPlan.length === 0) {
+                    this.showConfirm('暂无词语', '需要先在家长端「录入词语 → 从生词库选择 → 📝 词语表」中选择词语。现在去选词吗？', () => {
+                        this.currentView = 'parentHome';
+                        setTimeout(() => this.openAddWizard(), 100);
+                    });
+                    return;
+                }
+                this.sessionMode = 'word';
+                this.sessionTaskList = JSON.parse(JSON.stringify(wordPlan));
+                this.sessionCurrentIdx = 0;
+                this.sessionCurrentWordIdx = 0;
+                this.sessionCharHadTrace = false;
+                this.sessionCorrectCount = 0;
+                this.todayCompletedCount = 0;
+                this.sessionTimerSeconds = 0;
+                this.sessionFinished = false;
+                this.sessionAnswer = '';
+                this.sessionPendingQueue = [];
+                this.sessionCanvasData = [];
+                this.sessionBatchSubmitted = false;
+                this.sessionWrongWordIds = [];
+                this.sessionWrongRetryQueue = [];
+                this.sessionRetryCount = {};
+                if(this.timerInterval) clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(()=>{ if(!this.sessionFinished) this.sessionTimerSeconds++; }, 1000);
+                this.currentView = 'dictateView';
+                this.$nextTick(()=>{ this.initWordCanvas(); });
             },
             // 练习所有错字：复用三词连练流程
             practiceAllWrongWords() {
@@ -1718,18 +1837,78 @@
                     ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
                     ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
                     ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
-                    this.enableDrawing(canvas); 
-                } 
+                    this.enableDrawing(canvas);
+                }
                 // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
                 this.speakCurrentWord();
+            },
+            // 词语听写：初始化双田字格画布
+            initWordCanvas() {
+                const word = this.currentSessionWord;
+                if(!word) return;
+                this.traceMode = false;
+                // 创建两个田字格
+                const container = document.getElementById('word_canvas_container');
+                if(container) {
+                    container.innerHTML = '';
+                    const chars = word.word.split('');
+                    chars.forEach((ch, idx) => {
+                        const canvas = document.createElement('canvas');
+                        canvas.id = 'tg_w' + idx;
+                        canvas.width = 180;
+                        canvas.height = 180;
+                        canvas.className = 'canvas-tg';
+                        canvas.style.cssText = 'width:180px;height:180px;border:2px solid #fbc48d;border-radius:16px;background:#fffcf5;margin:0 6px;';
+                        container.appendChild(canvas);
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#fffcf5';
+                        ctx.fillRect(0, 0, 180, 180);
+                        ctx.strokeStyle = '#fbc48d';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(0, 0, 180, 180);
+                        ctx.beginPath();
+                        ctx.moveTo(90, 0); ctx.lineTo(90, 180); ctx.stroke();
+                        ctx.moveTo(0, 90); ctx.lineTo(180, 90); ctx.stroke();
+                        this.enableDrawing(canvas);
+                    });
+                }
+                this.speakCurrentWord();
+            },
+            // 词语听写：画描红
+            drawWordTrace(word) {
+                const chars = word.word.split('');
+                chars.forEach((ch, idx) => {
+                    const canvas = document.getElementById('tg_w' + idx);
+                    if(!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fffcf5';
+                    ctx.fillRect(0, 0, 180, 180);
+                    ctx.strokeStyle = '#fbc48d';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(0, 0, 180, 180);
+                    ctx.beginPath();
+                    ctx.moveTo(90, 0); ctx.lineTo(90, 180); ctx.stroke();
+                    ctx.moveTo(0, 90); ctx.lineTo(180, 90); ctx.stroke();
+                    ctx.fillStyle = 'rgba(249, 115, 22, 0.25)';
+                    ctx.font = "120px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(ch, 90, 95);
+                    this.enableDrawing(canvas);
+                });
             },
             // 语音播报：读"两个的两"这种格式，优先百度TTS，失败降级原生
             speakCurrentWord() {
                 const word = this.currentSessionWord;
                 if(!word) return;
-                const curWord = (word.words || [word.word])[this.sessionCurrentWordIdx] || word.word;
-                const text = curWord + '的' + word.word;
-                this.speakWithBaidu(text);
+                if(this.sessionMode === 'word') {
+                    // 词语模式：直接读词语拼音
+                    this.speakWithBaidu(word.word);
+                } else {
+                    const curWord = (word.words || [word.word])[this.sessionCurrentWordIdx] || word.word;
+                    const text = curWord + '的' + word.word;
+                    this.speakWithBaidu(text);
+                }
             },
             // 百度语音合成
             async speakWithBaidu(text) {
@@ -1932,13 +2111,52 @@
             },
             async recognizeAndSubmit() {
                 try {
-                    const canvas = document.getElementById('tg_c');
-                    const dataURL = canvas ? canvas.toDataURL() : '';
                     const cur = this.currentSessionWord;
                     if(!cur) return;
+                    if(this.sessionMode === 'word') {
+                        // 词语模式：保存所有画布数据
+                        const chars = cur.word.split('');
+                        const dataURLs = [];
+                        for(let i = 0; i < chars.length; i++) {
+                            const canvas = document.getElementById('tg_w' + i);
+                            dataURLs.push(canvas ? canvas.toDataURL() : '');
+                        }
+                        const wordObj = this.words.find(w => w.id === cur.id);
+                        if(wordObj) wordObj.handwritingData = dataURLs;
+                        this.sessionCanvasData.push({
+                            charId: cur.id,
+                            char: cur.word,
+                            word: cur.word,
+                            wordIndex: 0,
+                            pinyin: cur.pinyin,
+                            canvasDataURL: dataURLs.join('|||')
+                        });
+                        this.totalDictateTimes++;
+                        this.todayCompletedCount++;
+                        this.saveData();
+                        // 检查是否需要重试
+                        const retryCount = this.sessionRetryCount[cur.id] || 0;
+                        if(this.traceMode && retryCount < 3) {
+                            // 还需要重试：重新初始化画布，不清除重试计数
+                            this.$nextTick(() => { this.initWordCanvas(); });
+                            return;
+                        }
+                        // 完成：移除当前词，进入下一个
+                        this.traceMode = false;
+                        this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
+                        if(this.sessionTaskList.length === 0) {
+                            if(this.timerInterval) clearInterval(this.timerInterval);
+                            this.sessionFinished = true;
+                        } else {
+                            this.$nextTick(() => { this.initWordCanvas(); });
+                        }
+                        return;
+                    }
+                    // 单字模式
+                    const canvas = document.getElementById('tg_c');
+                    const dataURL = canvas ? canvas.toDataURL() : '';
                     const wordObj = this.words.find(w=>w.id===cur.id);
                     if(wordObj && canvas) wordObj.handwritingData = [dataURL];
-                    // 存入批量提交队列，带上charId和wordIndex
                     this.sessionCanvasData.push({
                         charId: cur.id,
                         char: cur.word,
@@ -1950,9 +2168,7 @@
                     this.totalDictateTimes++;
                     this.todayCompletedCount++;
                     this.saveData();
-                    // 退出描摹模式（如果有）
                     this.traceMode = false;
-                    // 点过"不会"→描摹的字走完3个组词；没点过的直接跳到下个字
                     if(this.sessionCharHadTrace && this.sessionCurrentWordIdx < 2) {
                         this.sessionCurrentWordIdx++;
                         this.$nextTick(()=>{ this.initCanvasForCurrent(); });
@@ -1979,7 +2195,6 @@
                 this.sessionCorrectCount = 0;
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
-                // 按 charId 分组
                 const groups = {};
                 for(const item of this.sessionCanvasData) {
                     if(!groups[item.charId]) groups[item.charId] = { charId: item.charId, char: item.char, items: [] };
@@ -1992,59 +2207,86 @@
                         if(!wordObj) continue;
                         let anyCorrect = false;
                         for(const item of group.items) {
-                            const base64 = item.canvasDataURL.split(',')[1];
                             let recognized = '';
                             try {
-                                let useTesseract = true;
-                                if(this.useBaiduOCR) {
-                                    for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
-                                        const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
-                                        const acc = this.baiduAccounts[idx];
-                                        if(acc && acc.used < 500) {
-                                            // 自动续期：token 过期且填了 API Key 时自动刷新（静默）
-                                            if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) {
-                                                await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true);
-                                            }
-                                            if(!acc.token) continue;
-                                            const body = new URLSearchParams({ image: base64 });
-                                            const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                            const ocrData = await ocrRes.json();
-                                            acc.used++;
-                                            if(ocrData.error_code === 17 || ocrData.error_code === 110) {
-                                                acc.used = 500;
+                                if(this.sessionMode === 'word') {
+                                    // 词语模式：合并多个画布识别
+                                    const parts = item.canvasDataURL.split('|||');
+                                    let fullRecognized = '';
+                                    for(const part of parts) {
+                                        const base64 = part.split(',')[1];
+                                        if(!base64) continue;
+                                        let singleRec = '';
+                                        if(this.useBaiduOCR) {
+                                            for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
+                                                const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
+                                                const acc = this.baiduAccounts[idx];
+                                                if(acc && acc.used < 500) {
+                                                    if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) {
+                                                        await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true);
+                                                    }
+                                                    if(!acc.token) continue;
+                                                    const body = new URLSearchParams({ image: base64 });
+                                                    const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                                    const ocrData = await ocrRes.json();
+                                                    acc.used++;
+                                                    if(ocrData.error_code === 17 || ocrData.error_code === 110) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                    if(ocrData.words_result && ocrData.words_result.length > 0) { singleRec = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); break; }
+                                                }
                                                 this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                                continue;
-                                            }
-                                            if(ocrData.words_result && ocrData.words_result.length > 0) {
-                                                recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, '');
-                                                useTesseract = false;
-                                                break;
                                             }
                                         }
-                                        this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                                        if(!singleRec) {
+                                            const img = new Image();
+                                            img.src = part;
+                                            await Promise.race([new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }), new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))]);
+                                            const { data: { text } } = await Promise.race([Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }), new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))]);
+                                            singleRec = text.trim().replace(/\s/g, '');
+                                        }
+                                        fullRecognized += singleRec;
                                     }
-                                }
-                                if(useTesseract) {
-                                    const img = new Image();
-                                    img.src = item.canvasDataURL;
-                                    await Promise.race([
-                                        new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }),
-                                        new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))
-                                    ]);
-                                    const { data: { text } } = await Promise.race([
-                                        Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }),
-                                        new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))
-                                    ]);
-                                    recognized = text.trim().replace(/\s/g, '');
+                                    recognized = fullRecognized;
+                                } else {
+                                    // 单字模式
+                                    const base64 = item.canvasDataURL.split(',')[1];
+                                    let useTesseract = true;
+                                    if(this.useBaiduOCR) {
+                                        for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
+                                            const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
+                                            const acc = this.baiduAccounts[idx];
+                                            if(acc && acc.used < 500) {
+                                                if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true); }
+                                                if(!acc.token) continue;
+                                                const body = new URLSearchParams({ image: base64 });
+                                                const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                                const ocrData = await ocrRes.json();
+                                                acc.used++;
+                                                if(ocrData.error_code === 17 || ocrData.error_code === 110) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                if(ocrData.words_result && ocrData.words_result.length > 0) { recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); useTesseract = false; break; }
+                                            }
+                                            this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                                        }
+                                    }
+                                    if(useTesseract) {
+                                        const img = new Image();
+                                        img.src = item.canvasDataURL;
+                                        await Promise.race([new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }), new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))]);
+                                        const { data: { text } } = await Promise.race([Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }), new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))]);
+                                        recognized = text.trim().replace(/\s/g, '');
+                                    }
                                 }
                             } catch(e) {
                                 console.log('OCR识别失败:', e);
                                 recognized = '';
                             }
-                            // 识别结果与目标字（而非组词）比较
                             const expectedChar = item.char || group.char || '';
-                            if(this.isRecognitionMatch(recognized || '', expectedChar)) {
-                                anyCorrect = true;
+                            if(this.sessionMode === 'word') {
+                                // 词语模式：识别结果包含词语的所有字即算对
+                                const expectedChars = expectedChar.split('');
+                                const allFound = expectedChars.every(c => recognized.includes(c));
+                                if(allFound) anyCorrect = true;
+                            } else {
+                                if(this.isRecognitionMatch(recognized || '', expectedChar)) anyCorrect = true;
                             }
                         }
                         wordObj.handwritingData = [group.items[0]?.canvasDataURL];
@@ -2072,9 +2314,7 @@
                             this.sessionCorrectCount++;
                             this.todayCompletedCount++;
                         } else {
-                            if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
-                                wordObj.firstWrong = true;
-                            }
+                            if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) { wordObj.firstWrong = true; }
                             wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
                             wordObj._127_rollingStreak = 0;
                             wordObj._127_day7Entry = null;
@@ -2171,10 +2411,34 @@
             handleDontKnow() {
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
                 if(!wordObj) return;
-                // 如果已在描摹模式，只刷新浅色字，不重复加wrongCount
+                if(this.sessionMode === 'word') {
+                    // 词语模式：点击不会 → 描红 + 重复3次
+                    const retryCount = this.sessionRetryCount[wordObj.id] || 0;
+                    if(!this.traceMode) {
+                        // 首次点击不会：加入错字本和127
+                        if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
+                            wordObj.firstWrong = true;
+                        }
+                        wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
+                        wordObj._127_rollingStreak = 0;
+                        wordObj._127_day7Entry = null;
+                        wordObj.status = 'learning';
+                        wordObj.pendingReview = true;
+                        wordObj.pendingReviewDate = new Date().toISOString().slice(0,10);
+                        this.generateReviewDates(wordObj);
+                        this.sessionRetryCount[wordObj.id] = 1;
+                    } else {
+                        // 已在描红状态：增加重试计数
+                        this.sessionRetryCount[wordObj.id] = retryCount + 1;
+                    }
+                    this.traceMode = true;
+                    this.drawWordTrace(wordObj);
+                    this.saveData();
+                    return;
+                }
+                // 单字模式
                 if(!this.traceMode) {
-                    this.sessionCharHadTrace = true;  // 标记本字需要走完3个组词
-                    // wrongCount 同一字只加1次（在wordIndex=0时加）
+                    this.sessionCharHadTrace = true;
                     if(this.sessionCurrentWordIdx === 0) {
                         if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
                             wordObj.firstWrong = true;
@@ -2188,7 +2452,6 @@
                         this.generateReviewDates(wordObj);
                     }
                 }
-                // 进入描摹模式：在canvas上画浅色字供描摹（刷新画布）
                 this.traceMode = true;
                 const canvas = document.getElementById('tg_c');
                 if(canvas) {
@@ -2723,6 +2986,11 @@
                         this.vocabularyData = window.VOCABULARY_SHIZI_EMBEDDED;
                         this.vocabularyLoaded = true;
                     }
+                } else if(source === 'ciyu') {
+                    if(window.VOCABULARY_WORDS_EMBEDDED && window.VOCABULARY_WORDS_EMBEDDED.units) {
+                        this.vocabularyData = window.VOCABULARY_WORDS_EMBEDDED;
+                        this.vocabularyLoaded = true;
+                    }
                 }
                 this.vocabSource = source;
                 this.vocabSelectedLessons = [];
@@ -2738,6 +3006,7 @@
                 for(let unit of (this.vocabularyData?.units || [])) {
                     for(let lesson of unit.lessons) {
                         if(unit.name + '||' + lesson.name === lessonKey) {
+                            if(this.vocabSource === 'ciyu') return (lesson.words?.length || 0);
                             return (lesson.shizi?.length || 0) + (lesson.xiezhi?.length || 0);
                         }
                     }
@@ -2802,6 +3071,79 @@
                 });
             },
             confirmVocabSelect() {
+                // 词语表模式
+                if(this.vocabSource === 'ciyu') {
+                    let selectedWords = [];
+                    for(let lessonKey of this.vocabSelectedLessons) {
+                        for(let unit of (this.vocabularyData?.units || [])) {
+                            for(let lesson of unit.lessons) {
+                                if(unit.name + '||' + lesson.name === lessonKey) {
+                                    for(let w of (lesson.words || [])) {
+                                        selectedWords.push({ lesson: lesson, word: w, unitName: unit.name });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for(let key of this.vocabSelectedChars) {
+                        const parts = key.split('_');
+                        const unitName = parts[0];
+                        const lessonName = parts[1];
+                        const cat = parts[2];
+                        const word = parts.slice(3).join('_');
+                        for(let unit of (this.vocabularyData?.units || [])) {
+                            if(unit.name !== unitName) continue;
+                            for(let lesson of unit.lessons) {
+                                if(lesson.name !== lessonName) continue;
+                                if((lesson.words || []).includes(word)) {
+                                    selectedWords.push({ lesson: lesson, word: word, unitName: unit.name });
+                                }
+                            }
+                        }
+                    }
+                    if(selectedWords.length === 0) {
+                        this.showAlert('提示', '请先选择至少一个词语');
+                        return;
+                    }
+                    const seen = new Set();
+                    selectedWords = selectedWords.filter(item => {
+                        if(seen.has(item.word)) return false;
+                        seen.add(item.word);
+                        return true;
+                    });
+                    let added = 0, exists = 0;
+                    for(let item of selectedWords) {
+                        const wordId = 'yw_' + item.unitName + '_' + item.lesson.name + '_' + item.word;
+                        if(this.words.some(w => w.id === wordId)) { exists++; continue; }
+                        const wordPinyin = toPinyinForWord(item.word);
+                        this.words.push({
+                            id: wordId,
+                            word: item.word,
+                            char: item.word,
+                            pinyin: wordPinyin,
+                            words: [item.word],
+                            isWord: true,
+                            correctCount: 0,
+                            wrongCount: 0,
+                            status: 'learning',
+                            reviewCorrected: false,
+                            _127_rollingStreak: 0,
+                            _127_day7Entry: null,
+                            _127_randomCheckWeek: 0,
+                            reviewDates: [],
+                            pendingReview: false,
+                            pendingReviewDate: null,
+                            handwritingData: null
+                        });
+                        added++;
+                    }
+                    this.saveData();
+                    this.generateTodayPlan();
+                    this.showAlert('成功', `已添加 ${added} 个词语${exists ? '，'+exists+' 个已存在已跳过' : ''}`);
+                    this.currentView = 'parentHome';
+                    return;
+                }
+                // 识字表/写字表模式
                 let selectedChars = [];
                 for(let lessonKey of this.vocabSelectedLessons) {
                     for(let unit of (this.vocabularyData?.units || [])) {
@@ -2843,15 +3185,11 @@
                     seen.add(item.ch.char);
                     return true;
                 });
-                // 生成 char entry，直接加入词库（跳过确认页）
                 let added = 0, exists = 0;
                 for(let item of selectedChars) {
                     const ch = item.ch;
                     const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + ch.char;
-                    if(this.words.some(w => w.id === charId)) {
-                        exists++;
-                        continue;
-                    }
+                    if(this.words.some(w => w.id === charId)) { exists++; continue; }
                     const charPinyin = toPinyinWithTone(ch.char);
                     this.words.push({
                         id: charId,
