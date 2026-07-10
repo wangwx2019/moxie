@@ -156,6 +156,9 @@
         <div class="card-white">
             <div class="flex-between"><strong>📖 今日默写计划</strong><span class="badge">{{ todayPlanWords.length }} 个</span></div>
             <div style="margin: 10px 0;">✨ 已完成: {{ todayCompletedCount }} / {{ todayPlanWords.length }}</div>
+            <div v-if="todayPlanWords.length > 0" style="text-align:right; margin-bottom:4px;">
+                <span class="text-small" style="color:#aaa; cursor:pointer;" @click="cancelTodayPlan">取消今日计划（滚动词顺延）</span>
+            </div>
             <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession" :disabled="todayPlanWords.length === 0">✍️ 田字格手写默写</button>
             <button class="cute-btn" style="width:100%; margin-top:8px; background:#fef3c7; color:#92400e; border:2px solid #fbbf24;" @click="startWordDictateSession">📝 词语听写{{ todayWordPlanWords.length > 0 ? '（' + todayWordPlanWords.length + ' 个词语）' : '（去选词）' }}</button>
         </div>
@@ -1545,7 +1548,7 @@
                     this.baiduResetMonth = thisMonth;
                 }
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
-                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
+                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w._planSkipDate === undefined) w._planSkipDate = null; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
                 this.saveData(); 
             },
             saveData() {
@@ -1654,6 +1657,19 @@
                 // 判断词语是否在"错字复习队列"中
                 return word.pendingReview || word.isInReviewQueue === true;
             },
+            cancelTodayPlan() {
+                const today = new Date();
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                // 今日计划中的所有词设跳过标记，明天自动恢复
+                this.todayPlanWords.forEach(w => {
+                    const wordObj = this.words.find(t => t.id === w.id);
+                    if(wordObj) wordObj._planSkipDate = todayStr;
+                });
+                this.todayPlanWords = [];
+                this.todayCompletedCount = 0;
+                this.saveData();
+                this.showAlert('已取消', '今日计划已清零，滚动词语已顺延至明天。');
+            },
             generateTodayPlan() {
                 if(this.usingTextbookPlan) return;
                 const today = new Date().toISOString().slice(0,10);
@@ -1663,24 +1679,25 @@
                 // 1. 新课：所有从未默写过的词
                 let newWords = this.words.filter(w =>
                     w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning'
+                    && w._planSkipDate !== today
                 );
 
                 // 2. 滚动池：所有有错字记录、未毕业的词
                 let rollingWords = this.words.filter(w =>
                     w.wrongCount > 0 && w.status !== 'mastered' && !w._127_day7Entry
+                    && w._planSkipDate !== today
                 );
 
                 // 3. Day7 池：进入 Day7 满 7 天、还未掌握的
                 let day7Words = this.words.filter(w => {
                     if (!w._127_day7Entry || w.status === 'mastered') return false;
-                    const today = new Date();
-                    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-                    let daysSince = this.daysBetween(w._127_day7Entry, todayStr);
+                    if (w._planSkipDate === today) return false;
+                    let daysSince = this.daysBetween(w._127_day7Entry, today);
                     return daysSince >= 7;
                 });
 
                 // 4. 已掌握随机抽查
-                let masteredWords = this.words.filter(w => w.status === 'mastered');
+                let masteredWords = this.words.filter(w => w.status === 'mastered' && w._planSkipDate !== today);
                 let randomCheck = this.selectRandomCheckWords(masteredWords, currentWeek);
 
                 // 错字优先（按错误次数排序），再排新课
