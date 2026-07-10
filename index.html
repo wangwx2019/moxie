@@ -1659,22 +1659,19 @@
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
 
-                // 词语表：所有 isWord 的词始终纳入今日计划（不受课本计划影响）
-                let wordOnly = this.words.filter(w => w.isWord === true);
-                // 单字部分
+                // 所有词（词语+单字）统一走 127 法则：
                 // 1. 新课：所有从未默写过的词
                 let newWords = this.words.filter(w =>
-                    !w.isWord && w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning'
+                    w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning'
                 );
 
                 // 2. 滚动池：所有有错字记录、未毕业的词
                 let rollingWords = this.words.filter(w =>
-                    !w.isWord && w.wrongCount > 0 && w.status !== 'mastered' && !w._127_day7Entry
+                    w.wrongCount > 0 && w.status !== 'mastered' && !w._127_day7Entry
                 );
 
                 // 3. Day7 池：进入 Day7 满 7 天、还未掌握的
                 let day7Words = this.words.filter(w => {
-                    if (w.isWord) return false;
                     if (!w._127_day7Entry || w.status === 'mastered') return false;
                     const today = new Date();
                     const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -1683,12 +1680,12 @@
                 });
 
                 // 4. 已掌握随机抽查
-                let masteredWords = this.words.filter(w => !w.isWord && w.status === 'mastered');
+                let masteredWords = this.words.filter(w => w.status === 'mastered');
                 let randomCheck = this.selectRandomCheckWords(masteredWords, currentWeek);
 
                 // 错字优先（按错误次数排序），再排新课
                 rollingWords.sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0));
-                let combined = [...wordOnly, ...rollingWords, ...newWords, ...day7Words, ...randomCheck];
+                let combined = [...rollingWords, ...newWords, ...day7Words, ...randomCheck];
                 combined = [...new Map(combined.map(w=>[w.id,w])).values()];
 
                 this.todayPlanWords = combined;
