@@ -1737,6 +1737,7 @@
                     this.generateReviewDates(wordObj);
                 }
                 this.saveData();
+                this.generateTodayPlan();
                 this.$forceUpdate();
             },
             undoCorrectWord(wordObj) {
@@ -1753,6 +1754,7 @@
                 }
                 this.generateReviewDates(wordObj);
                 this.saveData();
+                this.generateTodayPlan();
                 this.$forceUpdate();
             },
             startHandwriteSession() {
@@ -2574,6 +2576,7 @@
                 // 重置 session 错字记录
                 this.sessionWrongWordIds = [];
                 this.saveData();
+                this.generateTodayPlan();
                 this.currentView='parentHome';
                 this.showAlert('完成', '复核已处理。错字本已更新。');
             },
