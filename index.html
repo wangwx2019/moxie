@@ -2107,35 +2107,35 @@
                     canvas.removeEventListener('mouseleave', canvas._tgHandlers.leave);
                 }
                 let ctx = canvas.getContext('2d');
-                ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
                 let drawing = false;
-                let lastX, lastY;
-                const getCoord = (e, rect) => { 
+                let lastX, lastY, prevX, prevY;
+                const getCoord = (e, rect) => {
                     let clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     let clientY = e.touches ? e.touches[0].clientY : e.clientY;
                     let x = (clientX - rect.left) * canvas.width / rect.width;
                     let y = (clientY - rect.top) * canvas.height / rect.height;
                     return {x,y};
                 };
-                const start = (e) => { 
+                const start = (e) => {
                     e.preventDefault();
-                    // 橡皮擦模式：点击直接清除这个单元格
-                    if(this.eraserActive) {
-                        this.clearCanvasCell(canvas.id);
-                        return;
-                    }
-                    drawing=true; 
-                    let rect=canvas.getBoundingClientRect(); 
-                    let {x,y}=getCoord(e, rect); 
-                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round';
-                    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+1,y+1); ctx.stroke(); 
-                    lastX=x; lastY=y;
+                    if(this.eraserActive) { this.clearCanvasCell(canvas.id); return; }
+                    drawing=true;
+                    let rect=canvas.getBoundingClientRect();
+                    let {x,y}=getCoord(e, rect);
+                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                    ctx.beginPath(); ctx.moveTo(x,y);
+                    lastX=prevX=x; lastY=prevY=y;
                 };
-                const draw = (e) => { 
-                    if(!drawing) return; e.preventDefault(); 
-                    let rect=canvas.getBoundingClientRect(); 
-                    let {x,y}=getCoord(e, rect); 
-                    ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); 
+                const draw = (e) => {
+                    if(!drawing) return; e.preventDefault();
+                    let rect=canvas.getBoundingClientRect();
+                    let {x,y}=getCoord(e, rect);
+                    let midX=(prevX+x)/2, midY=(prevY+y)/2;
+                    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
+                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(midX, midY);
+                    prevX=x; prevY=y;
                 };
                 const end = () => { drawing=false; };
                 const leave = () => { drawing=false; };
@@ -2223,6 +2223,7 @@
                 if(this.sessionCanvasData.length === 0) return;
                 const prev = this.sessionCanvasData.pop();
                 if(!prev) return;
+                console.log('goToPrevWord:', { sessionMode: this.sessionMode, sessionCurrentIdx: this.sessionCurrentIdx, listLen: this.sessionTaskList.length, prev });
                 // 找到原始词对象，用完整数据恢复
                 const origWord = this.words.find(w => w.id === prev.charId);
                 if(origWord) {
