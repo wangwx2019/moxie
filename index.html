@@ -234,7 +234,7 @@
                 <button class="cute-btn primary" @click="recognizeAndSubmit">✨ 保存并继续</button>
             </div>
             <div class="text-small">✏️ 看拼音，在田字格中写出这个词语</div>
-            <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
+            <div class="api-status">🤖 当前引擎: {{ lastOcrEngine || (useBaiduOCR ? '百度智能云' : '本地 Tesseract') }}{{ lastOcrEngine && lastOcrEngine !== (useBaiduOCR ? '百度智能云' : '本地 Tesseract') ? '（已回退）' : '' }}</div>
         </div>
         <div class="dictate-main-card" v-else-if="currentSessionWord">
             <!-- 拼音大号居中 -->
@@ -293,7 +293,7 @@
             </div>
             <div class="text-small" v-if="!traceMode">✏️ 看拼音，在下方田字格写出带 <span style="color:#f97316; font-weight:700;">?</span> 的字。写对任意一个即算通过。</div>
             <div class="text-small" v-else style="color:#d97706;">✏️ 照着浅色字描摹，然后点击「保存并继续」。</div>
-            <div class="api-status">🤖 当前引擎: {{ useBaiduOCR ? '百度智能云' : '本地 Tesseract' }}</div>
+            <div class="api-status">🤖 当前引擎: {{ lastOcrEngine || (useBaiduOCR ? '百度智能云' : '本地 Tesseract') }}{{ lastOcrEngine && lastOcrEngine !== (useBaiduOCR ? '百度智能云' : '本地 Tesseract') ? '（已回退）' : '' }}</div>
         </div>
         <!-- 笔顺动画弹窗 -->
         <div v-if="showStrokeOrderOverlay" class="stroke-order-overlay" @click.self="closeStrokeOrder">
@@ -318,6 +318,7 @@
             <div v-else>
                 <div style="font-size:1.3rem;">🎉 批改完成！错词已进入复习队列</div>
                 <div style="margin:12px 0; font-size:1rem;">✅ 正确 {{ sessionCorrectCount }} / {{ sessionCanvasData.length }}</div>
+                <div v-if="lastOcrEngine" style="margin:8px 0; font-size:0.85rem; color:#92400e;">🤖 识别引擎: {{ lastOcrEngine }}{{ lastOcrEngine.includes('回退') ? '（请在设置中检查百度Token）' : '' }}</div>
                 <button class="cute-btn primary" style="width:100%; margin-top:20px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="finishAndGoHome">返回首页</button>
             </div>
         </div>
@@ -617,8 +618,9 @@
             <div class="flex-between"><span>🐙 GitHub Token</span></div>
             <input type="text" v-model="githubToken" placeholder="ghp_xxx 或 github_pat_xxx" style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; margin-top:6px; box-sizing:border-box;">
             <button class="cute-btn primary" style="width:100%; margin-top:10px; padding:14px 0; font-size:1rem; font-weight:700;" @click="syncToGitHub" :disabled="!githubToken">{{ syncing ? '同步中...' : '☁️ 同步到 GitHub' }}</button>
+            <button class="cute-btn" style="width:100%; margin-top:8px; padding:14px 0; font-size:1rem; font-weight:700; background:#e0f2fe; color:#0369a1; border:2px solid #7dd3fc;" @click="pullFromGitHub" :disabled="!githubToken || pulling">{{ pulling ? '拉取中...' : '📥 从 GitHub 拉取' }}</button>
             <div v-if="githubSyncTime" class="text-small" style="margin-top:6px;">上次同步：{{ githubSyncTime }}</div>
-            <div class="text-small">将数据同步到 GitHub 仓库 wangwx2019/moxie 的 data.json</div>
+            <div class="text-small">同步到/拉取自 GitHub 仓库 wangwx2019/moxie 的 data.json</div>
         </div>
         <button class="cute-btn" @click="confirmResetData">重置演示数据</button>
     </div>
@@ -668,8 +670,8 @@
             <div class="modal-message">{{ customModal.message }}</div>
             <input v-if="customModal.inputType" v-model="customModal.inputValue" class="modal-input" :placeholder="customModal.placeholder || ''" @keydown.enter="customModal.onConfirm?.()">
             <div class="modal-buttons">
-                <button v-if="customModal.showCancel" class="modal-btn cancel" @click="customModal.onCancel?.()">取消</button>
-                <button class="modal-btn" ref="confirmBtn" @click="customModal.onConfirm?.()">确认</button>
+                <button v-if="customModal.showCancel" class="modal-btn cancel" @click="customModal.onCancel?.()">{{ customModal.cancelText || '取消' }}</button>
+                <button class="modal-btn" ref="confirmBtn" @click="customModal.onConfirm?.()">{{ customModal.confirmText || '确认' }}</button>
             </div>
         </div>
     </div>
@@ -1247,6 +1249,7 @@
                 resultModalData: {},
                 resultModalCallback: null,
                 ocrBusy: false,
+                lastOcrEngine: '', // 上次实际使用的OCR引擎
                 useBaiduOCR: true,
                 baiduAccounts: [{ name: '账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }],
                 baiduActiveIdx: 0,
@@ -1254,6 +1257,7 @@
                 githubToken: '',
                 githubSyncTime: '',
                 syncing: false,
+                pulling: false,
                 textbookLessons: {},
                 textbookSelections: [],
                 textbookImportInput: '',
@@ -1471,8 +1475,8 @@
             showAlert(title, message, callback) {
                 this.customModal = { visible: true, title, message, inputType: false, showCancel: false, onConfirm: () => { this.customModal.visible = false; if(callback) callback(); } };
             },
-            showConfirm(title, message, onConfirm, onCancel) {
-                this.customModal = { visible: true, title, message, inputType: false, showCancel: true, onConfirm: () => { this.customModal.visible = false; onConfirm?.(); }, onCancel: () => { this.customModal.visible = false; onCancel?.(); } };
+            showConfirm(title, message, onConfirm, onCancel, confirmText, cancelText) {
+                this.customModal = { visible: true, title, message, inputType: false, showCancel: true, confirmText: confirmText || '确认', cancelText: cancelText || '取消', onConfirm: () => { this.customModal.visible = false; onConfirm?.(); }, onCancel: () => { this.customModal.visible = false; onCancel?.(); } };
                 this.$nextTick(() => { if(this.$refs.confirmModal) this.$refs.confirmModal.focus(); });
             },
             showPrompt(title, message, placeholder, onConfirm) {
@@ -1562,6 +1566,7 @@
                     if(a.apiKey === undefined) a.apiKey = '';
                     if(a.secretKey === undefined) a.secretKey = '';
                     if(a.tokenExpiresAt === undefined) a.tokenExpiresAt = 0;
+                    if(a.used === undefined || a.used === null) a.used = 0;
                 });
                 // 月初重置百度账号用量
                 const now = new Date();
@@ -2159,6 +2164,52 @@
                 }
                 return canvas;
             },
+            // 预处理图片：白底黑字 + 放大，提高OCR识别率
+            preprocessForOCR(dataURL) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const SIZE = 512;
+                        const c = document.createElement('canvas');
+                        c.width = SIZE; c.height = SIZE;
+                        const ctx = c.getContext('2d');
+                        // 纯白背景
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, SIZE, SIZE);
+                        // 原图居中放大绘制
+                        const pad = 32;
+                        const drawSize = SIZE - pad * 2;
+                        ctx.drawImage(img, pad, pad, drawSize, drawSize);
+                        // 二值化：像素亮度 < 180 → 黑，否则 → 白
+                        const imageData = ctx.getImageData(0, 0, SIZE, SIZE);
+                        const d = imageData.data;
+                        for(let i = 0; i < d.length; i += 4) {
+                            const gray = d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114;
+                            const v = gray < 180 ? 0 : 255;
+                            d[i] = d[i+1] = d[i+2] = v;
+                        }
+                        ctx.putImageData(imageData, 0, 0);
+                        resolve(c.toDataURL('image/png'));
+                    };
+                    img.onerror = () => resolve(dataURL);
+                    img.src = dataURL;
+                });
+            },
+            // 手动OCR：CORS失败时，用户在新标签页打开请求，粘贴结果
+            manualOCR(base64) {
+                return new Promise((resolve) => {
+                    const acc = this.baiduAccounts[this.baiduActiveIdx];
+                    if(!acc || !acc.token) { resolve(''); return; }
+                    const url = 'https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token;
+                    // 复制curl命令到剪贴板
+                    const curlCmd = `curl -s "${url}" --data-urlencode "image=${base64}" -H "Content-Type: application/x-www-form-urlencoded"`;
+                    navigator.clipboard.writeText(curlCmd).catch(()=>{});
+                    this.showConfirm('手动识别', '浏览器安全限制无法自动调用百度API。\n\n已复制命令到剪贴板，请：\n1. 打开浏览器新标签页\n2. 直接访问上面的链接（或粘贴curl命令到终端）\n3. 把返回的JSON中 words_result 的内容粘贴到下方', () => {
+                        const input = prompt('粘贴识别结果（如：花、草、树）：');
+                        resolve(input || '');
+                    }, () => { resolve(''); });
+                });
+            },
             async recognizeAndSubmit() {
                 try {
                     const cur = this.currentSessionWord;
@@ -2242,6 +2293,7 @@
             // ---- 批量 AI 批改（按字分组，三词连练） ----
             async batchSubmitAll() {
                 this.ocrBusy = true;
+                this.lastOcrEngine = '';
                 this.sessionCorrectCount = 0;
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
@@ -2264,7 +2316,8 @@
                                     const parts = item.canvasDataURL.split('|||');
                                     let fullRecognized = '';
                                     for(const part of parts) {
-                                        const base64 = part.split(',')[1];
+                                        const processed = await this.preprocessForOCR(part);
+                                        const base64 = processed.split(',')[1];
                                         if(!base64) continue;
                                         let singleRec = '';
                                         if(this.useBaiduOCR) {
@@ -2275,18 +2328,31 @@
                                                     if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) {
                                                         await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true);
                                                     }
-                                                    if(!acc.token) continue;
-                                                    const body = new URLSearchParams({ image: base64 });
-                                                    const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                                    const ocrData = await ocrRes.json();
-                                                    acc.used++;
-                                                    if(ocrData.error_code === 17 || ocrData.error_code === 110) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                    if(ocrData.words_result && ocrData.words_result.length > 0) { singleRec = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); break; }
+                                                    if(!acc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                    try {
+                                                        const body = new URLSearchParams({ image: base64 });
+                                                        const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                                        const ocrData = await ocrRes.json();
+                                                        if(ocrData.error_code === 17) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                        if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                        if(ocrData.error_code) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                        acc.used++;
+                                                        if(ocrData.words_result && ocrData.words_result.length > 0) { singleRec = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); this.lastOcrEngine = '百度智能云'; break; }
+                                                    } catch(fetchErr) {
+                                                        // CORS失败 → 尝试手动回退
+                                                        if(!singleRec) {
+                                                            const manualResult = await this.manualOCR(base64);
+                                                            if(manualResult) { singleRec = manualResult.replace(/\s/g, ''); this.lastOcrEngine = '百度智能云（手动）'; break; }
+                                                        }
+                                                        this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                                                    }
+                                                } else {
+                                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                                                 }
-                                                this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                                             }
                                         }
                                         if(!singleRec) {
+                                            this.lastOcrEngine = this.useBaiduOCR ? '百度智能云（失败回退Tesseract）' : '本地 Tesseract';
                                             const img = new Image();
                                             img.src = part;
                                             await Promise.race([new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }), new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))]);
@@ -2298,7 +2364,8 @@
                                     recognized = fullRecognized;
                                 } else {
                                     // 单字模式
-                                    const base64 = item.canvasDataURL.split(',')[1];
+                                    const processedSingle = await this.preprocessForOCR(item.canvasDataURL);
+                                    const base64 = processedSingle.split(',')[1];
                                     let useTesseract = true;
                                     if(this.useBaiduOCR) {
                                         for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
@@ -2306,18 +2373,31 @@
                                             const acc = this.baiduAccounts[idx];
                                             if(acc && acc.used < 500) {
                                                 if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true); }
-                                                if(!acc.token) continue;
-                                                const body = new URLSearchParams({ image: base64 });
-                                                const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                                const ocrData = await ocrRes.json();
-                                                acc.used++;
-                                                if(ocrData.error_code === 17 || ocrData.error_code === 110) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                if(ocrData.words_result && ocrData.words_result.length > 0) { recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); useTesseract = false; break; }
+                                                if(!acc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                try {
+                                                    const body = new URLSearchParams({ image: base64 });
+                                                    const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                                    const ocrData = await ocrRes.json();
+                                                    if(ocrData.error_code === 17) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                    if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                    if(ocrData.error_code) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                                    acc.used++;
+                                                    if(ocrData.words_result && ocrData.words_result.length > 0) { recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); useTesseract = false; this.lastOcrEngine = '百度智能云'; break; }
+                                                } catch(fetchErr) {
+                                                    // CORS失败 → 尝试手动回退
+                                                    if(!recognized) {
+                                                        const manualResult = await this.manualOCR(base64);
+                                                        if(manualResult) { recognized = manualResult; useTesseract = false; this.lastOcrEngine = '百度智能云（手动）'; break; }
+                                                    }
+                                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                                                }
+                                            } else {
+                                                this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                                             }
-                                            this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                                         }
                                     }
                                     if(useTesseract) {
+                                        this.lastOcrEngine = this.useBaiduOCR ? '百度智能云（失败回退Tesseract）' : '本地 Tesseract';
                                         const img = new Image();
                                         img.src = item.canvasDataURL;
                                         await Promise.race([new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }), new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))]);
@@ -2989,6 +3069,71 @@
                     this.showAlert('同步失败', '网络错误：' + (e.message || e));
                 }
                 this.syncing = false;
+            },
+            async pullFromGitHub() {
+                if(!this.githubToken) return;
+                this.showConfirm('拉取方式', '选择数据拉取方式：\n\n【覆盖】本地数据完全替换为 GitHub 数据（推荐：恢复之前同步的数据）\n【合并】将 GitHub 数据合并到本地（新增词+已有词取错误多的版本）', () => {
+                    this._doPull(true);
+                }, () => {
+                    this._doPull(false);
+                }, '覆盖', '合并');
+            },
+            async _doPull(overwrite) {
+                this.pulling = true;
+                try {
+                    const res = await fetch('https://api.github.com/repos/wangwx2019/moxie/contents/data.json', {
+                        headers: { 'Authorization': 'Bearer ' + this.githubToken }
+                    });
+                    if(!res.ok) {
+                        const err = await res.json();
+                        this.showAlert('拉取失败', err.message || '请检查 Token 权限或仓库中是否有 data.json');
+                        this.pulling = false;
+                        return;
+                    }
+                    const fileData = await res.json();
+                    const decoded = decodeURIComponent(escape(atob(fileData.content)));
+                    const remote = JSON.parse(decoded);
+                    if(!remote.words || !remote.words.length) {
+                        this.showAlert('提示', 'GitHub 上没有找到有效的词语数据');
+                        this.pulling = false;
+                        return;
+                    }
+                    if(overwrite) {
+                        // 覆盖模式：直接替换
+                        this.words = remote.words;
+                        if(remote.checkinDays !== undefined) this.checkinDays = remote.checkinDays;
+                        if(remote.textbookLessons) this.textbookLessons = remote.textbookLessons;
+                        if(remote.textbookSelections) this.textbookSelections = remote.textbookSelections;
+                        if(remote.usingTextbookPlan !== undefined) this.usingTextbookPlan = remote.usingTextbookPlan;
+                        if(remote.vocabUsage) this.vocabUsage = remote.vocabUsage;
+                        if(remote.todayWrongReviewWords) this.todayWrongReviewWords = remote.todayWrongReviewWords;
+                        this.saveData();
+                        this.showAlert('覆盖完成', `已用 GitHub 数据替换本地\n共 ${remote.words.length} 个词`);
+                    } else {
+                        // 合并模式
+                        const localIds = new Set(this.words.map(w => w.id));
+                        let added = 0;
+                        for(const rw of remote.words) {
+                            if(!localIds.has(rw.id)) {
+                                this.words.push(rw);
+                                added++;
+                            } else {
+                                const local = this.words.find(w => w.id === rw.id);
+                                if(local && (rw.wrongCount || 0) > (local.wrongCount || 0)) {
+                                    Object.assign(local, rw);
+                                }
+                            }
+                        }
+                        if(remote.checkinDays) this.checkinDays = Math.max(this.checkinDays, remote.checkinDays);
+                        if(remote.textbookLessons && Object.keys(remote.textbookLessons).length) this.textbookLessons = remote.textbookLessons;
+                        if(remote.textbookSelections && remote.textbookSelections.length) this.textbookSelections = remote.textbookSelections;
+                        this.saveData();
+                        this.showAlert('合并完成', `新增 ${added} 个词，合并 ${localIds.size} 个已有词`);
+                    }
+                } catch(e) {
+                    this.showAlert('拉取失败', '网络错误：' + (e.message || e));
+                }
+                this.pulling = false;
             },
             // ---- 生词库方法 ----
             async fetchVocabulary(skipCache) {
