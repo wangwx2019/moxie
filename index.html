@@ -3125,7 +3125,7 @@
                         // 直接写localStorage，跳过Vue响应式
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
                         const count = merged.words.length;
-                        this.showAlert('覆盖完成', `已写入 ${count} 个词\n百度OCR/GitHub/TTS配置已保留\n页面将刷新`, () => { location.reload(); });
+                        this.showAlert('覆盖完成', `已写入 ${count} 个词\n百度OCR/GitHub/TTS配置已保留\n页面将刷新`, () => { location.href = location.pathname + '?v=' + Date.now(); });
                     } else {
                         // 合并模式
                         const localIds = new Set(this.words.map(w => w.id));
