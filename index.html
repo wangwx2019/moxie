@@ -3099,44 +3099,33 @@
                         return;
                     }
                     if(overwrite) {
-                        // 覆盖模式：清空localStorage → 完全重建 → 刷新页面
-                        localStorage.removeItem(STORAGE_KEY);
-                        this.words = [];
-                        this.todayPlanWords = [];
-                        this.sessionCanvasData = [];
-                        this.sessionTaskList = [];
-                        this.textbookSelections = [];
-                        this.textbookLessons = {};
-                        this.todayWrongReviewWords = [];
-                        this.vocabUsage = {};
-                        // 写入远程数据
-                        this.words = remote.words;
-                        if(remote.checkinDays !== undefined) this.checkinDays = remote.checkinDays;
-                        if(remote.textbookLessons) this.textbookLessons = remote.textbookLessons;
-                        if(remote.textbookSelections) this.textbookSelections = remote.textbookSelections;
-                        if(remote.usingTextbookPlan !== undefined) this.usingTextbookPlan = remote.usingTextbookPlan;
-                        if(remote.vocabUsage) this.vocabUsage = remote.vocabUsage;
-                        if(remote.todayWrongReviewWords) this.todayWrongReviewWords = remote.todayWrongReviewWords;
-                        if(remote.parentPassword) this.parentPassword = remote.parentPassword;
-                        if(remote.useBaiduOCR !== undefined) this.useBaiduOCR = remote.useBaiduOCR;
-                        if(remote.baiduAccounts) this.baiduAccounts = remote.baiduAccounts;
-                        if(remote.baiduActiveIdx !== undefined) this.baiduActiveIdx = remote.baiduActiveIdx;
-                        if(remote.ttsVoiceId) this.ttsVoiceId = remote.ttsVoiceId;
-                        if(remote.ttsToken) this.ttsToken = remote.ttsToken;
-                        this.saveData();
-                        // 生成今日计划（课本模式下也从选词生成）
-                        if(this.usingTextbookPlan && this.textbookSelections.length > 0) {
-                            const selectedWords = [];
-                            for(const lesson of this.textbookSelections) {
-                                if(this.textbookLessons[lesson]) {
-                                    this.textbookLessons[lesson].forEach(w => { if(!selectedWords.find(sw => sw.id === w.id)) selectedWords.push(w); });
-                                }
-                            }
-                            this.todayPlanWords = selectedWords.slice(0, 30);
-                        } else {
-                            this.generateTodayPlan();
-                        }
-                        this.showAlert('覆盖完成', `已用 GitHub 数据完全替换本地\n共 ${remote.words.length} 个词\n今日计划 ${this.todayPlanWords.length} 个\n页面将自动刷新`, () => { location.reload(); });
+                        // 覆盖模式：保留本地token，只替换数据
+                        const localData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                        const merged = {
+                            words: remote.words || [],
+                            checkinDays: remote.checkinDays || 1,
+                            parentPassword: remote.parentPassword || localData.parentPassword || '8899',
+                            useBaiduOCR: remote.useBaiduOCR !== false,
+                            // 百度OCR：优先用本地已有的完整账号信息
+                            baiduAccounts: (localData.baiduAccounts && localData.baiduAccounts[0] && localData.baiduAccounts[0].apiKey) ? localData.baiduAccounts : (remote.baiduAccounts || [{ name: '账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }]),
+                            baiduActiveIdx: localData.baiduActiveIdx || remote.baiduActiveIdx || 0,
+                            baiduResetMonth: localData.baiduResetMonth || remote.baiduResetMonth || '',
+                            // GitHub token：保留本地的
+                            githubToken: localData.githubToken || remote.githubToken || '',
+                            githubSyncTime: remote.githubSyncTime || localData.githubSyncTime || '',
+                            textbookLessons: remote.textbookLessons || {},
+                            textbookSelections: remote.textbookSelections || [],
+                            usingTextbookPlan: remote.usingTextbookPlan || false,
+                            vocabUsage: remote.vocabUsage || {},
+                            todayWrongReviewWords: remote.todayWrongReviewWords || [],
+                            // TTS：保留本地的
+                            ttsVoiceId: localData.ttsVoiceId || remote.ttsVoiceId || '5003',
+                            ttsToken: localData.ttsToken || remote.ttsToken || ''
+                        };
+                        // 直接写localStorage，跳过Vue响应式
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+                        const count = merged.words.length;
+                        this.showAlert('覆盖完成', `已写入 ${count} 个词\n百度OCR/GitHub/TTS配置已保留\n页面将刷新`, () => { location.reload(); });
                     } else {
                         // 合并模式
                         const localIds = new Set(this.words.map(w => w.id));
