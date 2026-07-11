@@ -225,15 +225,20 @@
                 <div style="font-size:2.8rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">{{ currentSessionWord.pinyin }}</div>
                 <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @click="speakCurrentWord">🔊 重播</button>
             </div>
-            <div style="display:flex; justify-content:center; margin-bottom:16px;" id="word_canvas_container">
-                <!-- 由 initWordCanvas 动态创建 -->
+            <!-- 词语田字格：上一个 | 画布 | 下一个 -->
+            <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:16px;">
+                <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
+                <div v-else style="width:56px; flex-shrink:0;"></div>
+                <div style="display:flex; justify-content:center;" id="word_canvas_container">
+                    <!-- 由 initWordCanvas 动态创建 -->
+                </div>
+                <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
-            <div class="action-row">
-                <button class="cute-btn" @click="handleDontKnow">😵 不会</button>
-                <button class="cute-btn" @click="clearAllCanvas">🗑️ 清除</button>
-                <button class="cute-btn primary" @click="recognizeAndSubmit">✨ 保存并继续</button>
+            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
+                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="clearAllCanvas">🗑️ 清除</button>
             </div>
-            <div class="text-small">✏️ 看拼音，在田字格中写出这个词语</div>
+            <div class="text-small">✏️ 看拼音，写出这个词语。◀ 上一个 · 下一个 ▶</div>
             <div class="api-status">🤖 当前引擎: {{ lastOcrEngine || (useBaiduOCR ? '百度智能云' : '本地 Tesseract') }}{{ lastOcrEngine && lastOcrEngine !== (useBaiduOCR ? '百度智能云' : '本地 Tesseract') ? '（已回退）' : '' }}</div>
         </div>
         <div class="dictate-main-card" v-else-if="currentSessionWord">
@@ -279,20 +284,22 @@
                     </template>
                 </div>
             </div>
-            <!-- 写字的田字格canvas -->
-            <div style="display:flex; justify-content:center; margin-bottom:16px;">
+            <!-- 写字的田字格canvas：上一个 | 田字格 | 下一个 -->
+            <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:16px;">
+                <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
+                <div v-else style="width:56px; flex-shrink:0;"></div>
                 <div class="tian-ge-cell">
                     <canvas id="tg_c" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;"></canvas>
                 </div>
+                <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
-            <div class="action-row">
-                <button class="cute-btn" @click="handleDontKnow">😵 不会</button>
-                <button class="cute-btn" @click="clearCurrentCanvas">🧽 橡皮擦</button>
-                <button class="cute-btn" @click="clearAllCanvas">🗑️ 清除</button>
-                <button class="cute-btn primary" @click="recognizeAndSubmit">✨ {{ traceMode ? '保存并继续' : '保存并继续' }}</button>
+            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
+                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="clearCurrentCanvas">🧽 橡皮擦</button>
+                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="clearAllCanvas">🗑️ 清除</button>
             </div>
-            <div class="text-small" v-if="!traceMode">✏️ 看拼音，在下方田字格写出带 <span style="color:#f97316; font-weight:700;">?</span> 的字。写对任意一个即算通过。</div>
-            <div class="text-small" v-else style="color:#d97706;">✏️ 照着浅色字描摹，然后点击「保存并继续」。</div>
+            <div class="text-small" v-if="!traceMode">✏️ 看拼音，写出带 <span style="color:#f97316; font-weight:700;">?</span> 的字。◀ 上一个 · 下一个 ▶</div>
+            <div class="text-small" v-else style="color:#d97706;">✏️ 照着浅色字描摹，然后点 ▶ 下一个。</div>
             <div class="api-status">🤖 当前引擎: {{ lastOcrEngine || (useBaiduOCR ? '百度智能云' : '本地 Tesseract') }}{{ lastOcrEngine && lastOcrEngine !== (useBaiduOCR ? '百度智能云' : '本地 Tesseract') ? '（已回退）' : '' }}</div>
         </div>
         <!-- 笔顺动画弹窗 -->
@@ -1437,8 +1444,8 @@
                 if(!word) return [];
                 const words = word.words || [word.word];
                 const currentWordStr = words[this.sessionCurrentWordIdx] || word.word;
-                const targetChar = word.word;
-                return currentWordStr.split('').map(ch => ({ char: ch, isTarget: ch === targetChar }));
+                const targetChar = word.char || '';
+                return currentWordStr.split('').map(ch => ({ char: ch, isTarget: targetChar.length === 1 && ch === targetChar }));
             },
             // 累计错字卡片显示（最多20个）
             allWrongWordsDisplay() {
@@ -1452,7 +1459,7 @@
             },
         },
         watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' }, ttsVoiceId:'saveData', ttsToken:'saveData' },
-        mounted() { this.loadData(); this.generateTodayPlan(); this.fetchRemoteData(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
+        mounted() { this.loadData(); this.generateTodayPlan(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
         methods: {
             async fetchRemoteData() {
                 try {
@@ -1558,9 +1565,10 @@
                 this.baiduAccounts.splice(i, 1);
                 if(this.baiduActiveIdx >= this.baiduAccounts.length) this.baiduActiveIdx = this.baiduAccounts.length - 1;
             },
-            loadData() { 
-                let s = localStorage.getItem(STORAGE_KEY); 
-                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR !== false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }                 this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; this.ttsVoiceId = d.ttsVoiceId || '5003'; this.ttsToken = d.ttsToken || ''; }  
+            loadData() {
+                let s = localStorage.getItem(STORAGE_KEY);
+                if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR !== false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }
+                    this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; this.ttsVoiceId = d.ttsVoiceId || '5003'; this.ttsToken = d.ttsToken || ''; }  
                 // 迁移旧账号字段
                 this.baiduAccounts.forEach(a => {
                     if(a.apiKey === undefined) a.apiKey = '';
@@ -2210,6 +2218,57 @@
                     }, () => { resolve(''); });
                 });
             },
+            // 返回上一个字：恢复画布，保留之前的书写内容
+            goToPrevWord() {
+                if(this.sessionCanvasData.length === 0) return;
+                const prev = this.sessionCanvasData.pop();
+                if(!prev) return;
+                // 找到原始词对象，用完整数据恢复
+                const origWord = this.words.find(w => w.id === prev.charId);
+                if(origWord) {
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 0, JSON.parse(JSON.stringify(origWord)));
+                } else {
+                    this.sessionTaskList.splice(this.sessionCurrentIdx, 0, { id: prev.charId, word: prev.char, pinyin: prev.pinyin, char: prev.char });
+                }
+                this.todayCompletedCount = Math.max(0, this.todayCompletedCount - 1);
+                this.traceMode = false;
+                this.$nextTick(() => {
+                    if(this.sessionMode === 'word') {
+                        // 词语模式：先重建canvas，再逐个恢复画布内容
+                        this.initWordCanvas();
+                        this.$nextTick(() => {
+                            const parts = prev.canvasDataURL.split('|||');
+                            parts.forEach((dataURL, i) => {
+                                if(!dataURL) return;
+                                const canvas = document.getElementById('tg_w' + i);
+                                if(!canvas) return;
+                                const img = new Image();
+                                img.onload = () => {
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                };
+                                img.src = dataURL;
+                            });
+                        });
+                    } else {
+                        // 单字模式：重建canvas，再恢复画布内容
+                        this.initCanvasForCurrent();
+                        this.$nextTick(() => {
+                            if(!prev.canvasDataURL) return;
+                            const canvas = document.getElementById('tg_c');
+                            if(!canvas) return;
+                            const img = new Image();
+                            img.onload = () => {
+                                const ctx = canvas.getContext('2d');
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            };
+                            img.src = prev.canvasDataURL;
+                        });
+                    }
+                });
+            },
             async recognizeAndSubmit() {
                 try {
                     const cur = this.currentSessionWord;
@@ -2249,6 +2308,7 @@
                             if(this.timerInterval) clearInterval(this.timerInterval);
                             this.sessionFinished = true;
                         } else {
+                            if(this.sessionCurrentIdx >= this.sessionTaskList.length) this.sessionCurrentIdx = 0;
                             this.$nextTick(() => { this.initWordCanvas(); });
                         }
                         return;
@@ -2281,6 +2341,7 @@
                             if(this.timerInterval) clearInterval(this.timerInterval);
                             this.sessionFinished = true;
                         } else {
+                            if(this.sessionCurrentIdx >= this.sessionTaskList.length) this.sessionCurrentIdx = 0;
                             this.$nextTick(()=>{ this.initCanvasForCurrent(); });
                         }
                     }
@@ -3100,27 +3161,28 @@
                     }
                     if(overwrite) {
                         // 覆盖模式：保留本地token，只替换数据
+                        // 优先用Vue当前状态（内存中最准确），其次localStorage，最后远程
                         const localData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                        // 检测本地是否有有效的百度账号（apiKey不为空即有效）
+                        const hasLocalBaidu = this.baiduAccounts.some(a => a.apiKey) || (localData.baiduAccounts || []).some(a => a.apiKey);
                         const merged = {
                             words: remote.words || [],
                             checkinDays: remote.checkinDays || 1,
-                            parentPassword: remote.parentPassword || localData.parentPassword || '8899',
-                            useBaiduOCR: remote.useBaiduOCR !== false,
-                            // 百度OCR：优先用本地已有的完整账号信息
-                            baiduAccounts: (localData.baiduAccounts && localData.baiduAccounts[0] && localData.baiduAccounts[0].apiKey) ? localData.baiduAccounts : (remote.baiduAccounts || [{ name: '账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }]),
-                            baiduActiveIdx: localData.baiduActiveIdx || remote.baiduActiveIdx || 0,
-                            baiduResetMonth: localData.baiduResetMonth || remote.baiduResetMonth || '',
-                            // GitHub token：保留本地的
-                            githubToken: localData.githubToken || remote.githubToken || '',
+                            parentPassword: remote.parentPassword || this.parentPassword || '8899',
+                            useBaiduOCR: this.useBaiduOCR,
+                            // 百度OCR：永远保留当前内存中的账号（最可靠）
+                            baiduAccounts: hasLocalBaidu ? (this.baiduAccounts.some(a => a.apiKey) ? this.baiduAccounts : localData.baiduAccounts) : (remote.baiduAccounts || this.baiduAccounts),
+                            baiduActiveIdx: this.baiduActiveIdx,
+                            baiduResetMonth: this.baiduResetMonth || localData.baiduResetMonth || '',
+                            githubToken: this.githubToken || localData.githubToken || remote.githubToken || '',
                             githubSyncTime: remote.githubSyncTime || localData.githubSyncTime || '',
                             textbookLessons: remote.textbookLessons || {},
                             textbookSelections: remote.textbookSelections || [],
                             usingTextbookPlan: remote.usingTextbookPlan || false,
                             vocabUsage: remote.vocabUsage || {},
                             todayWrongReviewWords: remote.todayWrongReviewWords || [],
-                            // TTS：保留本地的
-                            ttsVoiceId: localData.ttsVoiceId || remote.ttsVoiceId || '5003',
-                            ttsToken: localData.ttsToken || remote.ttsToken || ''
+                            ttsVoiceId: this.ttsVoiceId || localData.ttsVoiceId || remote.ttsVoiceId || '5003',
+                            ttsToken: this.ttsToken || localData.ttsToken || remote.ttsToken || ''
                         };
                         // 直接写localStorage，跳过Vue响应式
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
