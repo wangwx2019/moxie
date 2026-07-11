@@ -1739,7 +1739,7 @@
                 // 错字优先（按错误次数排序），再排新课
                 rollingWords.sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0));
                 let combined = [...rollingWords, ...newWords, ...day7Words, ...randomCheck];
-                combined = [...new Map(combined.map(w=>[w.id,w])).values()];
+                combined = [...new Map(combined.map(w=>[w.word,w])).values()];
 
                 this.todayPlanWords = combined;
             },
