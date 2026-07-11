@@ -3038,8 +3038,8 @@
                 if(!this.githubToken) return;
                 this.syncing = true;
                 try {
-                    // 构造要上传的数据
-                    const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx };
+                    // 构造要上传的数据（全部字段）
+                    const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken };
                     const content = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2))));
                     // 获取当前文件 SHA（更新时需要）
                     const getRes = await fetch('https://api.github.com/repos/wangwx2019/moxie/contents/data.json', {
@@ -3099,7 +3099,17 @@
                         return;
                     }
                     if(overwrite) {
-                        // 覆盖模式：直接替换
+                        // 覆盖模式：清空localStorage → 完全重建 → 刷新页面
+                        localStorage.removeItem(STORAGE_KEY);
+                        this.words = [];
+                        this.todayPlanWords = [];
+                        this.sessionCanvasData = [];
+                        this.sessionTaskList = [];
+                        this.textbookSelections = [];
+                        this.textbookLessons = {};
+                        this.todayWrongReviewWords = [];
+                        this.vocabUsage = {};
+                        // 写入远程数据
                         this.words = remote.words;
                         if(remote.checkinDays !== undefined) this.checkinDays = remote.checkinDays;
                         if(remote.textbookLessons) this.textbookLessons = remote.textbookLessons;
@@ -3107,8 +3117,26 @@
                         if(remote.usingTextbookPlan !== undefined) this.usingTextbookPlan = remote.usingTextbookPlan;
                         if(remote.vocabUsage) this.vocabUsage = remote.vocabUsage;
                         if(remote.todayWrongReviewWords) this.todayWrongReviewWords = remote.todayWrongReviewWords;
+                        if(remote.parentPassword) this.parentPassword = remote.parentPassword;
+                        if(remote.useBaiduOCR !== undefined) this.useBaiduOCR = remote.useBaiduOCR;
+                        if(remote.baiduAccounts) this.baiduAccounts = remote.baiduAccounts;
+                        if(remote.baiduActiveIdx !== undefined) this.baiduActiveIdx = remote.baiduActiveIdx;
+                        if(remote.ttsVoiceId) this.ttsVoiceId = remote.ttsVoiceId;
+                        if(remote.ttsToken) this.ttsToken = remote.ttsToken;
                         this.saveData();
-                        this.showAlert('覆盖完成', `已用 GitHub 数据替换本地\n共 ${remote.words.length} 个词`);
+                        // 生成今日计划（课本模式下也从选词生成）
+                        if(this.usingTextbookPlan && this.textbookSelections.length > 0) {
+                            const selectedWords = [];
+                            for(const lesson of this.textbookSelections) {
+                                if(this.textbookLessons[lesson]) {
+                                    this.textbookLessons[lesson].forEach(w => { if(!selectedWords.find(sw => sw.id === w.id)) selectedWords.push(w); });
+                                }
+                            }
+                            this.todayPlanWords = selectedWords.slice(0, 30);
+                        } else {
+                            this.generateTodayPlan();
+                        }
+                        this.showAlert('覆盖完成', `已用 GitHub 数据完全替换本地\n共 ${remote.words.length} 个词\n今日计划 ${this.todayPlanWords.length} 个\n页面将自动刷新`, () => { location.reload(); });
                     } else {
                         // 合并模式
                         const localIds = new Set(this.words.map(w => w.id));
