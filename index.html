@@ -2203,16 +2203,17 @@
                     img.src = dataURL;
                 });
             },
-            // 手动OCR：CORS失败时，用户在新标签页打开请求，粘贴结果
+            // 手动OCR：CORS失败时，用户粘贴结果
             manualOCR(base64) {
                 return new Promise((resolve) => {
                     const acc = this.baiduAccounts[this.baiduActiveIdx];
                     if(!acc || !acc.token) { resolve(''); return; }
-                    const url = 'https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token;
-                    // 复制curl命令到剪贴板
-                    const curlCmd = `curl -s "${url}" --data-urlencode "image=${base64}" -H "Content-Type: application/x-www-form-urlencoded"`;
-                    navigator.clipboard.writeText(curlCmd).catch(()=>{});
-                    this.showConfirm('手动识别', '浏览器安全限制无法自动调用百度API。\n\n已复制命令到剪贴板，请：\n1. 打开浏览器新标签页\n2. 直接访问上面的链接（或粘贴curl命令到终端）\n3. 把返回的JSON中 words_result 的内容粘贴到下方', () => {
+                    const url = location.origin + '/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token;
+                    // 尝试复制链接到剪贴板
+                    if(navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).catch(()=>{});
+                    }
+                    this.showConfirm('手动识别', '已复制链接到剪贴板，请：\n1. 打开浏览器新标签页\n2. 粘贴链接访问\n3. 把返回JSON中 words_result 的内容粘贴到下方', () => {
                         const input = prompt('粘贴识别结果（如：花、草、树）：');
                         resolve(input || '');
                     }, () => { resolve(''); });
@@ -2360,9 +2361,9 @@
                 this.sessionCorrectCount = 0;
                 // 诊断：打印百度OCR账号状态
                 const acc = this.baiduAccounts[this.baiduActiveIdx];
-                console.log('[OCR诊断] useBaiduOCR:', this.useBaiduOCR);
-                console.log('[OCR诊断] baiduActiveIdx:', this.baiduActiveIdx, '总账号数:', this.baiduAccounts.length);
-                console.log('[OCR诊断] 当前账号:', acc?.name, 'hasApiKey:', !!acc?.apiKey, 'hasToken:', !!acc?.token, 'used:', acc?.used, 'expired:', acc ? this.isBaiduTokenExpired(acc) : 'N/A');
+                const diagMsg = `useBaiduOCR=${this.useBaiduOCR}, idx=${this.baiduActiveIdx}, 账号数=${this.baiduAccounts.length}, apiKey=${acc?.apiKey?'有':'无'}, token=${acc?.token?'有':'无'}, expired=${acc?this.isBaiduTokenExpired(acc):'N/A'}`;
+                console.log('[OCR诊断]', diagMsg);
+                this.lastOcrEngine = diagMsg;
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
                 const groups = {};
@@ -2399,7 +2400,7 @@
                                                     if(!acc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
                                                     try {
                                                         const body = new URLSearchParams({ image: base64 });
-                                                        const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                                        const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
                                                         const ocrData = await ocrRes.json();
                                                         if(ocrData.error_code === 17) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
                                                         if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
@@ -2444,7 +2445,7 @@
                                                 if(!acc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
                                                 try {
                                                     const body = new URLSearchParams({ image: base64 });
-                                                    const ocrRes = await fetch('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                                    const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
                                                     const ocrData = await ocrRes.json();
                                                     if(ocrData.error_code === 17) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
                                                     if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
