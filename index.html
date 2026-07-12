@@ -1520,7 +1520,7 @@
                 }
                 try {
                     // 先用 POST（官方方式）
-                    const res = await fetch('https://aip.baidubce.com/oauth/2.0/token', {
+                    const res = await fetch('/proxy/baidu/oauth/2.0/token', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: 'grant_type=client_credentials&client_id=' + encodeURIComponent(acc.apiKey) + '&client_secret=' + encodeURIComponent(acc.secretKey)
