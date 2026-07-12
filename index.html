@@ -3170,33 +3170,30 @@
                     }
                     if(overwrite) {
                         // 覆盖模式：保留本地token，只替换数据
-                        // 优先用Vue当前状态（内存中最准确），其次localStorage，最后远程
                         const localData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-                        // 检测本地是否有有效的百度账号（apiKey不为空即有效）
-                        const hasLocalBaidu = this.baiduAccounts.some(a => a.apiKey) || (localData.baiduAccounts || []).some(a => a.apiKey);
                         const merged = {
                             words: remote.words || [],
                             checkinDays: remote.checkinDays || 1,
-                            parentPassword: remote.parentPassword || this.parentPassword || '8899',
-                            useBaiduOCR: this.useBaiduOCR,
-                            // 百度OCR：永远保留当前内存中的账号（最可靠）
-                            baiduAccounts: hasLocalBaidu ? (this.baiduAccounts.some(a => a.apiKey) ? this.baiduAccounts : localData.baiduAccounts) : (remote.baiduAccounts || this.baiduAccounts),
-                            baiduActiveIdx: this.baiduActiveIdx,
-                            baiduResetMonth: this.baiduResetMonth || localData.baiduResetMonth || '',
-                            githubToken: this.githubToken || localData.githubToken || remote.githubToken || '',
+                            parentPassword: remote.parentPassword || localData.parentPassword || '8899',
+                            useBaiduOCR: remote.useBaiduOCR !== false,
+                            baiduAccounts: (localData.baiduAccounts && localData.baiduAccounts[0] && localData.baiduAccounts[0].apiKey) ? localData.baiduAccounts : (remote.baiduAccounts || [{ name: '账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }]),
+                            baiduActiveIdx: localData.baiduActiveIdx || remote.baiduActiveIdx || 0,
+                            baiduResetMonth: localData.baiduResetMonth || remote.baiduResetMonth || '',
+                            githubToken: localData.githubToken || remote.githubToken || '',
                             githubSyncTime: remote.githubSyncTime || localData.githubSyncTime || '',
                             textbookLessons: remote.textbookLessons || {},
                             textbookSelections: remote.textbookSelections || [],
                             usingTextbookPlan: remote.usingTextbookPlan || false,
                             vocabUsage: remote.vocabUsage || {},
                             todayWrongReviewWords: remote.todayWrongReviewWords || [],
-                            ttsVoiceId: this.ttsVoiceId || localData.ttsVoiceId || remote.ttsVoiceId || '5003',
-                            ttsToken: this.ttsToken || localData.ttsToken || remote.ttsToken || ''
+                            ttsVoiceId: localData.ttsVoiceId || remote.ttsVoiceId || '5003',
+                            ttsToken: localData.ttsToken || remote.ttsToken || ''
                         };
-                        // 直接写localStorage，跳过Vue响应式
+                        // 直接写localStorage，不修改Vue状态，避免watcher覆盖
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
                         const count = merged.words.length;
-                        this.showAlert('覆盖完成', `已写入 ${count} 个词\n百度OCR/GitHub/TTS配置已保留\n页面将刷新`, () => { location.href = location.pathname + '?v=' + Date.now(); });
+                        // 直接刷新，不弹窗（弹窗会触发Vue状态变更导致watcher覆盖localStorage）
+                        location.href = location.pathname + '?v=' + Date.now();
                     } else {
                         // 合并模式
                         const localIds = new Set(this.words.map(w => w.id));
