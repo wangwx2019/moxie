@@ -3170,15 +3170,19 @@
                     }
                     if(overwrite) {
                         // 覆盖模式：保留本地token，只替换数据
+                        // 第一步：先把Vue当前状态（含用户刚填的token）保存到localStorage
+                        this.saveData();
+                        // 第二步：读取已保存的本地数据（此时包含了用户填的token）
                         const localData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                        // 第三步：构建合并数据，百度账号永远优先保留本地
                         const merged = {
                             words: remote.words || [],
                             checkinDays: remote.checkinDays || 1,
                             parentPassword: remote.parentPassword || localData.parentPassword || '8899',
                             useBaiduOCR: remote.useBaiduOCR !== false,
-                            baiduAccounts: (localData.baiduAccounts && localData.baiduAccounts[0] && localData.baiduAccounts[0].apiKey) ? localData.baiduAccounts : (remote.baiduAccounts || [{ name: '账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }]),
-                            baiduActiveIdx: localData.baiduActiveIdx || remote.baiduActiveIdx || 0,
-                            baiduResetMonth: localData.baiduResetMonth || remote.baiduResetMonth || '',
+                            baiduAccounts: (localData.baiduAccounts || []).some(a => a.apiKey || a.token) ? localData.baiduAccounts : (remote.baiduAccounts || [{ name: '账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }]),
+                            baiduActiveIdx: localData.baiduActiveIdx || 0,
+                            baiduResetMonth: localData.baiduResetMonth || '',
                             githubToken: localData.githubToken || remote.githubToken || '',
                             githubSyncTime: remote.githubSyncTime || localData.githubSyncTime || '',
                             textbookLessons: remote.textbookLessons || {},
@@ -3189,10 +3193,8 @@
                             ttsVoiceId: localData.ttsVoiceId || remote.ttsVoiceId || '5003',
                             ttsToken: localData.ttsToken || remote.ttsToken || ''
                         };
-                        // 直接写localStorage，不修改Vue状态，避免watcher覆盖
+                        // 第四步：直接写localStorage（不触发Vue watcher），然后刷新
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-                        const count = merged.words.length;
-                        // 直接刷新，不弹窗（弹窗会触发Vue状态变更导致watcher覆盖localStorage）
                         location.href = location.pathname + '?v=' + Date.now();
                     } else {
                         // 合并模式
