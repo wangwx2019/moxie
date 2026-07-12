@@ -363,10 +363,12 @@
                     <div class="vocab-lesson-check" :class="{checked: wordBankSelected.includes(word.id)}" @click.stop="toggleWordSelection(word.id)" style="cursor:pointer; flex-shrink:0;">{{ wordBankSelected.includes(word.id) ? '✓' : '' }}</div>
                     <div style="cursor:pointer; flex:1; min-width:0;" @click="showWordDetail(word)">
                         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                            <span style="font-weight:700; white-space:nowrap;">{{ word.word }}</span>
+                            <span style="font-weight:700; white-space:nowrap;" :style="{color: (word.wrongCount > 0) ? '#dc2626' : (word.correctCount > 0) ? '#16a34a' : '#1c1917'}">{{ word.word }}</span>
                             <span v-if="!isInReviewQueue(word)" style="color:#666; font-size:0.9em;">({{ word.pinyin }})</span>
                             <span class="word-badge" v-if="word.wrongCount >= 5" style="margin-left:4px;">顽固</span><span class="word-badge" v-else-if="word.wrongCount >= 3" style="margin-left:4px;">难点</span><span class="word-badge" v-else-if="word.wrongCount === 1" style="margin-left:4px;">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="margin-left:4px; background:#dcfce7;">已掌握</span>
-                            <div class="text-small" style="margin-left:4px;">错{{ word.wrongCount || 0 }}次</div>
+                            <div v-if="word.wrongCount > 0" class="text-small" style="margin-left:4px; color:#dc2626;">错{{ word.wrongCount }}次</div>
+                            <div v-else-if="word.correctCount > 0" class="text-small" style="margin-left:4px; color:#16a34a;">对{{ word.correctCount }}次</div>
+                            <div v-else class="text-small" style="margin-left:4px; color:#999;">未默写</div>
                         </div>
                     </div>
                 </div>
@@ -408,18 +410,19 @@
             <div v-for="(item, idx) in filteredReviewList" :key="idx" class="review-item-card">
                 <div class="flex-between">
                     <div>
-                        <span class="word-status-emoji">{{ item.word.wrongCount > 0 ? '❌' : '✅' }}</span>
+                        <span class="word-status-emoji">{{ item.word.reviewCorrected || item.word.ocrResult === 'correct' ? '✅' : '❌' }}</span>
                         <strong>{{ item.word.word }}</strong>
                         <span v-if="item.word.pendingReviewDate" class="date-badge">{{ relativeDateStr(item.word.pendingReviewDate) }}</span>
                         <span class="text-small">({{ item.word.pinyin }})</span>
+                        <span v-if="item.word.reviewCorrected" class="text-small" style="color:#16a34a; margin-left:4px;">（已纠正）</span>
+                        <span v-else class="text-small" style="margin-left:4px;">{{ item.word.ocrResult === 'correct' ? '批改正确' : '批改错误' }}</span>
                     </div>
                     <span v-if="item.word.reviewCorrected" style="display:flex; gap:4px; align-items:center;">
-                        <span class="text-small" style="color:#16a34a;">已纠正</span>
                         <button class="cute-btn-sm" style="background:#eee; color:#666; padding:2px 8px; font-size:0.7rem;" @click="undoCorrectWord(item.word)">撤销</button>
                     </span>
-                    <button v-else class="cute-btn-sm" @click="correctWord(item.word)">纠正</button>
+                    <button v-else-if="item.word.ocrResult === 'wrong'" class="cute-btn-sm" @click="correctWord(item.word)">纠正</button>
                 </div>
-                <div v-if="item.handwritingImages" class="handwriting-preview">
+                <div v-if="item.handwritingImages && item.handwritingImages.length > 0" class="handwriting-preview">
                     <div v-for="(imgSrc, cidx) in item.handwritingImages" :key="cidx">
                         <img :src="imgSrc" class="preview-img" width="70" height="70" />
                     </div>
@@ -502,7 +505,8 @@
                                 <div class="vocab-cat-label">词语（{{ lesson.words.length }} 个）</div>
                                 <div class="vocab-char-grid">
                                     <div v-for="w in lesson.words" :key="'yw_'+w" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'ciyu', w)}" @click="toggleVocabChar(unit.name, lesson.name, 'ciyu', {char:w})">
-                                        <span class="char-word">{{ w }}</span>
+                                        <span class="char-word" :style="{color: getWordColor(w)}">{{ w }}</span>
+                                        <span class="char-detail" :style="{color: getWordColor(w)}">{{ getWordCountText(w) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -511,8 +515,9 @@
                                 <div class="vocab-cat-label">会认（{{ lesson.shizi.length }} 个）</div>
                                 <div class="vocab-char-grid">
                                     <div v-for="ch in lesson.shizi" :key="'sz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'shizi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'shizi', ch)">
-                                        <span class="char-word">{{ ch.char }}</span>
+                                        <span class="char-word" :style="{color: getWordColor(ch.char)}">{{ ch.char }}</span>
                                         <span class="char-detail">{{ ch.words[0] }} / {{ ch.words[1] }} · {{ ch.words[2] }}</span>
+                                        <span class="char-detail" :style="{color: getWordColor(ch.char)}">{{ getWordCountText(ch.char) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -520,8 +525,9 @@
                                 <div class="vocab-cat-label">会写（{{ lesson.xiezhi.length }} 个）</div>
                                 <div class="vocab-char-grid">
                                     <div v-for="ch in lesson.xiezhi" :key="'xz_'+ch.char" class="vocab-char-item" :class="{checked: isVocabCharSelected(unit.name, lesson.name, 'xiezhi', ch.char)}" @click="toggleVocabChar(unit.name, lesson.name, 'xiezhi', ch)">
-                                        <span class="char-word">{{ ch.char }}</span>
+                                        <span class="char-word" :style="{color: getWordColor(ch.char)}">{{ ch.char }}</span>
                                         <span class="char-detail">{{ ch.words[0] }} / {{ ch.words[1] }} · {{ ch.words[2] }}</span>
+                                        <span class="char-detail" :style="{color: getWordColor(ch.char)}">{{ getWordCountText(ch.char) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1305,7 +1311,7 @@
             masteredCount() { return this.words.filter(w => w.status === 'mastered').length; },
             difficultWordsCount() { return this.words.filter(w => w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered').length; },
             stubbornCount() { return this.words.filter(w => w.wrongCount >= 5 && w.status !== 'mastered').length; },
-            pendingReviewCount() { return this.words.filter(w => w.pendingReview === true && w.handwritingData).length; },
+            pendingReviewCount() { return this.words.filter(w => w.pendingReview === true && w.handwritingData && w.handwritingData.length > 0).length; },
             // 今日正确词数 / 错误词数（按词统计，不是按次数）
             // 今日正确词数 / 错误词数（按词统计，不是按次数）
             reviewTotalCorrect() { return this.todayPlanWords.filter(w => w.wrongCount === 0).length; },
@@ -1313,7 +1319,7 @@
             // 复核列表：只显示今日计划中待复核的词（已纠正的也保留，直到点确认提交）
             reviewList() { 
                 return this.todayPlanWords
-                    .filter(w => w.pendingReview === true && w.handwritingData)
+                    .filter(w => w.handwritingData && w.handwritingData.length > 0)
                     .map(w => ({ 
                         word: w, 
                         handwritingImages: w.handwritingData
@@ -1325,8 +1331,8 @@
                 if(this.reviewFilter === 'all') return list;
                 return list.filter(item => {
                     const w = item.word;
-                    if(this.reviewFilter === 'firstCorrect') return w.wrongCount === 0;
-                    if(this.reviewFilter === 'firstWrong') return w.wrongCount === 1;
+                    if(this.reviewFilter === 'firstCorrect') return w.ocrResult === 'correct';
+                    if(this.reviewFilter === 'firstWrong') return w.ocrResult === 'wrong';
                     if(this.reviewFilter === 'multipleAttempt') return w.wrongCount >= 2;
                     return true;
                 });
@@ -1336,14 +1342,16 @@
                 let firstCorrect = 0;
                 let firstWrong = 0;
                 let multipleAttempt = 0;
-                for(let w of this.words) {
-                    if(this.todayPlanWords.some(pw => pw.id === w.id)) {
-                        if(w.wrongCount === 0) {
-                            firstCorrect++;      // 从未错过
-                        } else if(w.wrongCount === 1) {
-                            firstWrong++;        // 首次默错
-                        } else {
-                            multipleAttempt++;   // 多次尝试
+                for(let w of this.todayPlanWords) {
+                    if(w.handwritingData && w.handwritingData.length > 0) {
+                        if(w.ocrResult === 'correct') {
+                            firstCorrect++;
+                        } else if(w.ocrResult === 'wrong') {
+                            if(w.wrongCount >= 2) {
+                                multipleAttempt++;
+                            } else {
+                                firstWrong++;
+                            }
                         }
                     }
                 }
@@ -1628,6 +1636,21 @@
                 };
                 if(similarPairs[recognized] === expected || similarPairs[expected] === recognized) return true;
                 return false;
+            },
+            // 获取字/词的默写颜色和次数信息
+            getWordColor(text) {
+                const w = this.words.find(x => x.word === text || x.char === text);
+                if(!w) return '#999';
+                if(w.wrongCount > 0) return '#dc2626';
+                if(w.correctCount > 0) return '#16a34a';
+                return '#1c1917';
+            },
+            getWordCountText(text) {
+                const w = this.words.find(x => x.word === text || x.char === text);
+                if(!w) return '';
+                if(w.wrongCount > 0) return '错' + w.wrongCount + '次';
+                if(w.correctCount > 0) return '对' + w.correctCount + '次';
+                return '未默写';
             },
             // 判断OCR识别结果是否与期望文字匹配
             isRecognitionMatch(recognized, expected) {
@@ -2488,7 +2511,20 @@
                                 if(this.isRecognitionMatch(recognized || '', expectedChar)) anyCorrect = true;
                             }
                         }
-                        wordObj.handwritingData = [group.items[0]?.canvasDataURL];
+                        // 保存所有字的画布数据（词语模式下每个字单独保存）
+                        if(this.sessionMode === 'word') {
+                            const allCanvases = [];
+                            group.items.forEach(item => {
+                                if(item.canvasDataURL) {
+                                    const parts = item.canvasDataURL.split('|||').filter(Boolean);
+                                    allCanvases.push(...parts);
+                                }
+                            });
+                            wordObj.handwritingData = allCanvases;
+                        } else {
+                            wordObj.handwritingData = group.items[0]?.canvasDataURL ? [group.items[0].canvasDataURL] : [];
+                        }
+                        wordObj.ocrResult = anyCorrect ? 'correct' : 'wrong';
                         if(anyCorrect) {
                             wordObj.correctCount = (wordObj.correctCount || 0) + 1;
                             if(wordObj._127_day7Entry) {
@@ -2549,6 +2585,7 @@
                     // 保存手写图（供复核页查看）
                     const mergedCanvas = this.getMergedCanvas();
                     wordObj.handwritingData = [mergedCanvas.toDataURL()];
+                    wordObj.ocrResult = 'correct';
                     // 127 逻辑：判断词的当前状态
                     if(wordObj._127_day7Entry) {
                         // Day7 池里对了 → 真正掌握
@@ -2595,6 +2632,7 @@
                     wordObj.status = 'learning';
                     const mergedCanvas = this.getMergedCanvas();
                     wordObj.handwritingData = [mergedCanvas.toDataURL()];
+                    wordObj.ocrResult = 'wrong';
                     wordObj.pendingReview = true;
                     wordObj.pendingReviewDate = today;
                     this.generateReviewDates(wordObj);
@@ -2799,8 +2837,10 @@
             openReviewParentView(){ this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
             commitParentReview(){
-                // 清除已纠正词的待复核标记（未纠正的保留，下次继续）
-                this.words.forEach(w => {
+                // 清除今日计划中所有词的手写数据和OCR结果
+                this.todayPlanWords.forEach(w => {
+                    w.handwritingData = [];
+                    w.ocrResult = null;
                     if(w.pendingReview && w.reviewCorrected) {
                         w.pendingReview = false;
                         w.pendingReviewDate = null;
