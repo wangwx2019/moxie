@@ -2271,6 +2271,7 @@
                 });
             },
             async recognizeAndSubmit() {
+                console.log('[退出诊断] recognizeAndSubmit被调用, idx:', this.sessionCurrentIdx, 'listLen:', this.sessionTaskList.length, 'mode:', this.sessionMode);
                 try {
                     const cur = this.currentSessionWord;
                     if(!cur) return;
@@ -2357,6 +2358,11 @@
                 this.ocrBusy = true;
                 this.lastOcrEngine = '';
                 this.sessionCorrectCount = 0;
+                // 诊断：打印百度OCR账号状态
+                const acc = this.baiduAccounts[this.baiduActiveIdx];
+                console.log('[OCR诊断] useBaiduOCR:', this.useBaiduOCR);
+                console.log('[OCR诊断] baiduActiveIdx:', this.baiduActiveIdx, '总账号数:', this.baiduAccounts.length);
+                console.log('[OCR诊断] 当前账号:', acc?.name, 'hasApiKey:', !!acc?.apiKey, 'hasToken:', !!acc?.token, 'used:', acc?.used, 'expired:', acc ? this.isBaiduTokenExpired(acc) : 'N/A');
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
                 const groups = {};
@@ -2658,12 +2664,14 @@
                 this.closeStrokeOrder();
                 this.$nextTick(()=>{ this.initCanvasForCurrent(); }); 
             },
-            finishSession() { 
+            finishSession() {
+                console.log('[退出诊断] finishSession被调用, sessionTaskList长度:', this.sessionTaskList.length);
                 if(this.timerInterval) clearInterval(this.timerInterval); 
                 this.sessionFinished=true; 
                 this.generateTodayPlan(); 
             },
-            finishAndGoHome() { 
+            finishAndGoHome() {
+                console.log('[退出诊断] finishAndGoHome被调用', new Error().stack);
                 this.closeStrokeOrder();
                 this.currentView='childHome'; 
                 this.sessionFinished=false; 
@@ -2709,7 +2717,8 @@
                 const elem = document.getElementById('stroke_order_container');
                 if(elem) elem.innerHTML = '';
             },
-            abortDictate() { 
+            abortDictate() {
+                console.log('[退出诊断] abortDictate被调用', new Error().stack);
                 if(this.timerInterval) clearInterval(this.timerInterval); 
                 // OCR 正在跑，先不清数据，等它完成
                 if(this.ocrBusy) {
