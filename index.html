@@ -1300,6 +1300,8 @@
                 lastCheckinDate: '',
                 totalDictateTimes: 0,
                 todayPlanWords: [],
+                todayPlanDate: '',
+                todayPlanWordIds: [],
                 todayCompletedCount: 0,
                 sessionTaskList: [],
                 sessionCurrentIdx: 0,
@@ -1675,7 +1677,7 @@
                 try {
                     let s = localStorage.getItem(STORAGE_KEY);
                     if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR !== false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }
-                        this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; this.ttsVoiceId = d.ttsVoiceId || '5003'; this.ttsToken = d.ttsToken || ''; }  
+                        this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; this.ttsVoiceId = d.ttsVoiceId || '5003';                         this.ttsToken = d.ttsToken || ''; this.todayPlanDate = d.todayPlanDate || ''; this.todayPlanWordIds = d.todayPlanWordIds || []; }
                 } catch(e) {
                     console.error('加载数据失败，使用默认数据:', e);
                     localStorage.removeItem(STORAGE_KEY);
@@ -1699,7 +1701,7 @@
                 this.saveData(); 
             },
             saveData() {
-                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken };
+                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: this.todayPlanWords.map(w => w.id), todayPlanDate: this.todayPlanDate || '' };
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
                 } catch(e) {
@@ -1832,6 +1834,8 @@
                             if(wordObj) wordObj._planSkipDate = todayStr;
                         });
                         this.todayPlanWords = [];
+                        this.todayPlanDate = '';
+                        this.todayPlanWordIds = [];
                         this.todayCompletedCount = 0;
                         this.saveData();
                         this.showAlert('已延续', '今日计划已顺延至明天。');
@@ -1874,6 +1878,8 @@
                             }
                         });
                         this.todayPlanWords = [];
+                        this.todayPlanDate = '';
+                        this.todayPlanWordIds = [];
                         this.todayCompletedCount = 0;
                         this.saveData();
                         this.generateTodayPlan();
@@ -1888,29 +1894,44 @@
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
 
+                // 自动检测：如果今日计划已同步（todayPlanDate === today），
+                // 对已提交的词（handwritingData为空）设置 _planSkipDate，避免重复
+                if(this.todayPlanDate === today && this.todayPlanWordIds && this.todayPlanWordIds.length) {
+                    this.todayPlanWordIds.forEach(id => {
+                        const w = this.words.find(t => t.id === id);
+                        if(w && !w._planSkipDate && (!w.handwritingData || w.handwritingData.length === 0)) {
+                            // 词在今日计划中且已提交（handwritingData为空），标记跳过
+                            w._planSkipDate = today;
+                        }
+                    });
+                }
+
                 // 所有词（词语+单字）统一走 127 法则：
                 // 1. 新课：所有从未默写过的词
                 let newWords = this.words.filter(w =>
                     w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning'
                     && w._planSkipDate !== today
+                    && !w.ocrResult  // 今天已批改过的跳过
                 );
 
                 // 2. 滚动池：所有有错字记录、未毕业的词
                 let rollingWords = this.words.filter(w =>
                     w.wrongCount > 0 && w.status !== 'mastered' && !w._127_day7Entry
                     && w._planSkipDate !== today
+                    && !w.ocrResult  // 今天已批改过的跳过
                 );
 
                 // 3. Day7 池：进入 Day7 满 7 天、还未掌握的
                 let day7Words = this.words.filter(w => {
                     if (!w._127_day7Entry || w.status === 'mastered') return false;
                     if (w._planSkipDate === today) return false;
+                    if (w.ocrResult) return false;  // 今天已批改过的跳过
                     let daysSince = this.daysBetween(w._127_day7Entry, today);
                     return daysSince >= 7;
                 });
 
                 // 4. 已掌握随机抽查
-                let masteredWords = this.words.filter(w => w.status === 'mastered' && w._planSkipDate !== today);
+                let masteredWords = this.words.filter(w => w.status === 'mastered' && w._planSkipDate !== today && !w.ocrResult);
                 let randomCheck = this.selectRandomCheckWords(masteredWords, currentWeek);
 
                 // 错字优先（按错误次数排序），再排新课
@@ -1919,6 +1940,9 @@
                 combined = [...new Map(combined.map(w=>[w.word,w])).values()];
 
                 this.todayPlanWords = combined;
+                // 保存今日计划信息，供跨设备同步后自动检测已提交的词
+                this.todayPlanDate = today;
+                this.todayPlanWordIds = combined.map(w => w.id);
             },
             generateReviewDates(wordObj) {
                 // 127 版：根据词的状态生成复习日期（用于日历看板展示）
@@ -3066,6 +3090,9 @@
                         // 标记今日已处理，避免generateTodayPlan重复加入
                         w._planSkipDate = today;
                     });
+                    // 保存今日计划信息到data，供跨设备同步后自动检测
+                    this.todayPlanWordIds = this.todayPlanWords.map(w => w.id);
+                    this.todayPlanDate = today;
                     // 重置 session 错字记录
                     this.sessionWrongWordIds = [];
                     this.saveData();
@@ -3380,7 +3407,7 @@
                 this.syncing = true;
                 try {
                     // 构造要上传的数据（全部字段）
-                    const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken };
+                    const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: this.todayPlanWords.map(w => w.id), todayPlanDate: this.todayPlanDate || '' };
                     const content = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2))));
                     // 获取当前文件 SHA（更新时需要）
                     const getRes = await fetch('https://api.github.com/repos/wangwx2019/moxie/contents/data.json', {
@@ -3462,7 +3489,9 @@
                             vocabUsage: remote.vocabUsage || {},
                             todayWrongReviewWords: remote.todayWrongReviewWords || [],
                             ttsVoiceId: localData.ttsVoiceId || remote.ttsVoiceId || '5003',
-                            ttsToken: localData.ttsToken || remote.ttsToken || ''
+                            ttsToken: localData.ttsToken || remote.ttsToken || '',
+                            todayPlanWordIds: remote.todayPlanWordIds || [],
+                            todayPlanDate: remote.todayPlanDate || ''
                         };
                         // 第四步：直接写localStorage（不触发Vue watcher），然后刷新
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
