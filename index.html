@@ -144,6 +144,39 @@
         .stroke-order-panel { background:white; border-radius:20px; padding:24px; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.18); max-width:90vw; }
         .stroke-order-panel .close-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:#f3f4f6; cursor:pointer; font-size:1.1rem; color:#6b7280; transition:all 0.15s; }
         .stroke-order-panel .close-btn:hover { background:#e5e7eb; color:#374151; }
+        /* ===== 复核页面优化样式 ===== */
+        /* 大图预览弹窗 */
+        .large-preview-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:300; cursor:pointer; }
+        .large-preview-img { max-width:90vw; max-height:90vh; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.3); background:white; padding:12px; }
+        /* 目标字对比布局 */
+        .review-compare { display:flex; align-items:center; gap:16px; margin:10px 0; padding:12px; background:#fef9f2; border-radius:16px; }
+        .review-compare .compare-item { text-align:center; flex:1; }
+        .review-compare .compare-label { font-size:0.7rem; color:#92400e; margin-bottom:4px; font-weight:600; }
+        .review-compare .compare-char { font-size:2.2rem; font-weight:700; color:#92400e; line-height:1.2; }
+        .review-compare .compare-pinyin { font-size:0.8rem; color:#b45309; margin-top:2px; }
+        .review-compare .compare-arrow { font-size:1.4rem; color:#d97706; flex-shrink:0; }
+        .review-compare .compare-img { width:100px; height:100px; border:2px solid #ffcd9c; border-radius:12px; background:white; object-fit:contain; cursor:pointer; }
+        /* 手写预览放大 */
+        .handwriting-preview .preview-img { max-width:100px; max-height:100px; cursor:pointer; transition:transform 0.15s; }
+        .handwriting-preview .preview-img:hover { transform:scale(1.05); }
+        /* 复核卡片状态颜色语义 */
+        .review-item-card.status-pending { box-shadow:inset 4px 0 0 #f97316; background:#fff7ed; }
+        .review-item-card.status-confirmed { box-shadow:inset 4px 0 0 #22c55e; background:#f0fdf4; }
+        .review-item-card.status-corrected { box-shadow:inset 4px 0 0 #3b82f6; background:#eff6ff; }
+        /* 统计卡片优化 */
+        .stat-card.stat-pending { background:#fff7ed; border-color:#f97316; }
+        .stat-card.stat-pending .stat-number { color:#f97316; }
+        .stat-card.stat-done { background:#f0fdf4; border-color:#22c55e; }
+        .stat-card.stat-done .stat-number { color:#22c55e; }
+        /* 操作按钮组 */
+        .review-actions { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+        .review-actions .cute-btn-sm { font-size:0.72rem; padding:4px 10px; }
+        .btn-undo-ai { background:#f3f4f6; color:#374151; }
+        .btn-undo-ai:hover { background:#e5e7eb; }
+        .btn-correct { background:#dcfce7; color:#166534; }
+        .btn-correct:hover { background:#bbf7d0; }
+        .btn-undo-correct { background:#fef3c7; color:#92400e; }
+        .btn-undo-correct:hover { background:#fde68a; }
     </style>
 </head>
 <body>
@@ -317,6 +350,10 @@
                 </div>
             </div>
         </div>
+        <!-- 手写大图预览弹窗 -->
+        <div v-if="largePreviewVisible" class="large-preview-overlay" @click="largePreviewVisible=false">
+            <img :src="largePreviewSrc" class="large-preview-img" />
+        </div>
         <!-- 默写完成页面 -->
         <div v-if="sessionFinished" class="dictate-main-card" style="text-align:center;">
             <div v-if="!sessionBatchSubmitted">
@@ -392,41 +429,77 @@
     <div v-if="currentView === 'reviewParent'" class="page-container">
         <div class="nav-back" @click="currentView='parentHome'">← 返回</div>
         <h3>📋 复核默写</h3>
-        <div class="text-small" style="margin-bottom: 12px;">家长复核说明：如果系统判错实际正确，点击「纠正」按钮可更正。纠正后统计会自动更新。</div>
+        <div class="text-small" style="margin-bottom: 12px;">家长复核说明：点击「写对了」或「写错了」可覆盖AI的判断，统计以家长判断为准。</div>
         
+        <!-- 优化后的统计卡片：突出待复核 -->
         <div class="review-stats">
-            <div class="stat-card" :class="{active: reviewFilter === 'all'}" @click="reviewFilter='all'"><div class="stat-number">{{ reviewStats.total }}</div><div class="stat-label">今日总数</div></div>
-            <div class="stat-card" :class="{active: reviewFilter === 'firstCorrect'}" @click="reviewFilter='firstCorrect'"><div class="stat-number">{{ reviewStats.firstCorrect }}</div><div class="stat-label">首次默对</div></div>
-            <div class="stat-card" :class="{active: reviewFilter === 'firstWrong'}" @click="reviewFilter='firstWrong'"><div class="stat-number">{{ reviewStats.firstWrong }}</div><div class="stat-label">首次默错</div></div>
-            <div class="stat-card" :class="{active: reviewFilter === 'multipleAttempt'}" @click="reviewFilter='multipleAttempt'"><div class="stat-number">{{ reviewStats.multipleAttempt }}</div><div class="stat-label">多次尝试</div></div>
+            <div class="stat-card stat-pending" :class="{active: reviewFilter === 'pending'}" @click="reviewFilter='pending'">
+                <div class="stat-number">{{ pendingReviewCount }}</div>
+                <div class="stat-label">⚠️ 待复核</div>
+            </div>
+            <div class="stat-card stat-done" :class="{active: reviewFilter === 'done'}" @click="reviewFilter='done'">
+                <div class="stat-number">{{ reviewedCount }}</div>
+                <div class="stat-label">✅ 已复核</div>
+            </div>
+            <div class="stat-card" :class="{active: reviewFilter === 'all'}" @click="reviewFilter='all'">
+                <div class="stat-number">{{ reviewList.length }}</div>
+                <div class="stat-label">📝 今日总数</div>
+            </div>
         </div>
 
         <div class="text-small" style="margin-bottom: 12px;">
             共 {{ reviewList.length }} 个词 · 待复核 {{ pendingReviewCount }} 个
             <span style="margin-left:8px; color:#16a34a;">✅{{ reviewTotalCorrect }}</span>
             <span style="margin-left:4px; color:#dc2626;">❌{{ reviewTotalWrong }}</span>
-            <span v-if="reviewFilter !== 'all'" class="date-badge" style="margin-left:8px;">筛选: {{ {firstCorrect:'首次默对',firstWrong:'首次默错',multipleAttempt:'多次尝试'}[reviewFilter] }}</span>
+            <span v-if="reviewFilter !== 'all'" class="date-badge" style="margin-left:8px;">筛选: {{ {pending:'待复核',done:'已复核',all:'全部'}[reviewFilter] }}</span>
         </div>
         <div style="max-height: 60vh; overflow-y: auto;">
-            <div v-for="(item, idx) in filteredReviewList" :key="idx" class="review-item-card">
+            <div v-for="(item, idx) in filteredReviewList" :key="idx" 
+                 class="review-item-card"
+                 :class="{
+                     'status-pending': item.word.ocrResult === 'wrong' && !item.word.reviewCorrected,
+                     'status-confirmed': item.word.ocrResult === 'correct' && !item.word.reviewCorrected,
+                     'status-corrected': item.word.reviewCorrected
+                 }">
+                <!-- 第一行：状态图标 + 汉字 + 拼音 + 状态文字 -->
                 <div class="flex-between">
                     <div>
-                        <span class="word-status-emoji">{{ item.word.reviewCorrected || item.word.ocrResult === 'correct' ? '✅' : '❌' }}</span>
-                        <strong>{{ item.word.word }}</strong>
+                        <span class="word-status-emoji">{{ item.word.ocrResult === 'correct' ? '✅' : '❌' }}</span>
+                        <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
                         <span v-if="item.word.pendingReviewDate" class="date-badge">{{ relativeDateStr(item.word.pendingReviewDate) }}</span>
                         <span class="text-small">({{ item.word.pinyin }})</span>
-                        <span v-if="item.word.reviewCorrected" class="text-small" style="color:#16a34a; margin-left:4px;">（已纠正）</span>
-                        <span v-else class="text-small" style="margin-left:4px;">{{ item.word.ocrResult === 'correct' ? '批改正确' : '批改错误' }}</span>
+                        <span v-if="item.word.reviewCorrected" class="text-small" style="color:#3b82f6; margin-left:4px;">（家长已判断）</span>
+                        <span v-else-if="item.word.ocrResult === 'correct'" class="text-small" style="color:#16a34a; margin-left:4px;">AI判对</span>
+                        <span v-else class="text-small" style="color:#dc2626; margin-left:4px;">AI判错</span>
                     </div>
-                    <span v-if="item.word.reviewCorrected" style="display:flex; gap:4px; align-items:center;">
-                        <button class="cute-btn-sm" style="background:#eee; color:#666; padding:2px 8px; font-size:0.7rem;" @click="undoCorrectWord(item.word)">撤销</button>
-                    </span>
-                    <button v-else-if="item.word.ocrResult === 'wrong'" class="cute-btn-sm" @click="correctWord(item.word)">纠正</button>
                 </div>
-                <div v-if="item.handwritingImages && item.handwritingImages.length > 0" class="handwriting-preview">
-                    <div v-for="(imgSrc, cidx) in item.handwritingImages" :key="cidx">
-                        <img :src="imgSrc" class="preview-img" width="70" height="70" />
+                <!-- 第二行：目标字对比 -->
+                <div class="review-compare">
+                    <div class="compare-item">
+                        <div class="compare-label">应该写</div>
+                        <div class="compare-char">{{ item.word.char || item.word.word }}</div>
+                        <div class="compare-pinyin">{{ item.word.pinyin }}</div>
                     </div>
+                    <div class="compare-arrow">→</div>
+                    <div class="compare-item">
+                        <div class="compare-label">孩子写</div>
+                        <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
+                             :src="item.handwritingImages[0]" 
+                             class="compare-img" 
+                             @click="showLargePreview(item.handwritingImages[0])" />
+                        <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
+                    </div>
+                </div>
+                <!-- 第三行：操作按钮 - 家长直接判断对错 -->
+                <div class="review-actions">
+                    <!-- 已判断过的字，显示撤销按钮 -->
+                    <button v-if="item.word.reviewCorrected" 
+                            class="cute-btn-sm btn-undo-correct" @click="undoJudgment(item.word)">↩ 撤销我的判断</button>
+                    <!-- 未判断的字，显示判断按钮 -->
+                    <template v-else-if="item.word.ocrResult">
+                        <button class="cute-btn-sm btn-correct" @click="judgeAsCorrect(item.word)">✓ 写对了</button>
+                        <button class="cute-btn-sm" style="background:#fee2e2; color:#991b1b;" @click="judgeAsWrong(item.word)">✗ 写错了</button>
+                    </template>
                 </div>
             </div>
             <div v-if="filteredReviewList.length === 0" class="card-white">📅 今日无默写计划</div>
@@ -1250,7 +1323,9 @@
                 parentPassword: '8899',
                 wordBankFilter: 'all',
                 wordBankSelected: [],
-                reviewFilter: 'all',
+                reviewFilter: 'pending', // 默认显示待复核
+                largePreviewVisible: false,
+                largePreviewSrc: '',
                 wrongWordsFilter: 'all',
                 wizardStep: 1,
                 rawWordsInput: '',
@@ -1312,31 +1387,54 @@
             masteredCount() { return this.words.filter(w => w.status === 'mastered').length; },
             difficultWordsCount() { return this.words.filter(w => w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered').length; },
             stubbornCount() { return this.words.filter(w => w.wrongCount >= 5 && w.status !== 'mastered').length; },
-            pendingReviewCount() { return this.words.filter(w => w.pendingReview === true && w.handwritingData && w.handwritingData.length > 0).length; },
             // 今日正确词数 / 错误词数（按词统计，不是按次数）
             // 今日正确词数 / 错误词数（按词统计，不是按次数）
             reviewTotalCorrect() { return this.todayPlanWords.filter(w => w.wrongCount === 0).length; },
             reviewTotalWrong() { return this.todayPlanWords.filter(w => w.wrongCount > 0).length; },
-            // 复核列表：只显示今日计划中待复核的词（已纠正的也保留，直到点确认提交）
-            reviewList() { 
-                return this.todayPlanWords
-                    .filter(w => w.handwritingData && w.handwritingData.length > 0)
-                    .map(w => ({ 
-                        word: w, 
+            // 复核列表：从今日计划中取有手写数据的词
+            reviewList() {
+                const todayPlanIds = new Set(this.todayPlanWords.map(w => w.id));
+                return this.words
+                    .filter(w => todayPlanIds.has(w.id) && w.handwritingData && w.handwritingData.length > 0)
+                    .map(w => ({
+                        word: w,
                         handwritingImages: w.handwritingData
                     }));
             },
             // 按分类筛选后的复核列表
             filteredReviewList() {
-                const list = this.reviewList;
-                if(this.reviewFilter === 'all') return list;
-                return list.filter(item => {
-                    const w = item.word;
-                    if(this.reviewFilter === 'firstCorrect') return w.ocrResult === 'correct';
-                    if(this.reviewFilter === 'firstWrong') return w.ocrResult === 'wrong';
-                    if(this.reviewFilter === 'multipleAttempt') return w.wrongCount >= 2;
-                    return true;
+                let list = this.reviewList;
+                // 应用筛选
+                if(this.reviewFilter === 'pending') {
+                    // 待复核：AI判错，家长还没判断
+                    list = list.filter(item => 
+                        item.word.ocrResult === 'wrong' && !item.word.reviewCorrected
+                    );
+                } else if(this.reviewFilter === 'done') {
+                    // 已复核：家长已经判断过（无论判对还是判错）
+                    list = list.filter(item => item.word.reviewCorrected);
+                } else if(this.reviewFilter === 'all') {
+                    // 不筛选
+                }
+                // 排序：待复核的排在前面（使用slice避免原地修改）
+                return list.slice().sort((a, b) => {
+                    // AI判错未判断的排最前面
+                    const aPending = a.word.ocrResult === 'wrong' && !a.word.reviewCorrected;
+                    const bPending = b.word.ocrResult === 'wrong' && !b.word.reviewCorrected;
+                    if(aPending && !bPending) return -1;
+                    if(!aPending && bPending) return 1;
+                    return 0;
                 });
+            },
+            // 已复核数量（家长已判断）
+            reviewedCount() {
+                return this.reviewList.filter(item => item.word.reviewCorrected).length;
+            },
+            // 待复核数量（AI判错，家长还没判断）
+            pendingReviewCount() {
+                return this.reviewList.filter(item => 
+                    item.word.ocrResult === 'wrong' && !item.word.reviewCorrected
+                ).length;
             },
             reviewStats() {
                 const total = this.todayPlanWords.length;
@@ -1794,24 +1892,27 @@
                 this.saveData();
                 this.generateTodayPlan();
             },
-            // 家长纠正单个词（适配 127）
-            correctWord(wordObj) {
-                if(wordObj.wrongCount <= 0) return;
-                // 递减错字次数
-                wordObj.wrongCount--;
-                wordObj.correctCount = (wordObj.correctCount || 0) + 1;
+            // 家长判断字写对了（覆盖AI判断）
+            judgeAsCorrect(wordObj) {
+                // 保存AI原始判断，用于撤销时恢复
+                if (!wordObj._originalOcrResult) {
+                    wordObj._originalOcrResult = wordObj.ocrResult;
+                    wordObj._originalWrongCount = wordObj.wrongCount;
+                    wordObj._originalCorrectCount = wordObj.correctCount;
+                }
+                // 如果AI判错，需要修正计数
+                if (wordObj.ocrResult === 'wrong') {
+                    wordObj.wrongCount = Math.max(0, (wordObj.wrongCount || 0) - 1);
+                    wordObj.correctCount = (wordObj.correctCount || 0) + 1;
+                }
+                wordObj.ocrResult = 'correct';
                 wordObj.reviewCorrected = true;
-                if(wordObj.wrongCount === 0) {
-                    // 错误归零 → 标记为已掌握
-                    wordObj.firstWrong = false;
+                // 更新状态
+                if (wordObj.wrongCount === 0) {
                     wordObj.status = 'mastered';
-                    wordObj._127_day7Entry = null;
-                    wordObj._127_rollingStreak = 0;
+                    wordObj.firstWrong = false;
                     wordObj.reviewDates = [];
                 } else {
-                    // 仍有剩余错误，保持在滚动池
-                    wordObj._127_rollingStreak = 0;
-                    wordObj._127_day7Entry = null;
                     wordObj.status = 'learning';
                     this.generateReviewDates(wordObj);
                 }
@@ -1819,14 +1920,45 @@
                 this.generateTodayPlan();
                 this.$forceUpdate();
             },
-            undoCorrectWord(wordObj) {
-                wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
-                wordObj.correctCount = Math.max(0, (wordObj.correctCount || 0) - 1);
+            // 家长判断字写错了（覆盖AI判断）
+            judgeAsWrong(wordObj) {
+                // 保存AI原始判断，用于撤销时恢复
+                if (!wordObj._originalOcrResult) {
+                    wordObj._originalOcrResult = wordObj.ocrResult;
+                    wordObj._originalWrongCount = wordObj.wrongCount;
+                    wordObj._originalCorrectCount = wordObj.correctCount;
+                }
+                // 如果AI判对，需要修正计数
+                if (wordObj.ocrResult === 'correct') {
+                    wordObj.correctCount = Math.max(0, (wordObj.correctCount || 0) - 1);
+                    if (wordObj.wrongCount === 0 && wordObj.correctCount === 0) {
+                        wordObj.firstWrong = true;
+                    }
+                    wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
+                }
+                wordObj.ocrResult = 'wrong';
+                wordObj.reviewCorrected = true;
+                wordObj.status = 'learning';
+                this.generateReviewDates(wordObj);
+                this.saveData();
+                this.generateTodayPlan();
+                this.$forceUpdate();
+            },
+            // 撤销家长判断（恢复到AI原始判断）
+            undoJudgment(wordObj) {
+                if (!wordObj.reviewCorrected || !wordObj._originalOcrResult) return;
+                // 恢复AI原始判断
+                wordObj.ocrResult = wordObj._originalOcrResult;
+                wordObj.wrongCount = wordObj._originalWrongCount;
+                wordObj.correctCount = wordObj._originalCorrectCount;
                 wordObj.reviewCorrected = false;
-                // 恢复状态
-                if(wordObj.wrongCount > 0) {
+                // 清除原始记录
+                delete wordObj._originalOcrResult;
+                delete wordObj._originalWrongCount;
+                delete wordObj._originalCorrectCount;
+                // 重新计算状态
+                if (wordObj.wrongCount > 0) {
                     wordObj.status = 'learning';
-                    wordObj.firstWrong = wordObj.wrongCount === 1;
                 } else {
                     wordObj.status = 'mastered';
                     wordObj.firstWrong = false;
@@ -2176,7 +2308,19 @@
                 this.clearCanvasCell('tg_c');
             },
             clearAllCanvas() { 
-                this.clearCanvasCell('tg_c');
+                if (this.sessionMode === 'word') {
+                    // 词语模式：清除所有动态创建的画布
+                    const container = document.getElementById('word_canvas_container');
+                    if (container) {
+                        const canvases = container.querySelectorAll('canvas');
+                        canvases.forEach(canvas => {
+                            this.clearCanvasCell(canvas.id);
+                        });
+                    }
+                } else {
+                    // 单字模式：清除主画布
+                    this.clearCanvasCell('tg_c');
+                }
             },
             toggleEraser() {
                 this.eraserActive = !this.eraserActive;
@@ -2185,10 +2329,14 @@
                 let canvas = typeof canvasId === 'number' ? document.getElementById(`tg_${canvasId}`) : document.getElementById(canvasId); 
                 if(canvas){ 
                     let ctx = canvas.getContext('2d'); 
-                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
-                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
-                    ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
-                    ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke();
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const cx = w / 2;
+                    const cy = h / 2;
+                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,w,h); 
+                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,w,h); 
+                    ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,h); ctx.stroke(); 
+                    ctx.moveTo(0,cy); ctx.lineTo(w,cy); ctx.stroke();
                 } 
             },
             getMergedCanvas() {
@@ -2840,25 +2988,49 @@
                 this.detailWordData = word;
                 this.detailModalVisible = true;
             },
+            showLargePreview(imgSrc){
+                this.largePreviewSrc = imgSrc;
+                this.largePreviewVisible = true;
+            },
             openReviewParentView(){ this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
             commitParentReview(){
-                // 清除今日计划中所有词的手写数据和OCR结果
-                this.todayPlanWords.forEach(w => {
-                    w.handwritingData = [];
-                    w.ocrResult = null;
-                    if(w.pendingReview && w.reviewCorrected) {
+                // 检查是否有未复核的错字
+                const unreviewed = this.todayPlanWords.filter(w => 
+                    w.ocrResult === 'wrong' && !w.reviewCorrected && w.handwritingData && w.handwritingData.length > 0
+                );
+                
+                const doCommit = () => {
+                    // 清除今日计划中所有词的手写数据和OCR结果
+                    this.todayPlanWords.forEach(w => {
+                        w.handwritingData = [];
+                        w.ocrResult = null;
+                        // 清除所有pendingReview状态
                         w.pendingReview = false;
                         w.pendingReviewDate = null;
                         w.reviewCorrected = false;
-                    }
-                });
-                // 重置 session 错字记录
-                this.sessionWrongWordIds = [];
-                this.saveData();
-                this.generateTodayPlan();
-                this.currentView='parentHome';
-                this.showAlert('完成', '复核已处理。错字本已更新。');
+                        // 清除家长判断的原始数据备份
+                        delete w._originalOcrResult;
+                        delete w._originalWrongCount;
+                        delete w._originalCorrectCount;
+                    });
+                    // 重置 session 错字记录
+                    this.sessionWrongWordIds = [];
+                    this.saveData();
+                    this.generateTodayPlan();
+                    this.currentView='parentHome';
+                    this.showAlert('完成', '复核已处理。错字本已更新。');
+                };
+                
+                if(unreviewed.length > 0) {
+                    this.showConfirm(
+                        '还有未复核的字',
+                        `还有 ${unreviewed.length} 个错字未复核（AI判错但未纠正），确定要提交吗？`,
+                        doCommit
+                    );
+                } else {
+                    doCommit();
+                }
             },
             // 从错字本中删除（同步重置127状态）
             removeFromWrongWords(word) {
