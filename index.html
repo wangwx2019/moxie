@@ -2227,7 +2227,7 @@
                     const borderTotal = 4 * chars.length;
                     const gap = 8;
                     const gapTotal = gap * Math.max(0, chars.length - 1);
-                    const size = Math.max(60, Math.floor((innerW - borderTotal - gapTotal) / chars.length));
+                    const size = Math.min(180, Math.max(60, Math.floor((innerW - borderTotal - gapTotal) / chars.length)));
                     const half = size / 2;
                     chars.forEach((ch, idx) => {
                         const canvas = document.createElement('canvas');
