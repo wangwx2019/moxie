@@ -263,7 +263,7 @@
             <div style="display:flex; align-items:center; justify-content:center; gap:24px; margin-bottom:16px;">
                 <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:56px; flex-shrink:0;"></div>
-                <div style="display:flex; justify-content:center;" id="word_canvas_container">
+                <div style="display:flex; justify-content:center; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%; padding:4px 0;" id="word_canvas_container">
                     <!-- 由 initWordCanvas 动态创建 -->
                 </div>
                 <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
@@ -1465,7 +1465,12 @@
             // 复核列表：所有有手写数据的词（不依赖todayPlanIds，避免generateTodayPlan重建导致消失）
             reviewList() {
                 return this.words
-                    .filter(w => w.handwritingData && w.handwritingData.length > 0)
+                    .filter(w => {
+                        // 显式读取 ocrResult / reviewCorrected，确保 Vue 跟踪这些响应式依赖
+                        // 当 judgeAsCorrect / judgeAsWrong 修改这些属性时，computed 会被正确重算
+                        const _deps = w.ocrResult + '|' + w.reviewCorrected;
+                        return w.handwritingData && w.handwritingData.length > 0;
+                    })
                     .map(w => ({
                         word: w,
                         handwritingImages: w.handwritingData
@@ -2211,28 +2216,33 @@
                 const word = this.currentSessionWord;
                 if(!word) return;
                 this.traceMode = false;
-                // 创建两个田字格
+                // 创建田字格（根据屏幕宽度自适应大小）
                 const container = document.getElementById('word_canvas_container');
                 if(container) {
                     container.innerHTML = '';
                     const chars = word.word.split('');
+                    // 窄屏自适应：屏幕宽度 < 400px 用 140px 画布，否则用 180px
+                    const screenW = window.innerWidth || 375;
+                    const size = screenW < 400 ? 140 : 180;
+                    const half = size / 2;
                     chars.forEach((ch, idx) => {
                         const canvas = document.createElement('canvas');
                         canvas.id = 'tg_w' + idx;
-                        canvas.width = 180;
-                        canvas.height = 180;
+                        canvas.width = size;
+                        canvas.height = size;
                         canvas.className = 'canvas-tg';
-                        canvas.style.cssText = 'width:180px;height:180px;border:2px solid #fbc48d;border-radius:16px;background:#fffcf5;margin:0 6px;';
+                        // flex-shrink:0 防止 flex 布局压缩画布
+                        canvas.style.cssText = 'width:'+size+'px;height:'+size+'px;border:2px solid #fbc48d;border-radius:16px;background:#fffcf5;flex-shrink:0;';
                         container.appendChild(canvas);
                         const ctx = canvas.getContext('2d');
                         ctx.fillStyle = '#fffcf5';
-                        ctx.fillRect(0, 0, 180, 180);
+                        ctx.fillRect(0, 0, size, size);
                         ctx.strokeStyle = '#fbc48d';
                         ctx.lineWidth = 2;
-                        ctx.strokeRect(0, 0, 180, 180);
+                        ctx.strokeRect(0, 0, size, size);
                         ctx.beginPath();
-                        ctx.moveTo(90, 0); ctx.lineTo(90, 180); ctx.stroke();
-                        ctx.moveTo(0, 90); ctx.lineTo(180, 90); ctx.stroke();
+                        ctx.moveTo(half, 0); ctx.lineTo(half, size); ctx.stroke();
+                        ctx.moveTo(0, half); ctx.lineTo(size, half); ctx.stroke();
                         this.enableDrawing(canvas);
                     });
                 }
@@ -2244,20 +2254,21 @@
                 chars.forEach((ch, idx) => {
                     const canvas = document.getElementById('tg_w' + idx);
                     if(!canvas) return;
+                    const w = canvas.width, h = canvas.height;
                     const ctx = canvas.getContext('2d');
                     ctx.fillStyle = '#fffcf5';
-                    ctx.fillRect(0, 0, 180, 180);
+                    ctx.fillRect(0, 0, w, h);
                     ctx.strokeStyle = '#fbc48d';
                     ctx.lineWidth = 2;
-                    ctx.strokeRect(0, 0, 180, 180);
+                    ctx.strokeRect(0, 0, w, h);
                     ctx.beginPath();
-                    ctx.moveTo(90, 0); ctx.lineTo(90, 180); ctx.stroke();
-                    ctx.moveTo(0, 90); ctx.lineTo(180, 90); ctx.stroke();
+                    ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h); ctx.stroke();
+                    ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke();
                     ctx.fillStyle = 'rgba(249, 115, 22, 0.25)';
-                    ctx.font = "120px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
+                    ctx.font = (w*0.67)+"px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(ch, 90, 95);
+                    ctx.fillText(ch, w/2, h*0.53);
                     this.enableDrawing(canvas);
                 });
             },
