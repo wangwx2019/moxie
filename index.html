@@ -199,7 +199,7 @@
             <div v-if="todayPlanWords.length > 0" style="text-align:right; margin-bottom:4px;">
                 <span class="text-small" style="color:#aaa; cursor:pointer;" @click="cancelTodayPlan">取消今日计划（滚动词顺延）</span>
             </div>
-            <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession" :disabled="todayPlanWords.length === 0">✍️ 田字格手写默写</button>
+            <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession" :disabled="todayPlanWords.length === 0">✍️ 单字默写</button>
             <button class="cute-btn" style="width:100%; margin-top:8px; background:#fef3c7; color:#92400e; border:2px solid #fbbf24;" @click="startWordDictateSession">📝 词语听写{{ todayWordPlanWords.length > 0 ? '（' + todayWordPlanWords.length + ' 个词语）' : '（去选词）' }}</button>
         </div>
         <div class="card-white" @click="openWrongWordsView" style="cursor:pointer;">
@@ -260,7 +260,7 @@
                 <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @click="speakCurrentWord">🔊 重播</button>
             </div>
             <!-- 词语田字格：上一个 | 画布 | 下一个 -->
-            <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:24px; margin-bottom:16px;">
                 <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:56px; flex-shrink:0;"></div>
                 <div style="display:flex; justify-content:center;" id="word_canvas_container">
@@ -319,7 +319,7 @@
                 </div>
             </div>
             <!-- 写字的田字格canvas：上一个 | 田字格 | 下一个 -->
-            <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:24px; margin-bottom:16px;">
                 <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:56px; flex-shrink:0;"></div>
                 <div class="tian-ge-cell">
@@ -1820,18 +1820,68 @@
                 return word.pendingReview || word.isInReviewQueue === true;
             },
             cancelTodayPlan() {
-                this.showConfirm('清零今日计划', '确定清零今日计划吗？滚动词语将顺延至明天。', () => {
-                    const today = new Date();
-                    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-                    this.todayPlanWords.forEach(w => {
-                        const wordObj = this.words.find(t => t.id === w.id);
-                        if(wordObj) wordObj._planSkipDate = todayStr;
-                    });
-                    this.todayPlanWords = [];
-                    this.todayCompletedCount = 0;
-                    this.saveData();
-                    this.showAlert('已取消', '今日计划已清零，滚动词语已顺延至明天。');
-                });
+                this.showConfirm(
+                    '今日计划处理',
+                    '今日默写已完成，你想怎么处理？\n\n· 「延续到明日」今天没做完，明天继续今天的计划\n· 「清除计划」今天已做完，根据批改结果更新127状态',
+                    () => {
+                        // 延续到明日：今天没做完，设_planSkipDate让词明天再出现
+                        const today = new Date();
+                        const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                        this.todayPlanWords.forEach(w => {
+                            const wordObj = this.words.find(t => t.id === w.id);
+                            if(wordObj) wordObj._planSkipDate = todayStr;
+                        });
+                        this.todayPlanWords = [];
+                        this.todayCompletedCount = 0;
+                        this.saveData();
+                        this.showAlert('已延续', '今日计划已顺延至明天。');
+                    },
+                    () => {
+                        // 清除计划：根据ocrResult更新127状态，然后清空计划
+                        this.todayPlanWords.forEach(w => {
+                            const wordObj = this.words.find(t => t.id === w.id);
+                            if(wordObj && wordObj.ocrResult) {
+                                const currentWeek = this.getWeekNumber(new Date());
+                                if(wordObj.ocrResult === 'correct') {
+                                    // 今天批改正确：更新127状态
+                                    if(wordObj._127_day7Entry) {
+                                        // Day7池里对了 → 真正掌握
+                                        wordObj.status = 'mastered';
+                                        wordObj._127_day7Entry = null;
+                                        wordObj._127_rollingStreak = 0;
+                                        wordObj._127_randomCheckWeek = currentWeek;
+                                        wordObj.reviewDates = [];
+                                    } else if(wordObj.wrongCount > 0) {
+                                        // 滚动池里对了 → 累计连续正确
+                                        wordObj._127_rollingStreak = (wordObj._127_rollingStreak || 0) + 1;
+                                        if(wordObj._127_rollingStreak >= 3) {
+                                            // 连续对3次 → 升级到Day7
+                                            wordObj._127_day7Entry = new Date().toISOString().slice(0,10);
+                                            wordObj._127_rollingStreak = 0;
+                                            wordObj.reviewDates = [this.addDaysToDateStr(new Date().toISOString().slice(0,10), 7)];
+                                        } else {
+                                            this.generateReviewDates(wordObj);
+                                        }
+                                    }
+                                } else {
+                                    // 今天批改错误：重置滚动状态，进入滚动池
+                                    wordObj._127_rollingStreak = 0;
+                                    wordObj._127_day7Entry = null;
+                                    this.generateReviewDates(wordObj);
+                                }
+                                // 清除ocrResult
+                                wordObj.ocrResult = null;
+                            }
+                        });
+                        this.todayPlanWords = [];
+                        this.todayCompletedCount = 0;
+                        this.saveData();
+                        this.generateTodayPlan();
+                        this.showAlert('已清除', '今日计划已清空，127状态已更新。');
+                    },
+                    '📅 延续到明日',
+                    '🗑️ 清除计划'
+                );
             },
             generateTodayPlan() {
                 if(this.usingTextbookPlan) return;
@@ -3001,10 +3051,10 @@
                 );
                 
                 const doCommit = () => {
-                    // 清除今日计划中所有词的手写数据和OCR结果
+                    const today = new Date().toISOString().slice(0,10);
+                    // 清除复核UI状态，但保留ocrResult给"清除计划"使用
                     this.todayPlanWords.forEach(w => {
                         w.handwritingData = [];
-                        w.ocrResult = null;
                         // 清除所有pendingReview状态
                         w.pendingReview = false;
                         w.pendingReviewDate = null;
@@ -3013,13 +3063,15 @@
                         delete w._originalOcrResult;
                         delete w._originalWrongCount;
                         delete w._originalCorrectCount;
+                        // 标记今日已处理，避免generateTodayPlan重复加入
+                        w._planSkipDate = today;
                     });
                     // 重置 session 错字记录
                     this.sessionWrongWordIds = [];
                     this.saveData();
                     this.generateTodayPlan();
                     this.currentView='parentHome';
-                    this.showAlert('完成', '复核已处理。错字本已更新。');
+                    this.showAlert('完成', '复核已处理。请返回孩子端点击「清除计划」完成今日流程。');
                 };
                 
                 if(unreviewed.length > 0) {
