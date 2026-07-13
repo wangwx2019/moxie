@@ -255,25 +255,24 @@
         </div>
         <!-- 词语听写模式 -->
         <div class="dictate-main-card" v-if="sessionMode === 'word' && currentSessionWord">
-            <div style="text-align:center; margin-bottom:12px;">
-                <div style="font-size:2.8rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">{{ currentSessionWord.pinyin }}</div>
-                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @click="speakCurrentWord">🔊 重播</button>
+            <div style="text-align:center; margin-bottom:8px;">
+                <div style="font-size:2.4rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">{{ currentSessionWord.pinyin }}</div>
+                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:4px; padding:4px 12px; font-size:0.85rem;" @click="speakCurrentWord">🔊 重播</button>
             </div>
             <!-- 词语田字格：上一个 | 画布 | 下一个 -->
-            <div style="display:flex; align-items:center; justify-content:center; gap:24px; margin-bottom:16px;">
-                <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
-                <div v-else style="width:56px; flex-shrink:0;"></div>
-                <div style="display:flex; justify-content:center; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%; padding:4px 0;" id="word_canvas_container">
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px;">
+                <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:40px; height:40px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.1rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
+                <div v-else style="width:40px; flex-shrink:0;"></div>
+                <div style="display:flex; justify-content:center; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:calc(100% - 100px); padding:2px 0;" id="word_canvas_container">
                     <!-- 由 initWordCanvas 动态创建 -->
                 </div>
-                <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
+                <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:40px; height:40px; border-radius:50%; background:#f97316; border:none; font-size:1.1rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
-            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
-                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="handleDontKnow">😵 不会</button>
-                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="clearAllCanvas">🗑️ 清除</button>
+            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:6px;">
+                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem;" @click="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem;" @click="clearAllCanvas">🗑️ 清除</button>
             </div>
-            <div class="text-small">✏️ 看拼音，写出这个词语。◀ 上一个 · 下一个 ▶</div>
-            <div class="api-status">🤖 当前引擎: {{ lastOcrEngine || (useBaiduOCR ? '百度智能云' : '本地 Tesseract') }}{{ lastOcrEngine && lastOcrEngine !== (useBaiduOCR ? '百度智能云' : '本地 Tesseract') ? '（已回退）' : '' }}</div>
+            <div class="text-small" style="font-size:0.75rem;">✏️ 看拼音，写出这个词语。◀ 上一个 · 下一个 ▶</div>
         </div>
         <div class="dictate-main-card" v-else-if="currentSessionWord">
             <!-- 拼音大号居中 -->
@@ -2221,9 +2220,13 @@
                 if(container) {
                     container.innerHTML = '';
                     const chars = word.word.split('');
-                    // 窄屏自适应：屏幕宽度 < 400px 用 140px 画布，否则用 180px
+                    // 自适应：先创建临时不可见画布测量可用空间，再确定实际大小
                     const screenW = window.innerWidth || 375;
-                    const size = screenW < 400 ? 140 : 180;
+                    // 卡片margin(32) + 卡片padding(40) + 导航按钮(80) + 间距(16) ≈ 168
+                    const availableW = screenW - 170;
+                    const charCount = chars.length;
+                    const perCanvas = Math.floor((availableW - 8 * Math.max(0, charCount - 1)) / charCount);
+                    const size = Math.min(180, Math.max(90, perCanvas));
                     const half = size / 2;
                     chars.forEach((ch, idx) => {
                         const canvas = document.createElement('canvas');
