@@ -1822,9 +1822,12 @@
                 return word.pendingReview || word.isInReviewQueue === true;
             },
             cancelTodayPlan() {
+                // 检查今日计划是否已全部默写（handwritingData为空表示已提交）
+                const allDictated = this.todayPlanWords.length > 0 && this.todayPlanWords.every(w => !w.handwritingData || w.handwritingData.length === 0);
+                const statusText = allDictated ? '今日默写已完成' : '今日默写尚未完成';
                 this.showConfirm(
                     '今日计划处理',
-                    '今日默写已完成，你想怎么处理？\n\n· 「延续到明日」今天没做完，明天继续今天的计划\n· 「清除计划」今天已做完，根据批改结果更新127状态',
+                    `${statusText}，你想怎么处理？\n\n· 「延续到明日」今天没做完，明天继续今天的计划\n· 「清除计划」今天已做完，根据批改结果更新127状态`,
                     () => {
                         // 延续到明日：今天没做完，设_planSkipDate让词明天再出现
                         const today = new Date();
