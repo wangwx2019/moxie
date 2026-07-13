@@ -433,77 +433,146 @@
         
         <!-- 优化后的统计卡片：突出待复核 -->
         <div class="review-stats">
-            <div class="stat-card stat-pending" :class="{active: reviewFilter === 'pending'}" @click="reviewFilter='pending'">
+            <div class="stat-card stat-pending">
                 <div class="stat-number">{{ pendingReviewCount }}</div>
                 <div class="stat-label">⚠️ 待复核</div>
             </div>
-            <div class="stat-card stat-done" :class="{active: reviewFilter === 'done'}" @click="reviewFilter='done'">
-                <div class="stat-number">{{ reviewedCount }}</div>
-                <div class="stat-label">✅ 已复核</div>
+            <div class="stat-card stat-done">
+                <div class="stat-number">{{ reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length }}</div>
+                <div class="stat-label">✅ AI判对</div>
             </div>
-            <div class="stat-card" :class="{active: reviewFilter === 'all'}" @click="reviewFilter='all'">
-                <div class="stat-number">{{ reviewList.length }}</div>
-                <div class="stat-label">📝 今日总数</div>
+            <div class="stat-card">
+                <div class="stat-number">{{ reviewList.filter(i => i.word.reviewCorrected).length }}</div>
+                <div class="stat-label">👤 已判断</div>
             </div>
         </div>
 
         <div class="text-small" style="margin-bottom: 12px;">
             共 {{ reviewList.length }} 个词 · 待复核 {{ pendingReviewCount }} 个
-            <span style="margin-left:8px; color:#16a34a;">✅{{ reviewTotalCorrect }}</span>
-            <span style="margin-left:4px; color:#dc2626;">❌{{ reviewTotalWrong }}</span>
-            <span v-if="reviewFilter !== 'all'" class="date-badge" style="margin-left:8px;">筛选: {{ {pending:'待复核',done:'已复核',all:'全部'}[reviewFilter] }}</span>
+            <span style="margin-left:8px; color:#16a34a;">✅{{ reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length }}</span>
+            <span style="margin-left:4px; color:#3b82f6;">👤{{ reviewList.filter(i => i.word.reviewCorrected).length }}</span>
         </div>
         <div style="max-height: 60vh; overflow-y: auto;">
-            <div v-for="(item, idx) in filteredReviewList" :key="idx" 
-                 class="review-item-card"
-                 :class="{
-                     'status-pending': item.word.ocrResult === 'wrong' && !item.word.reviewCorrected,
-                     'status-confirmed': item.word.ocrResult === 'correct' && !item.word.reviewCorrected,
-                     'status-corrected': item.word.reviewCorrected
-                 }">
-                <!-- 第一行：状态图标 + 汉字 + 拼音 + 状态文字 -->
-                <div class="flex-between">
-                    <div>
-                        <span class="word-status-emoji">{{ item.word.ocrResult === 'correct' ? '✅' : '❌' }}</span>
-                        <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
-                        <span v-if="item.word.pendingReviewDate" class="date-badge">{{ relativeDateStr(item.word.pendingReviewDate) }}</span>
-                        <span class="text-small">({{ item.word.pinyin }})</span>
-                        <span v-if="item.word.reviewCorrected" class="text-small" style="color:#3b82f6; margin-left:4px;">（家长已判断）</span>
-                        <span v-else-if="item.word.ocrResult === 'correct'" class="text-small" style="color:#16a34a; margin-left:4px;">AI判对</span>
-                        <span v-else class="text-small" style="color:#dc2626; margin-left:4px;">AI判错</span>
+            <!-- 待复核区块：AI判错的词 -->
+            <div v-if="reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected).length > 0">
+                <div style="font-weight:bold; color:#dc2626; margin:8px 0;">⚠️ 待复核（AI判错 {{ reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected).length }} 个）</div>
+                <div v-for="(item, idx) in reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected)" :key="'w'+idx" 
+                     class="review-item-card status-pending">
+                    <!-- 第一行：状态图标 + 汉字 + 拼音 + 状态文字 -->
+                    <div class="flex-between">
+                        <div>
+                            <span class="word-status-emoji">❌</span>
+                            <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
+                            <span v-if="item.word.pendingReviewDate" class="date-badge">{{ relativeDateStr(item.word.pendingReviewDate) }}</span>
+                            <span class="text-small">({{ item.word.pinyin }})</span>
+                            <span class="text-small" style="color:#dc2626; margin-left:4px;">AI判错</span>
+                        </div>
                     </div>
-                </div>
-                <!-- 第二行：目标字对比 -->
-                <div class="review-compare">
-                    <div class="compare-item">
-                        <div class="compare-label">应该写</div>
-                        <div class="compare-char">{{ item.word.char || item.word.word }}</div>
-                        <div class="compare-pinyin">{{ item.word.pinyin }}</div>
+                    <!-- 第二行：目标字对比 -->
+                    <div class="review-compare">
+                        <div class="compare-item">
+                            <div class="compare-label">应该写</div>
+                            <div class="compare-char">{{ item.word.char || item.word.word }}</div>
+                            <div class="compare-pinyin">{{ item.word.pinyin }}</div>
+                        </div>
+                        <div class="compare-arrow">→</div>
+                        <div class="compare-item">
+                            <div class="compare-label">孩子写</div>
+                            <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
+                                 :src="item.handwritingImages[0]" 
+                                 class="compare-img" 
+                                 @click="showLargePreview(item.handwritingImages[0])" />
+                            <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
+                        </div>
                     </div>
-                    <div class="compare-arrow">→</div>
-                    <div class="compare-item">
-                        <div class="compare-label">孩子写</div>
-                        <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
-                             :src="item.handwritingImages[0]" 
-                             class="compare-img" 
-                             @click="showLargePreview(item.handwritingImages[0])" />
-                        <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
+                    <!-- 第三行：操作按钮 -->
+                    <div class="review-actions">
+                        <button v-if="item.word.reviewCorrected" 
+                                class="cute-btn-sm btn-undo-correct" @click="undoJudgment(item.word)">↩ 撤销我的判断</button>
+                        <template v-else>
+                            <button class="cute-btn-sm btn-correct" @click="judgeAsCorrect(item.word)">✓ 写对了</button>
+                            <button class="cute-btn-sm" style="background:#fee2e2; color:#991b1b;" @click="judgeAsWrong(item.word)">✗ 写错了</button>
+                        </template>
                     </div>
-                </div>
-                <!-- 第三行：操作按钮 - 家长直接判断对错 -->
-                <div class="review-actions">
-                    <!-- 已判断过的字，显示撤销按钮 -->
-                    <button v-if="item.word.reviewCorrected" 
-                            class="cute-btn-sm btn-undo-correct" @click="undoJudgment(item.word)">↩ 撤销我的判断</button>
-                    <!-- 未判断的字，显示判断按钮 -->
-                    <template v-else-if="item.word.ocrResult">
-                        <button class="cute-btn-sm btn-correct" @click="judgeAsCorrect(item.word)">✓ 写对了</button>
-                        <button class="cute-btn-sm" style="background:#fee2e2; color:#991b1b;" @click="judgeAsWrong(item.word)">✗ 写错了</button>
-                    </template>
                 </div>
             </div>
-            <div v-if="filteredReviewList.length === 0" class="card-white">📅 今日无默写计划</div>
-            <div v-else-if="reviewList.length > 0 && filteredReviewList.length === 0" class="card-white">当前筛选项没有匹配的词</div>
+
+            <!-- AI判对区块：AI判对的词 -->
+            <div v-if="reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length > 0">
+                <div style="font-weight:bold; color:#16a34a; margin:12px 0 8px;">✅ AI判对（{{ reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length }} 个，确认无误可直接提交）</div>
+                <div v-for="(item, idx) in reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected)" :key="'c'+idx" 
+                     class="review-item-card status-confirmed">
+                    <div class="flex-between">
+                        <div>
+                            <span class="word-status-emoji">✅</span>
+                            <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
+                            <span class="text-small">({{ item.word.pinyin }})</span>
+                            <span class="text-small" style="color:#16a34a; margin-left:4px;">AI判对</span>
+                        </div>
+                    </div>
+                    <div class="review-compare">
+                        <div class="compare-item">
+                            <div class="compare-label">应该写</div>
+                            <div class="compare-char">{{ item.word.char || item.word.word }}</div>
+                            <div class="compare-pinyin">{{ item.word.pinyin }}</div>
+                        </div>
+                        <div class="compare-arrow">→</div>
+                        <div class="compare-item">
+                            <div class="compare-label">孩子写</div>
+                            <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
+                                 :src="item.handwritingImages[0]" 
+                                 class="compare-img" 
+                                 @click="showLargePreview(item.handwritingImages[0])" />
+                            <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
+                        </div>
+                    </div>
+                    <div class="review-actions">
+                        <button v-if="item.word.reviewCorrected" 
+                                class="cute-btn-sm btn-undo-correct" @click="undoJudgment(item.word)">↩ 撤销我的判断</button>
+                        <template v-else>
+                            <button class="cute-btn-sm btn-correct" @click="judgeAsCorrect(item.word)">✓ 写对了</button>
+                            <button class="cute-btn-sm" style="background:#fee2e2; color:#991b1b;" @click="judgeAsWrong(item.word)">✗ 写错了</button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 家长已判断的词 -->
+            <div v-if="reviewList.filter(i => i.word.reviewCorrected).length > 0">
+                <div style="font-weight:bold; color:#3b82f6; margin:12px 0 8px;">👤 家长已判断（{{ reviewList.filter(i => i.word.reviewCorrected).length }} 个）</div>
+                <div v-for="(item, idx) in reviewList.filter(i => i.word.reviewCorrected)" :key="'r'+idx" 
+                     class="review-item-card status-corrected">
+                    <div class="flex-between">
+                        <div>
+                            <span class="word-status-emoji">{{ item.word.ocrResult === 'correct' ? '✅' : '❌' }}</span>
+                            <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
+                            <span class="text-small">({{ item.word.pinyin }})</span>
+                            <span class="text-small" style="color:#3b82f6; margin-left:4px;">家长已判断</span>
+                        </div>
+                    </div>
+                    <div class="review-compare">
+                        <div class="compare-item">
+                            <div class="compare-label">应该写</div>
+                            <div class="compare-char">{{ item.word.char || item.word.word }}</div>
+                            <div class="compare-pinyin">{{ item.word.pinyin }}</div>
+                        </div>
+                        <div class="compare-arrow">→</div>
+                        <div class="compare-item">
+                            <div class="compare-label">孩子写</div>
+                            <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
+                                 :src="item.handwritingImages[0]" 
+                                 class="compare-img" 
+                                 @click="showLargePreview(item.handwritingImages[0])" />
+                            <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
+                        </div>
+                    </div>
+                    <div class="review-actions">
+                        <button class="cute-btn-sm btn-undo-correct" @click="undoJudgment(item.word)">↩ 撤销我的判断</button>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="reviewList.length === 0" class="card-white">📅 今日无默写数据</div>
         </div>
         <button class="cute-btn primary" style="margin-top: 20px;" @click="commitParentReview">✅ 确认提交</button>
     </div>
@@ -1325,7 +1394,7 @@
                 parentPassword: '8899',
                 wordBankFilter: 'all',
                 wordBankSelected: [],
-                reviewFilter: 'pending', // 默认显示待复核
+                reviewFilter: 'all', // 默认显示全部（AI错+AI对）
                 largePreviewVisible: false,
                 largePreviewSrc: '',
                 wrongWordsFilter: 'all',
@@ -1393,11 +1462,10 @@
             // 今日正确词数 / 错误词数（按词统计，不是按次数）
             reviewTotalCorrect() { return this.todayPlanWords.filter(w => w.wrongCount === 0).length; },
             reviewTotalWrong() { return this.todayPlanWords.filter(w => w.wrongCount > 0).length; },
-            // 复核列表：从今日计划中取有手写数据的词
+            // 复核列表：所有有手写数据的词（不依赖todayPlanIds，避免generateTodayPlan重建导致消失）
             reviewList() {
-                const todayPlanIds = new Set(this.todayPlanWords.map(w => w.id));
                 return this.words
-                    .filter(w => todayPlanIds.has(w.id) && w.handwritingData && w.handwritingData.length > 0)
+                    .filter(w => w.handwritingData && w.handwritingData.length > 0)
                     .map(w => ({
                         word: w,
                         handwritingImages: w.handwritingData
@@ -1994,7 +2062,6 @@
                     this.generateReviewDates(wordObj);
                 }
                 this.saveData();
-                this.generateTodayPlan();
                 this.$forceUpdate();
             },
             // 家长判断字写错了（覆盖AI判断）
@@ -2018,7 +2085,6 @@
                 wordObj.status = 'learning';
                 this.generateReviewDates(wordObj);
                 this.saveData();
-                this.generateTodayPlan();
                 this.$forceUpdate();
             },
             // 撤销家长判断（恢复到AI原始判断）
@@ -2042,7 +2108,6 @@
                 }
                 this.generateReviewDates(wordObj);
                 this.saveData();
-                this.generateTodayPlan();
                 this.$forceUpdate();
             },
             startHandwriteSession() {
