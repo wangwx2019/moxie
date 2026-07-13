@@ -3242,18 +3242,32 @@
             openAddWizard(){ this.wizardStep=1; this.rawWordsInput=''; this.pendingWords=[]; this.currentView='addWizard'; },
             parseToStep2(){ let raw=this.rawWordsInput.trim(); if(!raw) { this.showAlert('提示', '请输入词语'); return; } let arr=raw.split(/[ ,，、\s]+/).filter(w=>w); this.pendingWords=arr.map(w=>({ word:w, pinyin:toPinyinWithTone(w), example:'' })); this.wizardStep=2; },
             confirmAddWords(){
-                let added=0, exists=[];
+                let added=0, exists=0, reset=0;
+                const today = new Date().toISOString().slice(0,10);
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
                         this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
                         added++;
-                    } else exists.push(it.word);
+                    } else {
+                        exists++;
+                        // 已存在的词语：重置跳过状态和OCR结果，确保能重新进入今日计划
+                        const w = this.words.find(x => x.word === it.word);
+                        if(w && w.isWord) {
+                            if(w._planSkipDate === today) { w._planSkipDate = ''; reset++; }
+                            if(w.ocrResult) { w.ocrResult = ''; reset++; }
+                        }
+                    }
                 }
+                this.saveData();
+                this.generateTodayPlan();
                 if(added){
-                    this.saveData(); this.generateTodayPlan();
-                    this.showAlert('成功', `成功添加 ${added} 个词语`);
-                    this.currentView='parentHome';
-                } else this.showAlert('提示', '所有词语都已存在');
+                    this.showAlert('成功', `成功添加 ${added} 个词语${reset ? '，'+reset+' 个已重置状态' : ''}`);
+                } else if(exists) {
+                    this.showAlert('已添加', `${exists} 个词语已存在并重置为可练习状态，今日计划已更新`);
+                } else {
+                    this.showAlert('提示', '没有输入词语');
+                }
+                this.currentView='parentHome';
             },
             openSettingsView(){ this.currentView='settingsView'; },
             changePassword(){
@@ -3821,10 +3835,18 @@
                         seen.add(item.word);
                         return true;
                     });
-                    let added = 0, exists = 0;
+                    let added = 0, exists = 0, reset = 0;
+                    const today = new Date().toISOString().slice(0,10);
                     for(let item of selectedWords) {
                         const wordId = 'yw_' + item.unitName + '_' + item.lesson.name + '_' + item.word;
-                        if(this.words.some(w => w.id === wordId)) { exists++; continue; }
+                        const existingWord = this.words.find(w => w.id === wordId);
+                        if(existingWord) {
+                            exists++;
+                            // 已存在的词语：重置跳过状态和OCR结果，确保能重新进入今日计划
+                            if(existingWord._planSkipDate === today) { existingWord._planSkipDate = ''; reset++; }
+                            if(existingWord.ocrResult) { existingWord.ocrResult = ''; reset++; }
+                            continue;
+                        }
                         const wordPinyin = toPinyinForWord(item.word);
                         this.words.push({
                             id: wordId,
@@ -3849,7 +3871,7 @@
                     }
                     this.saveData();
                     this.generateTodayPlan();
-                    this.showAlert('成功', `已添加 ${added} 个词语${exists ? '，'+exists+' 个已存在已跳过' : ''}`);
+                    this.showAlert('成功', `已添加 ${added} 个词语${exists ? '，'+exists+' 个已存在' : ''}${reset ? '，'+reset+' 个已重置状态' : ''}`);
                     this.currentView = 'parentHome';
                     return;
                 }
