@@ -27,7 +27,8 @@
         [v-cloak] { display: none !important; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #fef5e8; padding: 16px; font-family: system-ui, 'Segoe UI', 'Quicksand', 'PingFang SC', sans-serif; }
-        #app { margin: 0 auto; background: white; border-radius: 48px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); overflow: hidden; width: 100%; max-width: 1000px; }
+        #app { margin: 0 auto; background: white; border-radius: 48px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); overflow: hidden; width: 100%; max-width: 1000px; -webkit-user-select: none; user-select: none; }
+        #app * { -webkit-user-select: none; user-select: none; }
         @media (min-width: 768px) { body { padding: 24px; } #app { max-width: 1100px; } .canvas-tg { width: 240px; height: 240px; } }
         .app-header { padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; background: #fffaef; border-bottom: 3px solid #ffd9b5; }
         .logo { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, #f59e0b, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -244,7 +245,7 @@
 
     <!-- 手写默写界面 -->
     <div v-if="currentView === 'dictateView'" class="dictate-session">
-        <div style="padding: 12px 16px 0;"><div class="nav-back" @click="abortDictate">🐣 返回首页</div></div>
+        <div style="padding: 12px 16px 0;"><div class="nav-back" @click="confirmAbortDictate">🐣 返回首页</div></div>
         <!-- 默写模式头部统计 -->
         <div class="dictate-header-stats">
             <span>📝 {{ sessionCorrectCount }}/{{ sessionTotalCount }}</span>
@@ -435,41 +436,41 @@
         
         <!-- 优化后的统计卡片：突出待复核 -->
         <div class="review-stats">
-            <div class="stat-card stat-pending">
+            <div class="stat-card stat-pending" :style="reviewFilter==='pending'?'border:2px solid #dc2626;':'cursor:pointer;'" @click="reviewFilter=reviewFilter==='pending'?'all':'pending'">
                 <div class="stat-number">{{ pendingReviewCount }}</div>
                 <div class="stat-label">⚠️ 待复核</div>
             </div>
-            <div class="stat-card stat-done">
-                <div class="stat-number">{{ reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length }}</div>
+            <div class="stat-card stat-done" :style="reviewFilter==='aiCorrect'?'border:2px solid #16a34a;':'cursor:pointer;'" @click="reviewFilter=reviewFilter==='aiCorrect'?'all':'aiCorrect'">
+                <div class="stat-number">{{ aiCorrectCount }}</div>
                 <div class="stat-label">✅ AI判对</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ reviewList.filter(i => i.word.reviewCorrected).length }}</div>
+            <div class="stat-card" :style="reviewFilter==='done'?'border:2px solid #3b82f6;':'cursor:pointer;'" @click="reviewFilter=reviewFilter==='done'?'all':'done'">
+                <div class="stat-number">{{ reviewedCount }}</div>
                 <div class="stat-label">👤 已判断</div>
             </div>
         </div>
 
         <div class="text-small" style="margin-bottom: 12px;">
-            共 {{ reviewList.length }} 个词 · 待复核 {{ pendingReviewCount }} 个
-            <span style="margin-left:8px; color:#16a34a;">✅{{ reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length }}</span>
-            <span style="margin-left:4px; color:#3b82f6;">👤{{ reviewList.filter(i => i.word.reviewCorrected).length }}</span>
+            共 {{ reviewList.length }} 个词
+            <span v-if="reviewFilter!=='all'" style="margin-left:8px; color:#6b7280;">当前筛选：{{ reviewFilter==='pending'?'待复核':reviewFilter==='aiCorrect'?'AI判对':'已判断' }}，点击卡片取消筛选</span>
         </div>
         <div style="max-height: 60vh; overflow-y: auto;">
             <!-- 待复核区块：AI判错的词 -->
-            <div v-if="reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected).length > 0">
-                <div style="font-weight:bold; color:#dc2626; margin:8px 0;">⚠️ 待复核（AI判错 {{ reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected).length }} 个）</div>
-                <div v-for="(item, idx) in reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected)" :key="'w'+idx" 
-                     class="review-item-card status-pending">
-                    <!-- 第一行：状态图标 + 汉字 + 拼音 + 状态文字 -->
-                    <div class="flex-between">
-                        <div>
-                            <span class="word-status-emoji">❌</span>
-                            <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
-                            <span v-if="item.word.pendingReviewDate" class="date-badge">{{ relativeDateStr(item.word.pendingReviewDate) }}</span>
-                            <span class="text-small">({{ item.word.pinyin }})</span>
-                            <span class="text-small" style="color:#dc2626; margin-left:4px;">AI判错</span>
+            <div v-if="reviewFilter==='all' || reviewFilter==='pending'">
+                <div v-if="reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected).length > 0">
+                    <div style="font-weight:bold; color:#dc2626; margin:8px 0;">⚠️ 待复核（AI判错 {{ reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected).length }} 个）</div>
+                    <div v-for="(item, idx) in reviewList.filter(i => i.word.ocrResult === 'wrong' && !i.word.reviewCorrected)" :key="'w'+idx" 
+                         class="review-item-card status-pending">
+                        <!-- 第一行：状态图标 + 汉字 + 拼音 + 状态文字 -->
+                        <div class="flex-between">
+                            <div>
+                                <span class="word-status-emoji">❌</span>
+                                <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
+                                <span v-if="item.word.pendingReviewDate" class="date-badge">{{ relativeDateStr(item.word.pendingReviewDate) }}</span>
+                                <span class="text-small">({{ item.word.pinyin }})</span>
+                                <span class="text-small" style="color:#dc2626; margin-left:4px;">AI判错</span>
+                            </div>
                         </div>
-                    </div>
                     <!-- 第二行：目标字对比 -->
                     <div class="review-compare">
                         <div class="compare-item">
@@ -480,10 +481,13 @@
                         <div class="compare-arrow">→</div>
                         <div class="compare-item">
                             <div class="compare-label">孩子写</div>
-                            <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
-                                 :src="item.handwritingImages[0]" 
-                                 class="compare-img" 
-                                 @click="showLargePreview(item.handwritingImages[0])" />
+                            <div v-if="item.handwritingImages && item.handwritingImages.length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+                                <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
+                                     :src="img" 
+                                     class="compare-img" 
+                                     style="width:60px; height:60px;"
+                                     @click="showLargePreview(img)" />
+                            </div>
                             <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
                         </div>
                     </div>
@@ -497,10 +501,12 @@
                         </template>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- AI判对区块：AI判对的词 -->
-            <div v-if="reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length > 0">
+            <div v-if="reviewFilter==='all' || reviewFilter==='aiCorrect'">
+                <div v-if="reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length > 0">
                 <div style="font-weight:bold; color:#16a34a; margin:12px 0 8px;">✅ AI判对（{{ reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected).length }} 个，确认无误可直接提交）</div>
                 <div v-for="(item, idx) in reviewList.filter(i => i.word.ocrResult === 'correct' && !i.word.reviewCorrected)" :key="'c'+idx" 
                      class="review-item-card status-confirmed">
@@ -521,10 +527,13 @@
                         <div class="compare-arrow">→</div>
                         <div class="compare-item">
                             <div class="compare-label">孩子写</div>
-                            <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
-                                 :src="item.handwritingImages[0]" 
-                                 class="compare-img" 
-                                 @click="showLargePreview(item.handwritingImages[0])" />
+                            <div v-if="item.handwritingImages && item.handwritingImages.length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+                                <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
+                                     :src="img" 
+                                     class="compare-img" 
+                                     style="width:60px; height:60px;"
+                                     @click="showLargePreview(img)" />
+                            </div>
                             <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
                         </div>
                     </div>
@@ -537,39 +546,45 @@
                         </template>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- 家长已判断的词 -->
-            <div v-if="reviewList.filter(i => i.word.reviewCorrected).length > 0">
-                <div style="font-weight:bold; color:#3b82f6; margin:12px 0 8px;">👤 家长已判断（{{ reviewList.filter(i => i.word.reviewCorrected).length }} 个）</div>
-                <div v-for="(item, idx) in reviewList.filter(i => i.word.reviewCorrected)" :key="'r'+idx" 
-                     class="review-item-card status-corrected">
-                    <div class="flex-between">
-                        <div>
-                            <span class="word-status-emoji">{{ item.word.ocrResult === 'correct' ? '✅' : '❌' }}</span>
-                            <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
-                            <span class="text-small">({{ item.word.pinyin }})</span>
-                            <span class="text-small" style="color:#3b82f6; margin-left:4px;">家长已判断</span>
+            <div v-if="reviewFilter==='all' || reviewFilter==='done'">
+                <div v-if="reviewList.filter(i => i.word.reviewCorrected).length > 0">
+                    <div style="font-weight:bold; color:#3b82f6; margin:12px 0 8px;">👤 家长已判断（{{ reviewList.filter(i => i.word.reviewCorrected).length }} 个）</div>
+                    <div v-for="(item, idx) in reviewList.filter(i => i.word.reviewCorrected)" :key="'r'+idx" 
+                         class="review-item-card status-corrected">
+                        <div class="flex-between">
+                            <div>
+                                <span class="word-status-emoji">{{ item.word.ocrResult === 'correct' ? '✅' : '❌' }}</span>
+                                <strong style="font-size:1.1rem;">{{ item.word.word }}</strong>
+                                <span class="text-small">({{ item.word.pinyin }})</span>
+                                <span class="text-small" style="color:#3b82f6; margin-left:4px;">家长已判断</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="review-compare">
-                        <div class="compare-item">
-                            <div class="compare-label">应该写</div>
-                            <div class="compare-char">{{ item.word.char || item.word.word }}</div>
-                            <div class="compare-pinyin">{{ item.word.pinyin }}</div>
+                        <div class="review-compare">
+                            <div class="compare-item">
+                                <div class="compare-label">应该写</div>
+                                <div class="compare-char">{{ item.word.char || item.word.word }}</div>
+                                <div class="compare-pinyin">{{ item.word.pinyin }}</div>
+                            </div>
+                            <div class="compare-arrow">→</div>
+                            <div class="compare-item">
+                                <div class="compare-label">孩子写</div>
+                                <div v-if="item.handwritingImages && item.handwritingImages.length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+                                    <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
+                                         :src="img" 
+                                         class="compare-img" 
+                                         style="width:60px; height:60px;"
+                                         @click="showLargePreview(img)" />
+                                </div>
+                                <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
+                            </div>
                         </div>
-                        <div class="compare-arrow">→</div>
-                        <div class="compare-item">
-                            <div class="compare-label">孩子写</div>
-                            <img v-if="item.handwritingImages && item.handwritingImages.length > 0" 
-                                 :src="item.handwritingImages[0]" 
-                                 class="compare-img" 
-                                 @click="showLargePreview(item.handwritingImages[0])" />
-                            <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
+                        <div class="review-actions">
+                            <button class="cute-btn-sm btn-undo-correct" @click="undoJudgment(item.word)">↩ 撤销我的判断</button>
                         </div>
-                    </div>
-                    <div class="review-actions">
-                        <button class="cute-btn-sm btn-undo-correct" @click="undoJudgment(item.word)">↩ 撤销我的判断</button>
                     </div>
                 </div>
             </div>
@@ -1435,6 +1450,8 @@
                 expandedLessons: [],
                 // 词语听写模式
                 sessionMode: 'dictate',
+                _saveTimer: null,
+                _isProcessingSubmit: false,
                 sessionWrongRetryQueue: [],
                 sessionRetryCount: {},
                 // TTS 语音选择
@@ -1488,6 +1505,11 @@
                     list = list.filter(item => 
                         item.word.ocrResult === 'wrong' && !item.word.reviewCorrected
                     );
+                } else if(this.reviewFilter === 'aiCorrect') {
+                    // AI判对：AI认为正确，家长还没判断
+                    list = list.filter(item => 
+                        item.word.ocrResult === 'correct' && !item.word.reviewCorrected
+                    );
                 } else if(this.reviewFilter === 'done') {
                     // 已复核：家长已经判断过（无论判对还是判错）
                     list = list.filter(item => item.word.reviewCorrected);
@@ -1507,6 +1529,12 @@
             // 已复核数量（家长已判断）
             reviewedCount() {
                 return this.reviewList.filter(item => item.word.reviewCorrected).length;
+            },
+            // AI判对数量
+            aiCorrectCount() {
+                return this.reviewList.filter(item => 
+                    item.word.ocrResult === 'correct' && !item.word.reviewCorrected
+                ).length;
             },
             // 待复核数量（AI判错，家长还没判断）
             pendingReviewCount() {
@@ -1774,9 +1802,22 @@
                 }
                 if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
                 this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w._planSkipDate === undefined) w._planSkipDate = null; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
-                this.saveData(); 
+                this.saveDataImmediate(); 
             },
             saveData() {
+                // 防抖：300ms 内多次调用只执行最后一次，避免默写时频繁全量序列化
+                if(this._saveTimer) clearTimeout(this._saveTimer);
+                this._saveTimer = setTimeout(() => {
+                    this._saveTimer = null;
+                    this._doSave();
+                }, 300);
+            },
+            saveDataImmediate() {
+                // 立即保存（关键节点：AI批改、复核提交、清除计划等）
+                if(this._saveTimer) { clearTimeout(this._saveTimer); this._saveTimer = null; }
+                this._doSave();
+            },
+            _doSave() {
                 let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: this.todayPlanWords.map(w => w.id), todayPlanDate: this.todayPlanDate || '' };
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
@@ -1916,7 +1957,7 @@
                         this.todayPlanDate = '';
                         this.todayPlanWordIds = [];
                         this.todayCompletedCount = 0;
-                        this.saveData();
+                        this.saveDataImmediate();
                         this.showAlert('已延续', '今日计划已顺延至明天。');
                     },
                     () => {
@@ -1960,7 +2001,7 @@
                         this.todayPlanDate = '';
                         this.todayPlanWordIds = [];
                         this.todayCompletedCount = 0;
-                        this.saveData();
+                        this.saveDataImmediate();
                         this.generateTodayPlan();
                         this.showAlert('已清除', '今日计划已清空，127状态已更新。');
                     },
@@ -1973,13 +2014,22 @@
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
 
-                // 自动检测：如果今日计划已同步（todayPlanDate === today），
-                // 对已提交的词（handwritingData为空）设置 _planSkipDate，避免重复
+                // 如果今日计划已存在（todayPlanDate === today），直接从 todayPlanWordIds 恢复
+                // 避免重建时过滤掉已批改的词（ocrResult非空的词会被排除）
                 if(this.todayPlanDate === today && this.todayPlanWordIds && this.todayPlanWordIds.length) {
+                    const restored = this.todayPlanWordIds.map(id => this.words.find(w => w.id === id)).filter(Boolean);
+                    if(restored.length > 0) {
+                        this.todayPlanWords = restored;
+                        return; // 直接恢复，不重建
+                    }
+                }
+
+                // 新的一天或无计划：重新生成
+                // 对已提交的词（handwritingData为空）设置 _planSkipDate，避免重复
+                if(this.todayPlanDate && this.todayPlanDate !== today && this.todayPlanWordIds && this.todayPlanWordIds.length) {
                     this.todayPlanWordIds.forEach(id => {
                         const w = this.words.find(t => t.id === id);
                         if(w && !w._planSkipDate && (!w.handwritingData || w.handwritingData.length === 0)) {
-                            // 词在今日计划中且已提交（handwritingData为空），标记跳过
                             w._planSkipDate = today;
                         }
                     });
@@ -2145,10 +2195,18 @@
                 this.sessionBatchSubmitted = false;
                 this.sessionWrongWordIds = [];
                 this.sessionWrongRetryQueue = [];
+                this._isProcessingSubmit = false;
                 this.sessionRetryCount = {};
                 if(this.timerInterval) clearInterval(this.timerInterval);
                 this.timerInterval = setInterval(() => { if(!this.sessionFinished) this.sessionTimerSeconds++; }, 1000);
                 this.currentView = 'dictateView';
+                // 防止浏览器后退按钮退出默写
+                history.pushState({ dictate: true }, '');
+                this._dictatePopstateHandler = (e) => {
+                    history.pushState({ dictate: true }, '');
+                    this.showAlert('提示', '请使用页面上的返回按钮退出默写');
+                };
+                window.addEventListener('popstate', this._dictatePopstateHandler);
                 this.$nextTick(() => {
                     if(this.sessionMode === 'word') { this.initWordCanvas(); }
                     else { this.initCanvasForCurrent(); }
@@ -2470,6 +2528,9 @@
                 ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
                 let drawing = false;
                 let lastX, lastY, prevX, prevY;
+                let cachedRect = null; // 缓存 rect，避免每次 touchmove 都 reflow
+                let rafPending = false;
+                let pendingEvent = null;
                 const getCoord = (e, rect) => {
                     let clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     let clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -2477,28 +2538,39 @@
                     let y = (clientY - rect.top) * canvas.height / rect.height;
                     return {x,y};
                 };
-                const start = (e) => {
-                    e.preventDefault();
-                    if(this.eraserActive) { this.clearCanvasCell(canvas.id); return; }
-                    drawing=true;
-                    let rect=canvas.getBoundingClientRect();
-                    let {x,y}=getCoord(e, rect);
-                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-                    ctx.beginPath(); ctx.moveTo(x,y);
-                    lastX=prevX=x; lastY=prevY=y;
-                };
-                const draw = (e) => {
-                    if(!drawing) return; e.preventDefault();
-                    let rect=canvas.getBoundingClientRect();
-                    let {x,y}=getCoord(e, rect);
+                const doDraw = (e) => {
+                    rafPending = false;
+                    if(!drawing) return;
+                    // 使用缓存的 rect，不在 draw 时触发 reflow
+                    let {x,y}=getCoord(e, cachedRect);
                     let midX=(prevX+x)/2, midY=(prevY+y)/2;
                     ctx.quadraticCurveTo(prevX, prevY, midX, midY);
                     ctx.stroke();
                     ctx.beginPath(); ctx.moveTo(midX, midY);
                     prevX=x; prevY=y;
                 };
-                const end = () => { drawing=false; };
-                const leave = () => { drawing=false; };
+                const start = (e) => {
+                    e.preventDefault();
+                    if(this.eraserActive) { this.clearCanvasCell(canvas.id); return; }
+                    drawing=true;
+                    // 只在 touchstart 时获取一次 rect，缓存起来复用
+                    cachedRect = canvas.getBoundingClientRect();
+                    let {x,y}=getCoord(e, cachedRect);
+                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                    ctx.beginPath(); ctx.moveTo(x,y);
+                    lastX=prevX=x; lastY=prevY=y;
+                };
+                const draw = (e) => {
+                    if(!drawing) return; e.preventDefault();
+                    // 用 requestAnimationFrame 节流：多次触摸事件合并到下一帧
+                    pendingEvent = e;
+                    if(!rafPending) {
+                        rafPending = true;
+                        requestAnimationFrame(() => doDraw(pendingEvent));
+                    }
+                };
+                const end = () => { drawing=false; cachedRect=null; };
+                const leave = () => { drawing=false; cachedRect=null; };
                 canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); canvas.addEventListener('touchend', end, { passive: false });
                 canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', leave);
                 canvas._tgHandlers = { start, draw, end, leave };
@@ -2598,6 +2670,7 @@
             // 返回上一个字：恢复画布，保留之前的书写内容
             goToPrevWord() {
                 if(this.sessionCanvasData.length === 0) return;
+                this._isProcessingSubmit = false; // 重置提交锁
                 const prev = this.sessionCanvasData.pop();
                 if(!prev) return;
                 console.log('goToPrevWord:', { sessionMode: this.sessionMode, sessionCurrentIdx: this.sessionCurrentIdx, listLen: this.sessionTaskList.length, prev });
@@ -2651,7 +2724,58 @@
                 });
             },
             async recognizeAndSubmit() {
-                console.log('[退出诊断] recognizeAndSubmit被调用, idx:', this.sessionCurrentIdx, 'listLen:', this.sessionTaskList.length, 'mode:', this.sessionMode);
+                // 防抖：防止孩子快速连续点击"下一个"导致跳格
+                if(this._isProcessingSubmit) return;
+                this._isProcessingSubmit = true;
+                try {
+                    console.log('[退出诊断] recognizeAndSubmit被调用, idx:', this.sessionCurrentIdx, 'listLen:', this.sessionTaskList.length, 'mode:', this.sessionMode);
+                    const cur = this.currentSessionWord;
+                    if(!cur) { this._isProcessingSubmit = false; return; }
+                    // 空画布检测：如果田字格还未书写，弹窗提示是否跳过
+                    const isEmpty = this._isCurrentCanvasEmpty();
+                    if(isEmpty) {
+                        this._isProcessingSubmit = false;
+                        this.showConfirm('本页还未完成默写', '当前田字格还没有写字，确定要跳过吗？', () => {
+                            this._doRecognizeAndSubmit();
+                        });
+                        return;
+                    }
+                    await this._doRecognizeAndSubmit();
+                } finally {
+                    this._isProcessingSubmit = false;
+                }
+            },
+            _isCurrentCanvasEmpty() {
+                // 检测当前画布是否有任何笔画（非背景色像素）
+                try {
+                    if(this.sessionMode === 'word') {
+                        const chars = this.currentSessionWord.word.split('');
+                        for(let i = 0; i < chars.length; i++) {
+                            const canvas = document.getElementById('tg_w' + i);
+                            if(canvas && this._canvasHasInk(canvas)) return false;
+                        }
+                        return true;
+                    } else {
+                        const canvas = document.getElementById('tg_c');
+                        return canvas ? !this._canvasHasInk(canvas) : true;
+                    }
+                } catch(e) { return false; }
+            },
+            _canvasHasInk(canvas) {
+                // 扫描画布像素，检测是否有非背景色(#fffcf5)的笔画
+                try {
+                    const ctx = canvas.getContext('2d');
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const d = imgData.data;
+                    // 背景色 #fffcf5 = rgb(255,252,245)，允许少量偏差
+                    for(let i = 0; i < d.length; i += 16) { // 每4像素采样一次，提速
+                        const r = d[i], g = d[i+1], b = d[i+2];
+                        if(r < 250 || g < 245 || b < 235) return true; // 非背景色
+                    }
+                    return false;
+                } catch(e) { return false; }
+            },
+            async _doRecognizeAndSubmit() {
                 try {
                     const cur = this.currentSessionWord;
                     if(!cur) return;
@@ -2664,7 +2788,7 @@
                             dataURLs.push(canvas ? canvas.toDataURL() : '');
                         }
                         const wordObj = this.words.find(w => w.id === cur.id);
-                        if(wordObj) wordObj.handwritingData = dataURLs;
+                        // handwritingData 不在此处设置，由 batchSubmitAll 在AI批改时统一设置
                         this.sessionCanvasData.push({
                             charId: cur.id,
                             char: cur.word,
@@ -2674,8 +2798,7 @@
                             canvasDataURL: dataURLs.join('|||')
                         });
                         this.totalDictateTimes++;
-                        this.todayCompletedCount++;
-                        this.saveData();
+                        // todayCompletedCount 不在此处++，由 batchSubmitAll 在AI批改时统一计数
                         // 检查是否需要重试
                         const retryCount = this.sessionRetryCount[cur.id] || 0;
                         if(this.traceMode && retryCount < 3) {
@@ -2701,8 +2824,7 @@
                     // 单字模式
                     const canvas = document.getElementById('tg_c');
                     const dataURL = canvas ? canvas.toDataURL() : '';
-                    const wordObj = this.words.find(w=>w.id===cur.id);
-                    if(wordObj && canvas) wordObj.handwritingData = [dataURL];
+                    // handwritingData 不在此处设置，由 batchSubmitAll 在AI批改时统一设置
                     this.sessionCanvasData.push({
                         charId: cur.id,
                         char: cur.word,
@@ -2712,8 +2834,7 @@
                         canvasDataURL: dataURL
                     });
                     this.totalDictateTimes++;
-                    this.todayCompletedCount++;
-                    this.saveData();
+                    // todayCompletedCount 不在此处++，由 batchSubmitAll 在AI批改时统一计数
                     this.traceMode = false;
                     if(this.sessionCharHadTrace && this.sessionCurrentWordIdx < 2) {
                         this.sessionCurrentWordIdx++;
@@ -2928,7 +3049,7 @@
                 }
                 this.ocrBusy = false;
                 this.sessionBatchSubmitted = true;
-                this.saveData();
+                this.saveDataImmediate(); // AI批改完成后立即保存，确保数据持久化
             },
             // ---- 错字复习批量 AI 批改（每词3遍） ----
             // wrong review session removed
@@ -3118,8 +3239,18 @@
                 const elem = document.getElementById('stroke_order_container');
                 if(elem) elem.innerHTML = '';
             },
+            confirmAbortDictate() {
+                if(this.sessionTaskList.length > 0 && !this.sessionFinished) {
+                    this.showConfirm('确认退出', '确定要退出默写吗？当前进度将不会保存。', () => {
+                        this.abortDictate();
+                    });
+                } else {
+                    this.abortDictate();
+                }
+            },
             abortDictate() {
                 console.log('[退出诊断] abortDictate被调用', new Error().stack);
+                this._isProcessingSubmit = false; // 重置提交锁
                 if(this.timerInterval) clearInterval(this.timerInterval); 
                 // OCR 正在跑，先不清数据，等它完成
                 if(this.ocrBusy) {
@@ -3158,6 +3289,11 @@
                 this.sessionCurrentWordIdx = 0;
                 this.sessionCharHadTrace = false;
                 this.timerInterval = null;
+                // 移除浏览器后退监听
+                if(this._dictatePopstateHandler) {
+                    window.removeEventListener('popstate', this._dictatePopstateHandler);
+                    this._dictatePopstateHandler = null;
+                }
             },
             showParentPasswordModal() {
                 this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
@@ -3175,6 +3311,7 @@
             goToReviewFromChild() {
                 this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
                     if(pwd === this.parentPassword) {
+                        this.reviewFilter = 'all';
                         this.currentView='reviewParent';
                     } else {
                         this.showAlert('密码错误', '密码不正确');
@@ -3200,7 +3337,7 @@
                 this.largePreviewSrc = imgSrc;
                 this.largePreviewVisible = true;
             },
-            openReviewParentView(){ this.currentView='reviewParent'; },
+            openReviewParentView(){ this.reviewFilter = 'all'; this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
             commitParentReview(){
                 // 检查是否有未复核的错字
@@ -3210,26 +3347,25 @@
                 
                 const doCommit = () => {
                     const today = new Date().toISOString().slice(0,10);
-                    // 清除复核UI状态，但保留ocrResult给"清除计划"使用
-                    this.todayPlanWords.forEach(w => {
-                        w.handwritingData = [];
-                        // 清除所有pendingReview状态
-                        w.pendingReview = false;
-                        w.pendingReviewDate = null;
-                        w.reviewCorrected = false;
-                        // 清除家长判断的原始数据备份
-                        delete w._originalOcrResult;
-                        delete w._originalWrongCount;
-                        delete w._originalCorrectCount;
-                        // 标记今日已处理，避免generateTodayPlan重复加入
-                        w._planSkipDate = today;
+                    // 清除 ALL 有 handwritingData 的词（不仅仅是 todayPlanWords，防止复核项反复出现）
+                    this.words.forEach(w => {
+                        if(w.handwritingData && w.handwritingData.length > 0) {
+                            w.handwritingData = [];
+                            w.pendingReview = false;
+                            w.pendingReviewDate = null;
+                            w.reviewCorrected = false;
+                            delete w._originalOcrResult;
+                            delete w._originalWrongCount;
+                            delete w._originalCorrectCount;
+                            w._planSkipDate = today;
+                        }
                     });
                     // 保存今日计划信息到data，供跨设备同步后自动检测
                     this.todayPlanWordIds = this.todayPlanWords.map(w => w.id);
                     this.todayPlanDate = today;
                     // 重置 session 错字记录
                     this.sessionWrongWordIds = [];
-                    this.saveData();
+                    this.saveDataImmediate();
                     this.generateTodayPlan();
                     this.currentView='parentHome';
                     this.showAlert('完成', '复核已处理。请返回孩子端点击「清除计划」完成今日流程。');
@@ -4027,6 +4163,12 @@
             },
         }
     }).mount('#app');
-</script>
+    </script>
+    <script>
+    // 防止长按弹出复制菜单
+    document.addEventListener('contextmenu', function(e) {
+        if(e.target.closest('#app')) e.preventDefault();
+    });
+    </script>
 </body>
 </html>
