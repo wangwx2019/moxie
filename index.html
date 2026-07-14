@@ -628,7 +628,7 @@
         </div>
         <div v-else>
             <div class="vocab-summary">
-                <span>已选 {{ vocabSelectedChars.length + vocabSelectedLessons.reduce((sum,ln)=>sum+(vocabLessonCharCount(ln)||0),0) }} {{ vocabSource === 'ciyu' ? '个词' : '个字' }}</span>
+                <span>已选 {{ totalVocabSelectedCount() }} 个</span>
                 <div style="display:flex; gap:8px;">
                     <button class="cute-btn" style="padding:8px 14px; font-size:0.78rem;" @click="hardRefreshVocab" title="词库有更新时点此刷新">🔄 刷新词库</button>
                     <button class="cute-btn primary" style="padding:8px 20px;" @click="confirmVocabSelect">下一步：确认词语</button>
@@ -1431,6 +1431,7 @@
                 vocabSource: 'xiezhi',
                 vocabSelectedLessons: [],
                 vocabSelectedChars: [],
+                vocabSelections: { xiezhi: { lessons: [], chars: [] }, shizi: { lessons: [], chars: [] }, ciyu: { lessons: [], chars: [] } },
                 expandedLessons: [],
                 // 词语听写模式
                 sessionMode: 'dictate',
@@ -3747,11 +3748,14 @@
                 this.vocabularyLoaded = !!(this.vocabularyData?.units);
                 this.vocabSelectedLessons = [];
                 this.vocabSelectedChars = [];
+                this.vocabSelections = { xiezhi: { lessons: [], chars: [] }, shizi: { lessons: [], chars: [] }, ciyu: { lessons: [], chars: [] } };
                 this.expandedLessons = [];
                 this.currentView = 'vocabSelector';
             },
             switchVocabSource(source) {
                 if(source === this.vocabSource) return;
+                // 保存当前标签的选择
+                this.vocabSelections[this.vocabSource] = { lessons: [...this.vocabSelectedLessons], chars: [...this.vocabSelectedChars] };
                 if(source === 'xiezhi') {
                     if(window.VOCABULARY_EMBEDDED && window.VOCABULARY_EMBEDDED.units) {
                         this.vocabularyData = window.VOCABULARY_EMBEDDED;
@@ -3771,8 +3775,9 @@
                     }
                 }
                 this.vocabSource = source;
-                this.vocabSelectedLessons = [];
-                this.vocabSelectedChars = [];
+                // 恢复目标标签的选择
+                this.vocabSelectedLessons = [...(this.vocabSelections[source]?.lessons || [])];
+                this.vocabSelectedChars = [...(this.vocabSelections[source]?.chars || [])];
                 this.expandedLessons = [];
             },
             toggleLessonExpand(key) {
@@ -3790,6 +3795,34 @@
                     }
                 }
                 return 0;
+            },
+            totalVocabSelectedCount() {
+                let total = 0;
+                // 遍历所有标签的选择
+                for(const source of ['xiezhi', 'shizi', 'ciyu']) {
+                    const sel = source === this.vocabSource
+                        ? { lessons: this.vocabSelectedLessons, chars: this.vocabSelectedChars }
+                        : this.vocabSelections[source];
+                    if(!sel) continue;
+                    total += sel.chars.length;
+                    // 获取该标签的词库数据
+                    let vocabData = null;
+                    if(source === 'xiezhi') vocabData = window.VOCABULARY_EMBEDDED;
+                    else if(source === 'shizi') vocabData = window.VOCABULARY_SHIZI_EMBEDDED;
+                    else if(source === 'ciyu') vocabData = window.VOCABULARY_WORDS_EMBEDDED;
+                    // 计算整课选择的字/词数量
+                    for(const lessonKey of sel.lessons) {
+                        for(let unit of (vocabData?.units || [])) {
+                            for(let lesson of unit.lessons) {
+                                if(unit.name + '||' + lesson.name === lessonKey) {
+                                    if(source === 'ciyu') total += (lesson.words?.length || 0);
+                                    else total += (lesson.shizi?.length || 0) + (lesson.xiezhi?.length || 0);
+                                }
+                            }
+                        }
+                    }
+                }
+                return total;
             },
             toggleVocabLesson(unitName, lesson) {
                 const key = unitName + '||' + lesson.name;
@@ -3849,11 +3882,20 @@
                 });
             },
             confirmVocabSelect() {
-                // 词语表模式
-                if(this.vocabSource === 'ciyu') {
+                // 保存当前标签的选择
+                this.vocabSelections[this.vocabSource] = { lessons: [...this.vocabSelectedLessons], chars: [...this.vocabSelectedChars] };
+                const today = new Date().toISOString().slice(0,10);
+                let totalAdded = 0, totalExists = 0, totalReset = 0;
+                // 1. 处理词语表（ciyu）的选择
+                for(const source of ['ciyu']) {
+                    const sel = this.vocabSelections[source];
+                    if(!sel || (sel.lessons.length === 0 && sel.chars.length === 0)) continue;
+                    let vocabData = null;
+                    if(source === 'ciyu') vocabData = window.VOCABULARY_WORDS_EMBEDDED;
+                    if(!vocabData) continue;
                     let selectedWords = [];
-                    for(let lessonKey of this.vocabSelectedLessons) {
-                        for(let unit of (this.vocabularyData?.units || [])) {
+                    for(let lessonKey of sel.lessons) {
+                        for(let unit of (vocabData.units || [])) {
                             for(let lesson of unit.lessons) {
                                 if(unit.name + '||' + lesson.name === lessonKey) {
                                     for(let w of (lesson.words || [])) {
@@ -3863,13 +3905,12 @@
                             }
                         }
                     }
-                    for(let key of this.vocabSelectedChars) {
+                    for(let key of sel.chars) {
                         const parts = key.split('_');
                         const unitName = parts[0];
                         const lessonName = parts[1];
-                        const cat = parts[2];
                         const word = parts.slice(3).join('_');
-                        for(let unit of (this.vocabularyData?.units || [])) {
+                        for(let unit of (vocabData.units || [])) {
                             if(unit.name !== unitName) continue;
                             for(let lesson of unit.lessons) {
                                 if(lesson.name !== lessonName) continue;
@@ -3879,10 +3920,6 @@
                             }
                         }
                     }
-                    if(selectedWords.length === 0) {
-                        this.showAlert('提示', '请先选择至少一个词语');
-                        return;
-                    }
                     const seen = new Set();
                     selectedWords = selectedWords.filter(item => {
                         if(seen.has(item.word)) return false;
@@ -3890,123 +3927,102 @@
                         return true;
                     });
                     let added = 0, exists = 0, reset = 0;
-                    const today = new Date().toISOString().slice(0,10);
                     for(let item of selectedWords) {
                         const wordId = 'yw_' + item.unitName + '_' + item.lesson.name + '_' + item.word;
                         const existingWord = this.words.find(w => w.id === wordId);
                         if(existingWord) {
                             exists++;
-                            // 已存在的词语：重置跳过状态和OCR结果，确保能重新进入今日计划
                             if(existingWord._planSkipDate === today) { existingWord._planSkipDate = ''; reset++; }
                             if(existingWord.ocrResult) { existingWord.ocrResult = ''; reset++; }
                             continue;
                         }
                         const wordPinyin = toPinyinForWord(item.word);
                         this.words.push({
-                            id: wordId,
-                            word: item.word,
-                            char: item.word,
-                            pinyin: wordPinyin,
-                            words: [item.word],
-                            isWord: true,
-                            correctCount: 0,
-                            wrongCount: 0,
-                            status: 'learning',
-                            reviewCorrected: false,
-                            _127_rollingStreak: 0,
-                            _127_day7Entry: null,
-                            _127_randomCheckWeek: 0,
-                            reviewDates: [],
-                            pendingReview: false,
-                            pendingReviewDate: null,
-                            handwritingData: null
+                            id: wordId, word: item.word, char: item.word, pinyin: wordPinyin,
+                            words: [item.word], isWord: true, correctCount: 0, wrongCount: 0,
+                            status: 'learning', reviewCorrected: false,
+                            _127_rollingStreak: 0, _127_day7Entry: null, _127_randomCheckWeek: 0,
+                            reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
                         });
                         added++;
                     }
-                    this.saveData();
-                    this.generateTodayPlan();
-                    this.showAlert('成功', `已添加 ${added} 个词语${exists ? '，'+exists+' 个已存在' : ''}${reset ? '，'+reset+' 个已重置状态' : ''}`);
-                    this.currentView = 'parentHome';
-                    return;
+                    totalAdded += added; totalExists += exists; totalReset += reset;
                 }
-                // 识字表/写字表模式
-                let selectedChars = [];
-                for(let lessonKey of this.vocabSelectedLessons) {
-                    for(let unit of (this.vocabularyData?.units || [])) {
-                        for(let lesson of unit.lessons) {
-                            if(unit.name + '||' + lesson.name === lessonKey) {
-                                for(let ch of (lesson.shizi || [])) {
-                                    selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
-                                }
-                                for(let ch of (lesson.xiezhi || [])) {
-                                    selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                // 2. 处理识字表/写字表（shizi/xiezhi）的选择
+                for(const source of ['xiezhi', 'shizi']) {
+                    const sel = this.vocabSelections[source];
+                    if(!sel || (sel.lessons.length === 0 && sel.chars.length === 0)) continue;
+                    let vocabData = null;
+                    if(source === 'xiezhi') vocabData = window.VOCABULARY_EMBEDDED;
+                    else if(source === 'shizi') vocabData = window.VOCABULARY_SHIZI_EMBEDDED;
+                    if(!vocabData) continue;
+                    let selectedChars = [];
+                    for(let lessonKey of sel.lessons) {
+                        for(let unit of (vocabData.units || [])) {
+                            for(let lesson of unit.lessons) {
+                                if(unit.name + '||' + lesson.name === lessonKey) {
+                                    for(let ch of (lesson.shizi || [])) {
+                                        selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                                    }
+                                    for(let ch of (lesson.xiezhi || [])) {
+                                        selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                for(let key of this.vocabSelectedChars) {
-                    const parts = key.split('_');
-                    const unitName = parts[0];
-                    const lessonName = parts[1];
-                    const cat = parts[2];
-                    const char = parts.slice(3).join('_');
-                    for(let unit of (this.vocabularyData?.units || [])) {
-                        if(unit.name !== unitName) continue;
-                        for(let lesson of unit.lessons) {
-                            if(lesson.name !== lessonName) continue;
-                            const list = cat === 'shizi' ? lesson.shizi : lesson.xiezhi;
-                            const ch = list?.find(c => c.char === char);
-                            if(ch) selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                    for(let key of sel.chars) {
+                        const parts = key.split('_');
+                        const unitName = parts[0];
+                        const lessonName = parts[1];
+                        const cat = parts[2];
+                        const char = parts.slice(3).join('_');
+                        for(let unit of (vocabData.units || [])) {
+                            if(unit.name !== unitName) continue;
+                            for(let lesson of unit.lessons) {
+                                if(lesson.name !== lessonName) continue;
+                                const list = cat === 'shizi' ? lesson.shizi : lesson.xiezhi;
+                                const ch = list?.find(c => c.char === char);
+                                if(ch) selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                            }
                         }
                     }
-                }
-                if(selectedChars.length === 0) {
-                    this.showAlert('提示', '请先选择至少一个字');
-                    return;
-                }
-                const seen = new Set();
-                selectedChars = selectedChars.filter(item => {
-                    if(seen.has(item.ch.char)) return false;
-                    seen.add(item.ch.char);
-                    return true;
-                });
-                let added = 0, exists = 0, reset = 0;
-                for(let item of selectedChars) {
-                    const ch = item.ch;
-                    const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + ch.char;
-                    const existingChar = this.words.find(w => w.id === charId);
-                    if(existingChar) {
-                        exists++;
-                        // 已存在的字：重置跳过状态和OCR结果，确保能重新进入今日计划
-                        if(existingChar._planSkipDate === today) { existingChar._planSkipDate = ''; reset++; }
-                        if(existingChar.ocrResult) { existingChar.ocrResult = ''; reset++; }
-                        continue;
-                    }
-                    const charPinyin = toPinyinWithTone(ch.char);
-                    this.words.push({
-                        id: charId,
-                        word: ch.char,
-                        char: ch.char,
-                        pinyin: charPinyin,
-                        words: ch.words || [ch.word1, ch.word2, ch.word3].filter(Boolean),
-                        correctCount: 0,
-                        wrongCount: 0,
-                        status: 'learning',
-                        reviewCorrected: false,
-                        _127_rollingStreak: 0,
-                        _127_day7Entry: null,
-                        _127_randomCheckWeek: 0,
-                        reviewDates: [],
-                        pendingReview: false,
-                        pendingReviewDate: null,
-                        handwritingData: null
+                    const seen = new Set();
+                    selectedChars = selectedChars.filter(item => {
+                        if(seen.has(item.ch.char)) return false;
+                        seen.add(item.ch.char);
+                        return true;
                     });
-                    added++;
+                    let added = 0, exists = 0, reset = 0;
+                    for(let item of selectedChars) {
+                        const ch = item.ch;
+                        const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + ch.char;
+                        const existingChar = this.words.find(w => w.id === charId);
+                        if(existingChar) {
+                            exists++;
+                            if(existingChar._planSkipDate === today) { existingChar._planSkipDate = ''; reset++; }
+                            if(existingChar.ocrResult) { existingChar.ocrResult = ''; reset++; }
+                            continue;
+                        }
+                        const charPinyin = toPinyinWithTone(ch.char);
+                        this.words.push({
+                            id: charId, word: ch.char, char: ch.char, pinyin: charPinyin,
+                            words: ch.words || [ch.word1, ch.word2, ch.word3].filter(Boolean),
+                            correctCount: 0, wrongCount: 0, status: 'learning', reviewCorrected: false,
+                            _127_rollingStreak: 0, _127_day7Entry: null, _127_randomCheckWeek: 0,
+                            reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
+                        });
+                        added++;
+                    }
+                    totalAdded += added; totalExists += exists; totalReset += reset;
+                }
+                if(totalAdded === 0 && totalExists === 0) {
+                    this.showAlert('提示', '请先选择至少一个字或词语');
+                    return;
                 }
                 this.saveData();
                 this.generateTodayPlan();
-                this.showAlert('成功', `已添加 ${added} 个生字${exists ? '，'+exists+' 个已存在' : ''}${reset ? '，'+reset+' 个已重置状态' : ''}，每个配3个组词`);
+                this.showAlert('成功', `已添加 ${totalAdded} 个${totalExists ? '，'+totalExists+' 个已存在' : ''}${totalReset ? '，'+totalReset+' 个已重置状态' : ''}`);
                 this.currentView = 'parentHome';
             },
         }
