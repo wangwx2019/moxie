@@ -816,7 +816,7 @@
       "pendingReview": false,
       "pendingReviewDate": null,
       "handwritingData": [
-        "data:image/png;base64,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"
+        ""
       ],
       "firstWrong": true,
       "_planSkipDate": "2026-07-11",
@@ -2076,7 +2076,7 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
+      "_planSkipDate": "2026-07-14",
       "ocrResult": null
     },
     {
@@ -2088,7 +2088,7 @@
         "飞鸟"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2100,8 +2100,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字1_红领巾",
@@ -2112,7 +2112,7 @@
         "红领巾"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2124,8 +2124,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字1_欢笑",
@@ -2136,7 +2136,7 @@
         "欢笑"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2148,8 +2148,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字2_杨树",
@@ -2160,7 +2160,7 @@
         "杨树"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2172,8 +2172,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字2_树叶",
@@ -2184,7 +2184,7 @@
         "树叶"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2196,8 +2196,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字2_松柏",
@@ -2208,7 +2208,7 @@
         "松柏"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2220,8 +2220,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字2_化石",
@@ -2232,7 +2232,7 @@
         "化石"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2244,8 +2244,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字2_开花",
@@ -2256,7 +2256,7 @@
         "开花"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2268,8 +2268,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字3_拍手",
@@ -2280,7 +2280,7 @@
         "拍手"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2292,8 +2292,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字3_世界",
@@ -2304,7 +2304,7 @@
         "世界"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2316,8 +2316,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字3_云彩",
@@ -2328,7 +2328,7 @@
         "云彩"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2340,8 +2340,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字3_丛林",
@@ -2352,7 +2352,7 @@
         "丛林"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2364,8 +2364,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字3_竹林",
@@ -2376,7 +2376,7 @@
         "竹林"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2388,8 +2388,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字3_朋友",
@@ -2400,9 +2400,9 @@
         "朋友"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
-      "status": "learning",
+      "status": "mastered",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
       "_127_day7Entry": null,
@@ -2412,8 +2412,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字3_保护",
@@ -2424,7 +2424,7 @@
         "保护"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2436,8 +2436,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_四季",
@@ -2448,7 +2448,7 @@
         "四季"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2460,8 +2460,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_春风",
@@ -2472,7 +2472,7 @@
         "春风"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2484,8 +2484,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_农事",
@@ -2496,7 +2496,7 @@
         "农事"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2508,8 +2508,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_月光",
@@ -2520,7 +2520,7 @@
         "月光"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2532,8 +2532,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_身体",
@@ -2544,7 +2544,7 @@
         "身体"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2556,8 +2556,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_辛苦",
@@ -2568,7 +2568,7 @@
         "辛苦"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2580,8 +2580,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_心里",
@@ -2592,7 +2592,7 @@
         "心里"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2604,8 +2604,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第二单元·识字_识字4_大家",
@@ -2616,7 +2616,7 @@
         "大家"
       ],
       "isWord": true,
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
@@ -2628,8 +2628,8 @@
       "pendingReviewDate": null,
       "handwritingData": [],
       "firstWrong": false,
-      "_planSkipDate": "2026-07-13",
-      "ocrResult": null
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     },
     {
       "id": "yw_第一单元·阅读_课文1_他们",
@@ -3454,6 +3454,1598 @@
       "ocrResult": "correct",
       "firstWrong": false,
       "_planSkipDate": "2026-07-13"
+    },
+    {
+      "id": "sz_第二单元_课文4_季",
+      "word": "季",
+      "char": "季",
+      "pinyin": "jì",
+      "words": [
+        "季节",
+        "四季",
+        "季度"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_肥",
+      "word": "肥",
+      "char": "肥",
+      "pinyin": "féi",
+      "words": [
+        "肥胖",
+        "肥料",
+        "肥沃"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_农",
+      "word": "农",
+      "char": "农",
+      "pinyin": "nóng",
+      "words": [
+        "农民",
+        "农田",
+        "农业"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_事",
+      "word": "事",
+      "char": "事",
+      "pinyin": "shì",
+      "words": [
+        "事情",
+        "故事",
+        "事务"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_谷",
+      "word": "谷",
+      "char": "谷",
+      "pinyin": "gǔ",
+      "words": [
+        "稻谷",
+        "山谷",
+        "谷物"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": true,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_体",
+      "word": "体",
+      "char": "体",
+      "pinyin": "tǐ",
+      "words": [
+        "身体",
+        "体育",
+        "形体"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_虽",
+      "word": "虽",
+      "char": "虽",
+      "pinyin": "suī",
+      "words": [
+        "虽然",
+        "虽说",
+        "虽则"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_辛",
+      "word": "辛",
+      "char": "辛",
+      "pinyin": "xīn",
+      "words": [
+        "辛苦",
+        "辛劳",
+        "艰辛"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_苦",
+      "word": "苦",
+      "char": "苦",
+      "pinyin": "kǔ",
+      "words": [
+        "苦难",
+        "吃苦",
+        "苦味"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_课文4_初",
+      "word": "初",
+      "char": "初",
+      "pinyin": "chū",
+      "words": [
+        "初始",
+        "初夏",
+        "初次"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第二单元_语文园地二_丑",
+      "word": "丑",
+      "char": "丑",
+      "pinyin": "chǒu",
+      "words": [
+        "丑陋",
+        "丑事",
+        "丑恶"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "_planSkipDate": "2026-07-14",
+      "firstWrong": false,
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_丽",
+      "word": "丽",
+      "char": "丽",
+      "pinyin": "lì",
+      "words": [
+        "美丽",
+        "秀丽",
+        "华丽"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_提",
+      "word": "提",
+      "char": "提",
+      "pinyin": "tí",
+      "words": [
+        "提起",
+        "手提",
+        "提醒"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_吗",
+      "word": "吗",
+      "char": "吗",
+      "pinyin": "ma",
+      "words": [
+        "好吗",
+        "是吗",
+        "对吗"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_圆",
+      "word": "圆",
+      "char": "圆",
+      "pinyin": "yuán",
+      "words": [
+        "圆形",
+        "圆圈",
+        "团圆"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_哥",
+      "word": "哥",
+      "char": "哥",
+      "pinyin": "gē",
+      "words": [
+        "哥哥",
+        "表哥",
+        "大哥"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_秋",
+      "word": "秋",
+      "char": "秋",
+      "pinyin": "qiū",
+      "words": [
+        "秋天",
+        "金秋",
+        "秋风"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_挂",
+      "word": "挂",
+      "char": "挂",
+      "pinyin": "guà",
+      "words": [
+        "悬挂",
+        "挂钩",
+        "挂念"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_课文4_啊",
+      "word": "啊",
+      "char": "啊",
+      "pinyin": "a",
+      "words": [
+        "好啊",
+        "真美啊"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_语文园地三_图",
+      "word": "图",
+      "char": "图",
+      "pinyin": "tú",
+      "words": [
+        "图画",
+        "地图",
+        "图纸"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_语文园地三_泥",
+      "word": "泥",
+      "char": "泥",
+      "pinyin": "ní",
+      "words": [
+        "泥土",
+        "泥巴",
+        "水泥"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第三单元_语文园地三_铁",
+      "word": "铁",
+      "char": "铁",
+      "pinyin": "tiě",
+      "words": [
+        "铁钉",
+        "钢铁",
+        "铁锅"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_依",
+      "word": "依",
+      "char": "依",
+      "pinyin": "yī",
+      "words": [
+        "依赖",
+        "依靠",
+        "依据"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_尽",
+      "word": "尽",
+      "char": "尽",
+      "pinyin": "jìn",
+      "words": [
+        "尽力",
+        "尽头",
+        "尽心"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_穷",
+      "word": "穷",
+      "char": "穷",
+      "pinyin": "qióng",
+      "words": [
+        "无穷",
+        "贫穷",
+        "穷苦"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_层",
+      "word": "层",
+      "char": "层",
+      "pinyin": "céng",
+      "words": [
+        "层次",
+        "分层",
+        "层级"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_照",
+      "word": "照",
+      "char": "照",
+      "pinyin": "zhào",
+      "words": [
+        "照看",
+        "依照",
+        "照射"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_炉",
+      "word": "炉",
+      "char": "炉",
+      "pinyin": "lú",
+      "words": [
+        "火炉",
+        "电炉",
+        "锅炉"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_烟",
+      "word": "烟",
+      "char": "烟",
+      "pinyin": "yān",
+      "words": [
+        "烟火",
+        "浓烟",
+        "烟花"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_川",
+      "word": "川",
+      "char": "川",
+      "pinyin": "chuān",
+      "words": [
+        "名山大川",
+        "一马平川",
+        "川流不息"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_直",
+      "word": "直",
+      "char": "直",
+      "pinyin": "zhí",
+      "words": [
+        "笔直",
+        "正直",
+        "真心"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_银",
+      "word": "银",
+      "char": "银",
+      "pinyin": "yín",
+      "words": [
+        "银行",
+        "银河",
+        "银杏"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_仙",
+      "word": "仙",
+      "char": "仙",
+      "pinyin": "xiān",
+      "words": [
+        "仙女",
+        "神仙",
+        "仙境"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_顶",
+      "word": "顶",
+      "char": "顶",
+      "pinyin": "dǐng",
+      "words": [
+        "山顶",
+        "头顶",
+        "房顶"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_巨",
+      "word": "巨",
+      "char": "巨",
+      "pinyin": "jù",
+      "words": [
+        "巨大",
+        "巨人",
+        "巨变"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_位",
+      "word": "位",
+      "char": "位",
+      "pinyin": "wèi",
+      "words": [
+        "一位",
+        "地位",
+        "位子"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_闪",
+      "word": "闪",
+      "char": "闪",
+      "pinyin": "shǎn",
+      "words": [
+        "闪耀",
+        "闪电",
+        "闪开"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_狗",
+      "word": "狗",
+      "char": "狗",
+      "pinyin": "gǒu",
+      "words": [
+        "小狗",
+        "狼狗",
+        "猎狗"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_形",
+      "word": "形",
+      "char": "形",
+      "pinyin": "xíng",
+      "words": [
+        "形状",
+        "形成",
+        "圆形"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_状",
+      "word": "状",
+      "char": "状",
+      "pinyin": "zhuàng",
+      "words": [
+        "形状",
+        "状况",
+        "奖状"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_湖",
+      "word": "湖",
+      "char": "湖",
+      "pinyin": "hú",
+      "words": [
+        "西湖",
+        "湖泊",
+        "湖水"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_区",
+      "word": "区",
+      "char": "区",
+      "pinyin": "qū",
+      "words": [
+        "地区",
+        "区域",
+        "区别"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_胜",
+      "word": "胜",
+      "char": "胜",
+      "pinyin": "shèng",
+      "words": [
+        "胜利",
+        "取胜",
+        "名胜"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_岛",
+      "word": "岛",
+      "char": "岛",
+      "pinyin": "dǎo",
+      "words": [
+        "小岛",
+        "岛屿",
+        "海岛"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_弯",
+      "word": "弯",
+      "char": "弯",
+      "pinyin": "wān",
+      "words": [
+        "弯曲",
+        "弯道",
+        "弯腰"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_现",
+      "word": "现",
+      "char": "现",
+      "pinyin": "xiàn",
+      "words": [
+        "现在",
+        "现今",
+        "出现"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_就",
+      "word": "就",
+      "char": "就",
+      "pinyin": "jiù",
+      "words": [
+        "成就",
+        "就业",
+        "就近"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_外",
+      "word": "外",
+      "char": "外",
+      "pinyin": "wài",
+      "words": [
+        "外面",
+        "窗外",
+        "外边"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_份",
+      "word": "份",
+      "char": "份",
+      "pinyin": "fèn",
+      "words": [
+        "月份",
+        "年份",
+        "股份"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_枝",
+      "word": "枝",
+      "char": "枝",
+      "pinyin": "zhī",
+      "words": [
+        "枝头",
+        "树枝",
+        "分枝"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_客",
+      "word": "客",
+      "char": "客",
+      "pinyin": "kè",
+      "words": [
+        "客人",
+        "乘客",
+        "宾客"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_城",
+      "word": "城",
+      "char": "城",
+      "pinyin": "chéng",
+      "words": [
+        "城市",
+        "城区",
+        "长城"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_市",
+      "word": "市",
+      "char": "市",
+      "pinyin": "shì",
+      "words": [
+        "城市",
+        "市区",
+        "市场"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_孔",
+      "word": "孔",
+      "char": "孔",
+      "pinyin": "kǒng",
+      "words": [
+        "孔雀",
+        "桥孔",
+        "针孔"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_钉",
+      "word": "钉",
+      "char": "钉",
+      "pinyin": "dīng",
+      "words": [
+        "钉子",
+        "钉扣子",
+        "钉木板"
+      ],
+      "correctCount": 1,
+      "wrongCount": 1,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 1,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20",
+        "2026-07-21"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": true,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_味",
+      "word": "味",
+      "char": "味",
+      "pinyin": "wèi",
+      "words": [
+        "味道",
+        "气味",
+        "香味"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
+    },
+    {
+      "id": "sz_第四单元_语文园地四_号",
+      "word": "号",
+      "char": "号",
+      "pinyin": "hào",
+      "words": [
+        "口号",
+        "号码",
+        "学号"
+      ],
+      "correctCount": 1,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": [],
+      "firstWrong": false,
+      "_planSkipDate": "2026-07-14",
+      "ocrResult": "correct"
     }
   ],
   "checkinDays": 1,
@@ -3463,7 +5055,7 @@
     {
       "name": "账号1",
       "token": "24.05a1c4cc08946e9b98f5b82fa4a9a4ef.2592000.1786438559.282335-123506560",
-      "used": 143,
+      "used": 284,
       "apiKey": "HzC9ACSpL9QF4TodXcQOvL5O",
       "secretKey": "EmEjVU5ZnSD0Q8SX7UyyUPwhgWehTkeN",
       "tokenExpiresAt": 1786438561675
@@ -3479,5 +5071,5 @@
   "ttsVoiceId": "4",
   "ttsToken": "24.4fe7e622cb2385e0323fecfc543ca4e2.2592000.1786118372.282335-123931889",
   "todayPlanWordIds": [],
-  "todayPlanDate": "2026-07-13"
+  "todayPlanDate": "2026-07-14"
 }
