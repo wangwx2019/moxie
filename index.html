@@ -199,8 +199,7 @@
             <div v-if="todayPlanWords.length > 0" style="text-align:right; margin-bottom:4px;">
                 <span class="text-small" style="color:#aaa; cursor:pointer;" @click="cancelTodayPlan">取消今日计划（滚动词顺延）</span>
             </div>
-            <button class="cute-btn primary" style="width:100%;" @click="startHandwriteSession" :disabled="todayPlanWords.length === 0">✍️ 单字默写</button>
-            <button class="cute-btn" style="width:100%; margin-top:8px; background:#fef3c7; color:#92400e; border:2px solid #fbbf24;" @click="startWordDictateSession">📝 词语听写{{ todayWordPlanWords.length > 0 ? '（' + todayWordPlanWords.length + ' 个词语）' : '（去选词）' }}</button>
+            <button class="cute-btn primary" style="width:100%;" @click="startUnifiedSession" :disabled="todayPlanWords.length === 0">📝 开始默写{{ todayPlanWords.length > 0 ? '（' + todayPlanWords.length + ' 项）' : '' }}</button>
         </div>
         <div class="card-white" @click="openWrongWordsView" style="cursor:pointer;">
             <div class="flex-between">
@@ -253,8 +252,10 @@
             <span>✨ 余{{ sessionRemainCount }}</span>
             <span class="review-link" @click="goToReviewFromChild">💾 待复核 {{ pendingReviewCount }}</span>
         </div>
-        <!-- 词语听写模式 -->
-        <div class="dictate-main-card" v-if="sessionMode === 'word' && currentSessionWord">
+        <!-- 统一默写模式 -->
+        <div class="dictate-main-card" v-if="currentSessionWord">
+            <!-- 词语听写模式 -->
+            <template v-if="currentSessionWord.isWord">
             <div style="text-align:center; margin-bottom:8px;">
                 <div style="font-size:2.4rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">{{ currentSessionWord.pinyin }}</div>
                 <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:4px; padding:4px 12px; font-size:0.85rem;" @click="speakCurrentWord">🔊 重播</button>
@@ -273,8 +274,9 @@
                 <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem;" @click="clearAllCanvas">🗑️ 清除</button>
             </div>
             <div class="text-small" style="font-size:0.75rem;">✏️ 看拼音，写出这个词语。◀ 上一个 · 下一个 ▶</div>
-        </div>
-        <div class="dictate-main-card" v-else-if="currentSessionWord">
+            </template>
+            <!-- 单字默写模式 -->
+            <template v-else>
             <!-- 拼音大号居中 -->
             <div style="text-align:center; margin-bottom:12px;">
                 <div style="font-size:3.5rem; font-weight:700; color:#f97316; line-height:1.2;">{{ currentSessionWord.pinyin }}</div>
@@ -334,6 +336,7 @@
             <div class="text-small" v-if="!traceMode">✏️ 看拼音，写出带 <span style="color:#f97316; font-weight:700;">?</span> 的字。◀ 上一个 · 下一个 ▶</div>
             <div class="text-small" v-else style="color:#d97706;">✏️ 照着浅色字描摹，然后点 ▶ 下一个。</div>
             <div class="api-status">🤖 当前引擎: {{ lastOcrEngine || (useBaiduOCR ? '百度智能云' : '本地 Tesseract') }}{{ lastOcrEngine && lastOcrEngine !== (useBaiduOCR ? '百度智能云' : '本地 Tesseract') ? '（已回退）' : '' }}</div>
+            </template>
         </div>
         <!-- 笔顺动画弹窗 -->
         <div v-if="showStrokeOrderOverlay" class="stroke-order-overlay" @click.self="closeStrokeOrder">
@@ -2114,6 +2117,42 @@
                 this.saveData();
                 this.$forceUpdate();
             },
+            // 统一默写入口：单字在前，词语在后
+            startUnifiedSession() {
+                const charWords = this.todayPlanWords.filter(w => !w.isWord);
+                const wordWords = this.todayPlanWords.filter(w => w.isWord);
+                const allPlan = [...charWords, ...wordWords];
+                if(allPlan.length === 0) {
+                    this.showConfirm('暂无默写计划', '需要先添加字词或选择词语。现在去添加吗？', () => {
+                        this.currentView = 'parentHome';
+                        setTimeout(() => this.openAddWizard(), 100);
+                    });
+                    return;
+                }
+                this.sessionMode = allPlan[0].isWord ? 'word' : 'dictate';
+                this.sessionTaskList = JSON.parse(JSON.stringify(allPlan));
+                this.sessionCurrentIdx = 0;
+                this.sessionCurrentWordIdx = 0;
+                this.sessionCharHadTrace = false;
+                this.sessionCorrectCount = 0;
+                this.todayCompletedCount = 0;
+                this.sessionTimerSeconds = 0;
+                this.sessionFinished = false;
+                this.sessionAnswer = '';
+                this.sessionPendingQueue = [];
+                this.sessionCanvasData = [];
+                this.sessionBatchSubmitted = false;
+                this.sessionWrongWordIds = [];
+                this.sessionWrongRetryQueue = [];
+                this.sessionRetryCount = {};
+                if(this.timerInterval) clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => { if(!this.sessionFinished) this.sessionTimerSeconds++; }, 1000);
+                this.currentView = 'dictateView';
+                this.$nextTick(() => {
+                    if(this.sessionMode === 'word') { this.initWordCanvas(); }
+                    else { this.initCanvasForCurrent(); }
+                });
+            },
             startHandwriteSession() {
                 const charWords = this.todayPlanWords.filter(w => !w.isWord);
                 if(charWords.length===0){ this.showAlert('提示', '暂无单字默写计划'); return; }
@@ -2190,6 +2229,8 @@
             },
             initCanvasForCurrent() { 
                 let word = this.currentSessionWord; if(!word) return; 
+                // 统一模式：如果当前项是词语，委托给词语画布初始化
+                if(this.sessionMode === 'word' && word.isWord) { this.initWordCanvas(); return; }
                 this.traceMode = false; // 新开canvas时退出描摹模式
                 let canvas = document.getElementById('tg_c'); 
                 if(!canvas) { 
@@ -2280,7 +2321,7 @@
             speakCurrentWord() {
                 const word = this.currentSessionWord;
                 if(!word) return;
-                if(this.sessionMode === 'word') {
+                if(word.isWord) {
                     this.speakWithBaidu(word.word);
                 } else {
                     // 单字模式：读所有组词，如"花朵的花，荷花的花，花瓣的花"
@@ -2465,7 +2506,7 @@
                 this.clearCanvasCell('tg_c');
             },
             clearAllCanvas() { 
-                if (this.sessionMode === 'word') {
+                if (this.currentSessionWord && this.currentSessionWord.isWord) {
                     // 词语模式：清除所有动态创建的画布
                     const container = document.getElementById('word_canvas_container');
                     if (container) {
@@ -2568,6 +2609,9 @@
                 }
                 this.todayCompletedCount = Math.max(0, this.todayCompletedCount - 1);
                 this.traceMode = false;
+                // 统一模式：根据恢复的项切换模式
+                const restoredItem = this.sessionTaskList[this.sessionCurrentIdx];
+                this.sessionMode = restoredItem && restoredItem.isWord ? 'word' : 'dictate';
                 this.$nextTick(() => {
                     if(this.sessionMode === 'word') {
                         // 词语模式：先重建canvas，再逐个恢复画布内容
@@ -2646,7 +2690,10 @@
                             this.sessionFinished = true;
                         } else {
                             if(this.sessionCurrentIdx >= this.sessionTaskList.length) this.sessionCurrentIdx = 0;
-                            this.$nextTick(() => { this.initWordCanvas(); });
+                            // 统一模式：根据下一个项切换模式
+                            const nextItem = this.sessionTaskList[this.sessionCurrentIdx];
+                            this.sessionMode = nextItem.isWord ? 'word' : 'dictate';
+                            this.$nextTick(() => { this.initCanvasForCurrent(); });
                         }
                         return;
                     }
@@ -2679,6 +2726,9 @@
                             this.sessionFinished = true;
                         } else {
                             if(this.sessionCurrentIdx >= this.sessionTaskList.length) this.sessionCurrentIdx = 0;
+                            // 统一模式：根据下一个项切换模式
+                            const nextItem = this.sessionTaskList[this.sessionCurrentIdx];
+                            this.sessionMode = nextItem.isWord ? 'word' : 'dictate';
                             this.$nextTick(()=>{ this.initCanvasForCurrent(); });
                         }
                     }
@@ -2714,7 +2764,7 @@
                         for(const item of group.items) {
                             let recognized = '';
                             try {
-                                if(this.sessionMode === 'word') {
+                                if(wordObj.isWord) {
                                     // 词语模式：合并多个画布识别
                                     const parts = item.canvasDataURL.split('|||');
                                     let fullRecognized = '';
@@ -2813,7 +2863,7 @@
                                 recognized = '';
                             }
                             const expectedChar = item.char || group.char || '';
-                            if(this.sessionMode === 'word') {
+                            if(wordObj.isWord) {
                                 // 词语模式：识别结果包含词语的所有字即算对
                                 const expectedChars = expectedChar.split('');
                                 const allFound = expectedChars.every(c => recognized.includes(c));
@@ -2823,7 +2873,7 @@
                             }
                         }
                         // 保存所有字的画布数据（词语模式下每个字单独保存）
-                        if(this.sessionMode === 'word') {
+                        if(wordObj.isWord) {
                             const allCanvases = [];
                             group.items.forEach(item => {
                                 if(item.canvasDataURL) {
@@ -2958,7 +3008,7 @@
             handleDontKnow() {
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
                 if(!wordObj) return;
-                if(this.sessionMode === 'word') {
+                if(this.currentSessionWord.isWord) {
                     // 词语模式：点击不会 → 描红 + 重复3次
                     const retryCount = this.sessionRetryCount[wordObj.id] || 0;
                     if(!this.traceMode) {
@@ -3921,11 +3971,18 @@
                     seen.add(item.ch.char);
                     return true;
                 });
-                let added = 0, exists = 0;
+                let added = 0, exists = 0, reset = 0;
                 for(let item of selectedChars) {
                     const ch = item.ch;
                     const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + ch.char;
-                    if(this.words.some(w => w.id === charId)) { exists++; continue; }
+                    const existingChar = this.words.find(w => w.id === charId);
+                    if(existingChar) {
+                        exists++;
+                        // 已存在的字：重置跳过状态和OCR结果，确保能重新进入今日计划
+                        if(existingChar._planSkipDate === today) { existingChar._planSkipDate = ''; reset++; }
+                        if(existingChar.ocrResult) { existingChar.ocrResult = ''; reset++; }
+                        continue;
+                    }
                     const charPinyin = toPinyinWithTone(ch.char);
                     this.words.push({
                         id: charId,
@@ -3949,7 +4006,7 @@
                 }
                 this.saveData();
                 this.generateTodayPlan();
-                this.showAlert('成功', `已添加 ${added} 个生字${exists ? '，'+exists+' 个字已存在已跳过' : ''}，每个配3个组词`);
+                this.showAlert('成功', `已添加 ${added} 个生字${exists ? '，'+exists+' 个已存在' : ''}${reset ? '，'+reset+' 个已重置状态' : ''}，每个配3个组词`);
                 this.currentView = 'parentHome';
             },
         }
