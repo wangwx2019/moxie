@@ -2012,7 +2012,6 @@
             generateTodayPlan() {
                 if(this.usingTextbookPlan) return;
                 const today = new Date().toISOString().slice(0,10);
-                const currentWeek = this.getWeekNumber(new Date());
 
                 // 如果今日计划已存在（todayPlanDate === today），直接从 todayPlanWordIds 恢复
                 // 避免重建时过滤掉已批改的词（ocrResult非空的词会被排除）
@@ -2035,38 +2034,25 @@
                     });
                 }
 
-                // 所有词（词语+单字）统一走 127 法则：
-                // 1. 新课：所有从未默写过的词
-                let newWords = this.words.filter(w =>
-                    w.correctCount === 0 && w.wrongCount === 0 && w.status === 'learning'
+                // 从 reviewDates 统一生成今日计划（单一事实来源）
+                // 读取所有 reviewDates 包含今天的词
+                let todayWords = this.words.filter(w =>
+                    w.reviewDates && w.reviewDates.includes(today)
                     && w._planSkipDate !== today
                     && !w.ocrResult  // 今天已批改过的跳过
                 );
 
-                // 2. 滚动池：所有有错字记录、未毕业的词
-                let rollingWords = this.words.filter(w =>
-                    w.wrongCount > 0 && w.status !== 'mastered' && !w._127_day7Entry
-                    && w._planSkipDate !== today
-                    && !w.ocrResult  // 今天已批改过的跳过
-                );
-
-                // 3. Day7 池：进入 Day7 满 7 天、还未掌握的
-                let day7Words = this.words.filter(w => {
-                    if (!w._127_day7Entry || w.status === 'mastered') return false;
-                    if (w._planSkipDate === today) return false;
-                    if (w.ocrResult) return false;  // 今天已批改过的跳过
-                    let daysSince = this.daysBetween(w._127_day7Entry, today);
-                    return daysSince >= 7;
+                // 排序：滚动池（错字多的优先）→ 新课 → Day7池 → 已掌握抽查
+                todayWords.sort((a, b) => {
+                    // 滚动池优先（wrongCount > 0）
+                    if(a.wrongCount > 0 && b.wrongCount === 0) return -1;
+                    if(a.wrongCount === 0 && b.wrongCount > 0) return 1;
+                    // 滚动池内按错误次数排序
+                    if(a.wrongCount > 0 && b.wrongCount > 0) return (b.wrongCount || 0) - (a.wrongCount || 0);
+                    // 其他保持原顺序
+                    return 0;
                 });
-
-                // 4. 已掌握随机抽查
-                let masteredWords = this.words.filter(w => w.status === 'mastered' && w._planSkipDate !== today && !w.ocrResult);
-                let randomCheck = this.selectRandomCheckWords(masteredWords, currentWeek);
-
-                // 错字优先（按错误次数排序），再排新课
-                rollingWords.sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0));
-                let combined = [...rollingWords, ...newWords, ...day7Words, ...randomCheck];
-                combined = [...new Map(combined.map(w=>[w.word,w])).values()];
+                let combined = [...new Map(todayWords.map(w=>[w.word,w])).values()];
 
                 this.todayPlanWords = combined;
                 // 保存今日计划信息，供跨设备同步后自动检测已提交的词
@@ -2074,19 +2060,22 @@
                 this.todayPlanWordIds = combined.map(w => w.id);
             },
             generateReviewDates(wordObj) {
-                // 127 版：根据词的状态生成复习日期（用于日历看板展示）
+                // 127 版：根据词的状态生成复习日期（统一覆盖所有4个池子）
                 if(wordObj.status === 'mastered') { wordObj.reviewDates = []; return; }
                 let today = new Date(); today.setHours(0,0,0,0);
                 let todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
                 let dates = [];
                 if(wordObj._127_day7Entry) {
-                    // Day7 池：只显示 Day7 检测日
+                    // Day7 池：Day7 检测日
                     dates.push(this.addDaysToDateStr(wordObj._127_day7Entry, 7));
                 } else if(wordObj.wrongCount > 0) {
-                    // 滚动池：显示接下来 7 天都在计划中（每日滚动）
+                    // 滚动池：接下来 7 天都在计划中（每日滚动）
                     for(let i = 1; i <= 7; i++) {
                         dates.push(this.addDaysToDateStr(todayStr, i));
                     }
+                } else if(wordObj.correctCount === 0 && wordObj.wrongCount === 0 && wordObj.status === 'learning') {
+                    // 新课：今天该练习
+                    dates.push(todayStr);
                 }
                 wordObj.reviewDates = dates;
             },
@@ -3437,7 +3426,7 @@
                 const today = new Date().toISOString().slice(0,10);
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
-                        this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
+                        this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[today], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
                         added++;
                     } else {
                         exists++;
@@ -4081,7 +4070,7 @@
                             words: [item.word], isWord: true, correctCount: 0, wrongCount: 0,
                             status: 'learning', reviewCorrected: false,
                             _127_rollingStreak: 0, _127_day7Entry: null, _127_randomCheckWeek: 0,
-                            reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
+                            reviewDates: [today], pendingReview: false, pendingReviewDate: null, handwritingData: null
                         });
                         added++;
                     }
@@ -4149,7 +4138,7 @@
                             words: ch.words || [ch.word1, ch.word2, ch.word3].filter(Boolean),
                             correctCount: 0, wrongCount: 0, status: 'learning', reviewCorrected: false,
                             _127_rollingStreak: 0, _127_day7Entry: null, _127_randomCheckWeek: 0,
-                            reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
+                            reviewDates: [today], pendingReview: false, pendingReviewDate: null, handwritingData: null
                         });
                         added++;
                     }
