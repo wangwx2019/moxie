@@ -603,6 +603,7 @@
             <div v-for="plan in allReviewPlans" :key="plan.date" class="plan-date">
                 <div class="plan-date-header">{{ plan.date }} ({{ plan.weekday }}) · {{ plan.words.length }}个词语</div>
                 <div class="word-chips"><span v-for="w in plan.words" :key="w.id" class="chip-word">{{ w.word }}</span></div>
+                <button class="cute-btn-sm" style="margin-top:8px; font-size:0.8rem; padding:6px 12px; background:#f97316; color:white; border:none; border-radius:20px; cursor:pointer;" @click="addPlanToToday(plan)">➕ 添加到今日计划</button>
             </div>
             <div v-if="allReviewPlans.length === 0" class="card-white">暂无复习计划</div>
         </div>
@@ -2849,148 +2850,246 @@
                     this.traceMode = false;
                 }
             },
-            // ---- 批量 AI 批改（按字分组，三词连练） ----
+            // ---- 批量 AI 批改（合并所有画布为一张图，只调用1次OCR） ----
             async batchSubmitAll() {
                 this.ocrBusy = true;
                 this.lastOcrEngine = '';
                 this.sessionCorrectCount = 0;
-                // 诊断：打印百度OCR账号状态
-                const acc = this.baiduAccounts[this.baiduActiveIdx];
-                const diagMsg = `useBaiduOCR=${this.useBaiduOCR}, idx=${this.baiduActiveIdx}, 账号数=${this.baiduAccounts.length}, apiKey=${acc?.apiKey?'有':'无'}, token=${acc?.token?'有':'无'}, expired=${acc?this.isBaiduTokenExpired(acc):'N/A'}`;
-                console.log('[OCR诊断]', diagMsg);
-                this.lastOcrEngine = diagMsg;
                 const today = new Date().toISOString().slice(0,10);
                 const currentWeek = this.getWeekNumber(new Date());
+                // 诊断
+                const acc = this.baiduAccounts[this.baiduActiveIdx];
+                console.log('[OCR诊断]', `useBaiduOCR=${this.useBaiduOCR}, idx=${this.baiduActiveIdx}, 账号数=${this.baiduAccounts.length}, apiKey=${acc?.apiKey?'有':'无'}, token=${acc?.token?'有':'无'}`);
+
+                // ====== Phase 1: 分组 & 准备每个组的子图 ======
                 const groups = {};
                 for(const item of this.sessionCanvasData) {
                     if(!groups[item.charId]) groups[item.charId] = { charId: item.charId, char: item.char, items: [] };
                     groups[item.charId].items.push(item);
                 }
-                for(const charId in groups) {
+                const groupOrder = [];
+                const subImageList = []; // 每个group对应一张子图（base64）
+                for(const charId of Object.keys(groups)) {
+                    const group = groups[charId];
+                    const wordObj = this.words.find(w => w.id === group.charId);
+                    if(!wordObj) continue;
+                    let subBase64 = '';
+                    if(wordObj.isWord) {
+                        // 词语：合并该词的所有字画布到一个子图
+                        const parts = group.items.flatMap(it => (it.canvasDataURL || '').split('|||').filter(Boolean));
+                        if(parts.length > 0) {
+                            const imgs = await Promise.all(parts.map(p => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('img fail')); im.src = p; })));
+                            const tw = imgs.reduce((s, im) => s + im.width, 0);
+                            const mh = Math.max(...imgs.map(im => im.height));
+                            const c = document.createElement('canvas'); c.width = tw; c.height = mh;
+                            const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0,0,tw,mh);
+                            let px = 0; for(const im of imgs) { cx.drawImage(im, px, 0); px += im.width; }
+                            subBase64 = (await this.preprocessForOCR(c.toDataURL())).split(',')[1];
+                        }
+                    } else {
+                        // 单字：直接处理该字的画布
+                        if(group.items[0]?.canvasDataURL) {
+                            subBase64 = (await this.preprocessForOCR(group.items[0].canvasDataURL)).split(',')[1];
+                        }
+                    }
+                    if(subBase64) {
+                        groupOrder.push(charId);
+                        subImageList.push(subBase64);
+                    }
+                }
+                if(groupOrder.length === 0) { this.ocrBusy = false; return; }
+
+                // ====== Phase 2: 将每个子图缩小到合理尺寸，添加编号，再合并为一张大图 ======
+                const SUB_SIZE = 100; // 每个子图缩小到100×100
+                const LABEL_H = 20; // 编号区域高度
+                const CELL_H = SUB_SIZE + LABEL_H; // 每个单元格总高度
+                const SPACING = 4;
+                // 缩小每个子图并添加编号
+                const scaledList = [];
+                for(let gi = 0; gi < subImageList.length; gi++) {
+                    const b = subImageList[gi];
+                    const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('img fail')); i.src = 'data:image/png;base64,' + b; });
+                    const c = document.createElement('canvas'); c.width = SUB_SIZE; c.height = CELL_H;
+                    const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0,0,SUB_SIZE,CELL_H);
+                    // 绘制编号（顶部居中，14px字号）
+                    cx.fillStyle = '#666';
+                    cx.font = 'bold 14px Arial';
+                    cx.textAlign = 'center';
+                    cx.textBaseline = 'middle';
+                    cx.fillText(String(gi + 1), SUB_SIZE / 2, LABEL_H / 2);
+                    // 保持比例居中绘制子图（在编号下方）
+                    const scale = Math.min((SUB_SIZE - 8) / im.width, (SUB_SIZE - 8) / im.height);
+                    const dw = im.width * scale, dh = im.height * scale;
+                    cx.drawImage(im, (SUB_SIZE - dw) / 2, LABEL_H + (SUB_SIZE - dh) / 2, dw, dh);
+                    scaledList.push(c);
+                }
+                // 合并
+                const totalW = SUB_SIZE * scaledList.length + SPACING * (scaledList.length - 1);
+                const mergedCanvas = document.createElement('canvas');
+                mergedCanvas.width = totalW; mergedCanvas.height = CELL_H;
+                const mCtx = mergedCanvas.getContext('2d');
+                mCtx.fillStyle = '#ffffff';
+                mCtx.fillRect(0, 0, totalW, CELL_H);
+                let mx = 0;
+                const subPositions = [];
+                for(const sc of scaledList) { mCtx.drawImage(sc, mx, 0); subPositions.push({ x: mx, w: SUB_SIZE }); mx += SUB_SIZE + SPACING; }
+
+                // ====== Phase 3: 只调用1次OCR ======
+                let ocrWords = []; // Baidu OCR 返回的词列表 [{words, location}]
+                let ocrFullText = ''; // 合并后的全文
+                const mergedBase64 = mergedCanvas.toDataURL('image/png').split(',')[1];
+                //3a: 尝试百度OCR（仅1次调用）
+                if(this.useBaiduOCR) {
+                    for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
+                        const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
+                        const bAcc = this.baiduAccounts[idx];
+                        if(bAcc && bAcc.used < 500) {
+                            if(this.isBaiduTokenExpired(bAcc) && bAcc.apiKey && bAcc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(bAcc), true); }
+                            if(!bAcc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                            try {
+                                const body = new URLSearchParams({ image: mergedBase64 });
+                                const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + bAcc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                const ocrData = await ocrRes.json();
+                                if(ocrData.error_code === 17) { bAcc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                if(ocrData.error_code === 110 || ocrData.error_code) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                bAcc.used++;
+                                if(ocrData.words_result && ocrData.words_result.length > 0) {
+                                    ocrWords = ocrData.words_result;
+                                    ocrFullText = ocrWords.map(r => r.words).join('').trim().replace(/\s/g, '');
+                                    this.lastOcrEngine = `百度智能云（合并批改×1，共${groupOrder.length}组）`;
+                                    break;
+                                }
+                            } catch(fetchErr) {
+                                // 尝试手动OCR回退
+                                const manualResult = await this.manualOCR(mergedCanvas.toDataURL());
+                                if(manualResult) { ocrFullText = manualResult.replace(/\s/g, ''); this.lastOcrEngine = '百度智能云（手动合并×1）'; break; }
+                                this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                            }
+                        } else {
+                            this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
+                        }
+                    }
+                }
+                // 3b: 如果百度OCR失败，回退到Tesseract（也只调1次）
+                if(!ocrFullText) {
+                    this.lastOcrEngine = this.useBaiduOCR ? '百度智能云（失败回退Tesseract合并×1）' : '本地 Tesseract（合并×1）';
+                    try {
+                        const { data: { text } } = await Promise.race([
+                            Tesseract.recognize(mergedCanvas, 'chi_sim', { logger: m => console.log(m) }),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))
+                        ]);
+                        ocrFullText = text.trim().replace(/\s/g, '');
+                    } catch(e) {
+                        console.log('Tesseract合并识别失败:', e);
+                    }
+                }
+
+                // ====== Phase 4: 按编号将OCR结果分配回每个group ======
+                const recognizedMap = {}; // charId → 识别文本
+                
+                // 辅助：从OCR文本中提取编号和内容（如"1大"→{num:1, text:"大"}）
+                const parseOcrEntry = (text) => {
+                    const m = text.match(/^(\d+)\s*(.+)/);
+                    if(m) return { num: parseInt(m[1]), text: m[2].trim() };
+                    return { num: null, text: text.trim() };
+                };
+                
+                if(ocrWords.length > 0) {
+                    // 优先按编号匹配
+                    const numMap = {}; // 编号 → 识别文本（去掉编号部分）
+                    const unmatched = []; // 无法按编号匹配的条目
+                    for(const entry of ocrWords) {
+                        const parsed = parseOcrEntry(entry.words);
+                        if(parsed.num !== null && parsed.num >= 1 && parsed.num <= groupOrder.length) {
+                            // 按编号匹配：编号→groupOrder[num-1]
+                            const cid = groupOrder[parsed.num - 1];
+                            recognizedMap[cid] = (recognizedMap[cid] || '') + parsed.text;
+                        } else {
+                            unmatched.push(entry);
+                        }
+                    }
+                    // 对未按编号匹配的条目，按位置就近匹配补充
+                    if(unmatched.length > 0) {
+                        for(const entry of unmatched) {
+                            if(!entry.location) continue;
+                            const ex = entry.location.left + entry.location.width / 2;
+                            let bestIdx = 0, bestDist = Infinity;
+                            for(let i = 0; i < subPositions.length; i++) {
+                                const sp = subPositions[i];
+                                const dist = Math.abs(ex - (sp.x + sp.w / 2));
+                                if(dist < bestDist) { bestDist = dist; bestIdx = i; }
+                            }
+                            const cid = groupOrder[bestIdx];
+                            const cleanText = entry.words.trim().replace(/^\d+\s*/, '');
+                            recognizedMap[cid] = (recognizedMap[cid] || '') + cleanText;
+                        }
+                    }
+                } else if(ocrFullText) {
+                    // 情况：只有全文（Tesseract）→ 按编号模式拆分（如"1大2小3学"）
+                    // 尝试按 "编号+内容" 模式拆分
+                    const numPattern = ocrFullText.match(/(\d+)([^\d]+)/g);
+                    if(numPattern && numPattern.length >= groupOrder.length * 0.5) {
+                        // 能识别出编号模式
+                        for(const seg of numPattern) {
+                            const m = seg.match(/^(\d+)(.+)/);
+                            if(m) {
+                                const num = parseInt(m[1]);
+                                const text = m[2];
+                                if(num >= 1 && num <= groupOrder.length) {
+                                    const cid = groupOrder[num - 1];
+                                    recognizedMap[cid] = (recognizedMap[cid] || '') + text;
+                                }
+                            }
+                        }
+                    } else {
+                        // 无法识别编号模式 → 按期望字数比例拆分
+                        let totalExpected = 0;
+                        const expectedLens = [];
+                        for(const cid of groupOrder) {
+                            const wo = this.words.find(w => w.id === cid);
+                            const expLen = wo ? (wo.char || wo.word || '').length : 1;
+                            expectedLens.push(expLen);
+                            totalExpected += expLen;
+                        }
+                        if(totalExpected > 0) {
+                            let pos = 0;
+                            for(let i = 0; i < groupOrder.length; i++) {
+                                const len = Math.round((expectedLens[i] / totalExpected) * ocrFullText.length);
+                                recognizedMap[groupOrder[i]] = ocrFullText.slice(pos, pos + len);
+                                pos += len;
+                            }
+                            if(pos < ocrFullText.length && groupOrder.length > 0) {
+                                const lastCid = groupOrder[groupOrder.length - 1];
+                                recognizedMap[lastCid] = (recognizedMap[lastCid] || '') + ocrFullText.slice(pos);
+                            }
+                        }
+                    }
+                }
+
+                // ====== Phase 5: 处理每个group的判定结果（127逻辑） ======
+                for(const charId of groupOrder) {
                     try {
                         const group = groups[charId];
                         const wordObj = this.words.find(w => w.id === group.charId);
                         if(!wordObj) continue;
+                        const recognized = recognizedMap[charId] || '';
                         let anyCorrect = false;
-                        for(const item of group.items) {
-                            let recognized = '';
-                            try {
-                                if(wordObj.isWord) {
-                                    // 词语模式：合并多个画布识别
-                                    const parts = item.canvasDataURL.split('|||');
-                                    let fullRecognized = '';
-                                    for(const part of parts) {
-                                        const processed = await this.preprocessForOCR(part);
-                                        const base64 = processed.split(',')[1];
-                                        if(!base64) continue;
-                                        let singleRec = '';
-                                        if(this.useBaiduOCR) {
-                                            for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
-                                                const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
-                                                const acc = this.baiduAccounts[idx];
-                                                if(acc && acc.used < 500) {
-                                                    if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) {
-                                                        await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true);
-                                                    }
-                                                    if(!acc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                    try {
-                                                        const body = new URLSearchParams({ image: base64 });
-                                                        const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                                        const ocrData = await ocrRes.json();
-                                                        if(ocrData.error_code === 17) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                        if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                        if(ocrData.error_code) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                        acc.used++;
-                                                        if(ocrData.words_result && ocrData.words_result.length > 0) { singleRec = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); this.lastOcrEngine = '百度智能云'; break; }
-                                                    } catch(fetchErr) {
-                                                        // CORS失败 → 尝试手动回退
-                                                        if(!singleRec) {
-                                                            const manualResult = await this.manualOCR(base64);
-                                                            if(manualResult) { singleRec = manualResult.replace(/\s/g, ''); this.lastOcrEngine = '百度智能云（手动）'; break; }
-                                                        }
-                                                        this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                                    }
-                                                } else {
-                                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                                }
-                                            }
-                                        }
-                                        if(!singleRec) {
-                                            this.lastOcrEngine = this.useBaiduOCR ? '百度智能云（失败回退Tesseract）' : '本地 Tesseract';
-                                            const img = new Image();
-                                            img.src = part;
-                                            await Promise.race([new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }), new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))]);
-                                            const { data: { text } } = await Promise.race([Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }), new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))]);
-                                            singleRec = text.trim().replace(/\s/g, '');
-                                        }
-                                        fullRecognized += singleRec;
-                                    }
-                                    recognized = fullRecognized;
-                                } else {
-                                    // 单字模式
-                                    const processedSingle = await this.preprocessForOCR(item.canvasDataURL);
-                                    const base64 = processedSingle.split(',')[1];
-                                    let useTesseract = true;
-                                    if(this.useBaiduOCR) {
-                                        for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
-                                            const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
-                                            const acc = this.baiduAccounts[idx];
-                                            if(acc && acc.used < 500) {
-                                                if(this.isBaiduTokenExpired(acc) && acc.apiKey && acc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(acc), true); }
-                                                if(!acc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                try {
-                                                    const body = new URLSearchParams({ image: base64 });
-                                                    const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + acc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                                    const ocrData = await ocrRes.json();
-                                                    if(ocrData.error_code === 17) { acc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                    if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                    if(ocrData.error_code) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                                    acc.used++;
-                                                    if(ocrData.words_result && ocrData.words_result.length > 0) { recognized = ocrData.words_result.map(r => r.words).join('').trim().replace(/\s/g, ''); useTesseract = false; this.lastOcrEngine = '百度智能云'; break; }
-                                                } catch(fetchErr) {
-                                                    // CORS失败 → 尝试手动回退
-                                                    if(!recognized) {
-                                                        const manualResult = await this.manualOCR(base64);
-                                                        if(manualResult) { recognized = manualResult; useTesseract = false; this.lastOcrEngine = '百度智能云（手动）'; break; }
-                                                    }
-                                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                                }
-                                            } else {
-                                                this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
-                                            }
-                                        }
-                                    }
-                                    if(useTesseract) {
-                                        this.lastOcrEngine = this.useBaiduOCR ? '百度智能云（失败回退Tesseract）' : '本地 Tesseract';
-                                        const img = new Image();
-                                        img.src = item.canvasDataURL;
-                                        await Promise.race([new Promise((resolve, reject) => { img.onload = resolve; img.onerror = () => reject(new Error('图片加载失败')); }), new Promise((_, reject) => setTimeout(() => reject(new Error('图片加载超时')), 15000))]);
-                                        const { data: { text } } = await Promise.race([Tesseract.recognize(img, 'chi_sim', { logger: m => console.log(m) }), new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))]);
-                                        recognized = text.trim().replace(/\s/g, '');
-                                    }
-                                }
-                            } catch(e) {
-                                console.log('OCR识别失败:', e);
-                                recognized = '';
+                        const expectedChar = group.char || '';
+                        if(wordObj.isWord) {
+                            // 词语：以词语为单位整体比较，去除空格后完全匹配才算对
+                            // 例如："同学"必须识别为"同学"才算对，"同大"或"大同学"都算错
+                            const cleanRecog = recognized.replace(/\s/g, '');
+                            if(cleanRecog === expectedChar) {
+                                anyCorrect = true;
                             }
-                            const expectedChar = item.char || group.char || '';
-                            if(wordObj.isWord) {
-                                // 词语模式：识别结果包含词语的所有字即算对
-                                const expectedChars = expectedChar.split('');
-                                const allFound = expectedChars.every(c => recognized.includes(c));
-                                if(allFound) anyCorrect = true;
-                            } else {
-                                if(this.isRecognitionMatch(recognized || '', expectedChar)) anyCorrect = true;
-                            }
+                        } else {
+                            if(this.isRecognitionMatch(recognized, expectedChar)) anyCorrect = true;
                         }
-                        // 保存所有字的画布数据（词语模式下每个字单独保存）
+                        // 保存手写数据
                         if(wordObj.isWord) {
                             const allCanvases = [];
-                            group.items.forEach(item => {
-                                if(item.canvasDataURL) {
-                                    const parts = item.canvasDataURL.split('|||').filter(Boolean);
-                                    allCanvases.push(...parts);
-                                }
+                            group.items.forEach(it => {
+                                if(it.canvasDataURL) { allCanvases.push(...it.canvasDataURL.split('|||').filter(Boolean)); }
                             });
                             wordObj.handwritingData = allCanvases;
                         } else {
@@ -3033,12 +3132,12 @@
                         }
                     } catch(e) {
                         console.log('处理字符时出错:', e);
-                        if(group && group.charId) this.sessionWrongWordIds.push(group.charId);
+                        this.sessionWrongWordIds.push(charId);
                     }
                 }
                 this.ocrBusy = false;
                 this.sessionBatchSubmitted = true;
-                this.saveDataImmediate(); // AI批改完成后立即保存，确保数据持久化
+                this.saveDataImmediate();
             },
             // ---- 错字复习批量 AI 批改（每词3遍） ----
             // wrong review session removed
@@ -3328,6 +3427,25 @@
             },
             openReviewParentView(){ this.reviewFilter = 'all'; this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
+            addPlanToToday(plan) {
+                const today = new Date().toISOString().slice(0,10);
+                let addedCount = 0;
+                // 将该日期的词添加到今日计划（去重）
+                for(const w of plan.words) {
+                    if(!this.todayPlanWords.some(p => p.id === w.id)) {
+                        this.todayPlanWords.push(w);
+                        addedCount++;
+                    }
+                }
+                if(addedCount > 0) {
+                    this.todayPlanWordIds = this.todayPlanWords.map(w => w.id);
+                    this.todayPlanDate = today;
+                    this.saveData();
+                    this.showAlert('成功', `已添加 ${addedCount} 个词语到今日计划`);
+                } else {
+                    this.showAlert('提示', '这些词语已在今日计划中');
+                }
+            },
             commitParentReview(){
                 // 检查是否有未复核的错字
                 const unreviewed = this.todayPlanWords.filter(w => 
@@ -3424,6 +3542,9 @@
             confirmAddWords(){
                 let added=0, exists=0, reset=0;
                 const today = new Date().toISOString().slice(0,10);
+                // 保存手动添加的词ID（不在reviewDates中但已在todayPlanWordIds里的词）
+                const reviewBasedIds = new Set(this.words.filter(w => w.reviewDates && w.reviewDates.includes(today)).map(w => w.id));
+                const manualIds = this.todayPlanWordIds.filter(id => !reviewBasedIds.has(id));
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
                         this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[today], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
@@ -3443,6 +3564,15 @@
                 this.todayPlanWordIds = [];
                 this.todayPlanDate = '';
                 this.generateTodayPlan();
+                // 恢复手动添加的词（从看板添加但reviewDates不包含今天的词）
+                for(const id of manualIds) {
+                    const w = this.words.find(x => x.id === id);
+                    if(w && !this.todayPlanWords.some(p => p.id === id)) {
+                        this.todayPlanWords.push(w);
+                    }
+                }
+                this.todayPlanWordIds = this.todayPlanWords.map(w => w.id);
+                this.saveData();
                 if(added){
                     this.showAlert('成功', `成功添加 ${added} 个词语${reset ? '，'+reset+' 个已重置状态' : ''}`);
                 } else if(exists) {
@@ -4013,6 +4143,9 @@
                 // 保存当前标签的选择
                 this.vocabSelections[this.vocabSource] = { lessons: [...this.vocabSelectedLessons], chars: [...this.vocabSelectedChars] };
                 const today = new Date().toISOString().slice(0,10);
+                // 保存手动添加的词ID（不在reviewDates中但已在todayPlanWordIds里的词）
+                const reviewBasedIds = new Set(this.words.filter(w => w.reviewDates && w.reviewDates.includes(today)).map(w => w.id));
+                const manualIds = this.todayPlanWordIds.filter(id => !reviewBasedIds.has(id));
                 let totalAdded = 0, totalExists = 0, totalReset = 0;
                 // 1. 处理词语表（ciyu）的选择
                 for(const source of ['ciyu']) {
@@ -4153,6 +4286,15 @@
                 this.todayPlanWordIds = [];
                 this.todayPlanDate = '';
                 this.generateTodayPlan();
+                // 恢复手动添加的词（从看板添加但reviewDates不包含今天的词）
+                for(const id of manualIds) {
+                    const w = this.words.find(x => x.id === id);
+                    if(w && !this.todayPlanWords.some(p => p.id === id)) {
+                        this.todayPlanWords.push(w);
+                    }
+                }
+                this.todayPlanWordIds = this.todayPlanWords.map(w => w.id);
+                this.saveData();
                 this.showAlert('成功', `已添加 ${totalAdded} 个${totalExists ? '，'+totalExists+' 个已存在' : ''}${totalReset ? '，'+totalReset+' 个已重置状态' : ''}`);
                 this.currentView = 'parentHome';
             },
