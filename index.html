@@ -3450,6 +3450,9 @@
                     }
                 }
                 this.saveData();
+                // 清除计划缓存，强制重新生成（确保新添加的词能进入今日计划）
+                this.todayPlanWordIds = [];
+                this.todayPlanDate = '';
                 this.generateTodayPlan();
                 if(added){
                     this.showAlert('成功', `成功添加 ${added} 个词语${reset ? '，'+reset+' 个已重置状态' : ''}`);
@@ -4157,6 +4160,9 @@
                     return;
                 }
                 this.saveData();
+                // 清除计划缓存，强制重新生成（确保新添加的词能进入今日计划）
+                this.todayPlanWordIds = [];
+                this.todayPlanDate = '';
                 this.generateTodayPlan();
                 this.showAlert('成功', `已添加 ${totalAdded} 个${totalExists ? '，'+totalExists+' 个已存在' : ''}${totalReset ? '，'+totalReset+' 个已重置状态' : ''}`);
                 this.currentView = 'parentHome';
