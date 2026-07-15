@@ -1697,7 +1697,7 @@
             ttsVoiceId:'saveData', 
             ttsToken:'saveData' 
         },
-        mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); this.generateTodayPlan(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
+        mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); this.generateTodayPlan(); window.addEventListener('beforeunload', this.flushSave); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
         methods: {
             async fetchRemoteData() {
                 try {
@@ -1910,6 +1910,10 @@
             },
             saveDataImmediate() {
                 // 立即保存（关键节点：AI批改、复核提交、清除计划等）
+                if(this._saveTimer) { clearTimeout(this._saveTimer); this._saveTimer = null; }
+                this._doSave();
+            },
+            flushSave() {
                 if(this._saveTimer) { clearTimeout(this._saveTimer); this._saveTimer = null; }
                 this._doSave();
             },
