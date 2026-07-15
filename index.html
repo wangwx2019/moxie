@@ -1924,7 +1924,7 @@
                     const { handwritingData, ...rest } = w;
                     return rest;
                 });
-                let toSave = { words: wordsForSave, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: this.todayPlanWords.map(w => w.id), todayPlanDate: this.todayPlanDate || '' };
+                let toSave = { words: wordsForSave, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: (this.todayPlanWords || []).map(w => w.id), todayPlanDate: this.todayPlanDate || '' };
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
                 } catch(e) {
@@ -3725,7 +3725,7 @@
                     this.checkinDays=1;
                     this.parentPassword='8899';
                     this.useBaiduOCR=false;
-                    this.baiduAccounts = [{ name:'账号1', token:'', used:0 }];
+                    this.baiduAccounts = [{ name:'账号1', apiKey: '', secretKey: '', token: '', tokenExpiresAt: 0, used: 0 }];
                     this.baiduActiveIdx = 0;
                     this.saveData();
                     this.generateTodayPlan();
