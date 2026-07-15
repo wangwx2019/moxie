@@ -3542,12 +3542,9 @@
             confirmAddWords(){
                 let added=0, exists=0, reset=0;
                 const today = new Date().toISOString().slice(0,10);
-                // 保存手动添加的词ID（不在reviewDates中但已在todayPlanWordIds里的词）
-                const reviewBasedIds = new Set(this.words.filter(w => w.reviewDates && w.reviewDates.includes(today)).map(w => w.id));
-                const manualIds = this.todayPlanWordIds.filter(id => !reviewBasedIds.has(id));
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
-                        this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[today], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
+                        this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
                         added++;
                     } else {
                         exists++;
@@ -3560,14 +3557,15 @@
                     }
                 }
                 this.saveData();
-                // 清除计划缓存，强制重新生成（确保新添加的词能进入今日计划）
-                this.todayPlanWordIds = [];
-                this.todayPlanDate = '';
-                this.generateTodayPlan();
-                // 恢复手动添加的词（从看板添加但reviewDates不包含今天的词）
-                for(const id of manualIds) {
-                    const w = this.words.find(x => x.id === id);
-                    if(w && !this.todayPlanWords.some(p => p.id === id)) {
+                // 将新添加的词加入今日计划（保留看板手动添加的词）
+                // 1. 先确保 todayPlanWords 存在
+                if(!this.todayPlanWords) this.todayPlanWords = [];
+                if(!this.todayPlanWordIds) this.todayPlanWordIds = [];
+                if(!this.todayPlanDate) this.todayPlanDate = today;
+                // 2. 添加新词到今日计划（去重）
+                for(let it of this.pendingWords){
+                    const w = this.words.find(x => x.word === it.word);
+                    if(w && !this.todayPlanWords.some(p => p.id === w.id)) {
                         this.todayPlanWords.push(w);
                     }
                 }
