@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>墨趣听写 · 智能复习计划</title>
     <script>
     // ===== 版本自检：检测 vocabulary.json 是否更新，强制刷新页面 =====
@@ -19,10 +16,21 @@
         }
     })();
     </script>
+    <script>
+    // ===== 本地日期工具函数（避免UTC时区偏移） =====
+    function getLocalDateStr() {
+        var now = new Date();
+        return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    }
+    </script>
     <script src="https://unpkg.com/pinyin-pro@3.19.6/dist/index.js"></script>
+    <script>if(typeof pinyinPro==='undefined'){document.write('<script src="./lib/pinyin-pro.js"><\/script>')}</script>
     <script src="https://unpkg.com/vue@3.4.27/dist/vue.global.js"></script>
+    <script>if(typeof Vue==='undefined'){document.write('<script src="./lib/vue.global.js"><\/script>')}</script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script>if(typeof Tesseract==='undefined'){document.write('<script src="./lib/tesseract.min.js"><\/script>')}</script>
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <script>if(typeof HanziWriter==='undefined'){document.write('<script src="./lib/hanzi-writer.min.js"><\/script>')}</script>
     <style>
         [v-cloak] { display: none !important; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -325,7 +333,7 @@
                 <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:56px; flex-shrink:0;"></div>
                 <div class="tian-ge-cell">
-                    <canvas id="tg_c" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;"></canvas>
+                    <canvas id="tg_c" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;" aria-label="手写区域，在此处用手指或鼠标写字"></canvas>
                 </div>
                 <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
@@ -837,7 +845,7 @@
     </div>
 
     <!-- 弹窗组件 -->
-    <div v-if="customModal.visible" class="modal-mask" @click.self="customModal.visible=false">
+    <div v-if="customModal.visible" class="modal-mask" @click.self="customModal.visible=false" role="dialog" aria-modal="true" :aria-label="customModal.title || '提示'">
         <div class="modal-container" tabindex="0" ref="confirmModal" @keydown.enter="customModal.onConfirm?.()" @keydown.escape="customModal.onCancel?.()">
             <div class="modal-icon">{{ customModal.icon || '📌' }}</div>
             <div class="modal-word">{{ customModal.title || '提示' }}</div>
@@ -1489,7 +1497,8 @@
                     .filter(w => {
                         // 显式读取 ocrResult / reviewCorrected，确保 Vue 跟踪这些响应式依赖
                         // 当 judgeAsCorrect / judgeAsWrong 修改这些属性时，computed 会被正确重算
-                        const _deps = w.ocrResult + '|' + w.reviewCorrected;
+                        void w.ocrResult;
+                        void w.reviewCorrected;
                         return w.handwritingData && w.handwritingData.length > 0;
                     })
                     .map(w => ({
@@ -1671,7 +1680,23 @@
                 return this.todayPlanWords.filter(w => w.isWord === true);
             },
         },
-        watch: { words: { deep: true, handler: 'saveData' }, checkinDays:'saveData', totalDictateTimes:'saveData', parentPassword:'saveData', useBaiduOCR:'saveData', baiduAccounts:{ deep:true, handler:'saveData' }, baiduActiveIdx:'saveData', githubToken:'saveData', githubSyncTime:'saveData', vocabUsage:{ deep:true, handler:'saveData' }, ttsVoiceId:'saveData', ttsToken:'saveData' },
+        watch: { 
+            words: { deep: true, handler: 'saveData' }, 
+            checkinDays:'saveData', 
+            totalDictateTimes:'saveData', 
+            parentPassword:'saveData', 
+            useBaiduOCR(val) { 
+                this.useBaiduOCR = val === 'true' || val === true; 
+                this.saveData(); 
+            },
+            baiduAccounts:{ deep:true, handler:'saveData' }, 
+            baiduActiveIdx:'saveData', 
+            githubToken:'saveData', 
+            githubSyncTime:'saveData', 
+            vocabUsage:{ deep:true, handler:'saveData' }, 
+            ttsVoiceId:'saveData', 
+            ttsToken:'saveData' 
+        },
         mounted() { this.loadData(); this.generateTodayPlan(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
         methods: {
             async fetchRemoteData() {
@@ -1712,6 +1737,21 @@
                 this.resultModalVisible = false;
                 if(this.resultModalCallback) this.resultModalCallback();
                 this.resultModalCallback = null;
+            },
+            fallbackCopy(text) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    this.showAlert('已复制', '链接已复制到剪贴板，请在新标签页打开获取 access_token');
+                } catch(e) {
+                    this.showAlert('复制失败', '请手动复制以下链接：\n' + text);
+                }
+                document.body.removeChild(ta);
             },
             addAccount() {
                 const n = this.baiduAccounts.length + 1;
@@ -1757,14 +1797,22 @@
                     // CORS 或网络问题 → 给用户手动获取的链接
                     if(!silent) {
                         const manualUrl = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=' + encodeURIComponent(acc.apiKey) + '&client_secret=' + encodeURIComponent(acc.secretKey);
-                        this.showConfirm('无法自动获取', '浏览器安全限制导致无法直接调用百度接口。\n\n是否复制手动获取链接到剪贴板？\n（在浏览器新标签页打开，返回的 JSON 中找到 access_token 字段，粘贴到 token 输入框即可）', () => {
-                            const ta = document.createElement('textarea');
-                            ta.value = manualUrl;
-                            document.body.appendChild(ta);
-                            ta.select();
-                            document.execCommand('copy');
-                            document.body.removeChild(ta);
-                            this.showAlert('已复制', '链接已复制，请在新标签页打开获取 access_token');
+                        this.showConfirm('手动获取Token', 
+                            '操作步骤（3步即可）：\n' +
+                            '1. 点下方「复制链接」\n' +
+                            '2. 浏览器新标签页粘贴打开\n' +
+                            '3. 复制返回JSON中的 access_token\n' +
+                            '   粘贴到上方 token 输入框\n\n' +
+                            '提示：token 有效期约30天，过期后重复此操作即可', () => {
+                            if(navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(manualUrl).then(() => {
+                                    this.showAlert('已复制', '链接已复制到剪贴板，请在新标签页打开获取 access_token');
+                                }).catch(() => {
+                                    this.fallbackCopy(manualUrl);
+                                });
+                            } else {
+                                this.fallbackCopy(manualUrl);
+                            }
                         });
                     }
                 }
@@ -1781,8 +1829,31 @@
             loadData() {
                 try {
                     let s = localStorage.getItem(STORAGE_KEY);
-                    if(s){ let d=JSON.parse(s); this.words=d.words; this.checkinDays=d.checkinDays; this.parentPassword=d.parentPassword; this.useBaiduOCR = d.useBaiduOCR !== false; if(d.baiduAccounts && d.baiduAccounts.length) { this.baiduAccounts = d.baiduAccounts; this.baiduActiveIdx = d.baiduActiveIdx || 0; } else if(d.baiduDirectToken) { this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }]; }
-                        this.baiduResetMonth = d.baiduResetMonth || ''; this.githubToken = d.githubToken || ''; this.githubSyncTime = d.githubSyncTime || ''; this.textbookLessons = d.textbookLessons || {}; this.textbookSelections = d.textbookSelections || []; this.usingTextbookPlan = d.usingTextbookPlan || false; this.vocabUsage = d.vocabUsage || {}; this.todayWrongReviewWords = d.todayWrongReviewWords || []; this.ttsVoiceId = d.ttsVoiceId || '5003';                         this.ttsToken = d.ttsToken || ''; this.todayPlanDate = d.todayPlanDate || ''; this.todayPlanWordIds = d.todayPlanWordIds || []; }
+                    if(s) {
+                        let d = JSON.parse(s);
+                        this.words = d.words;
+                        this.checkinDays = d.checkinDays;
+                        this.parentPassword = d.parentPassword;
+                        this.useBaiduOCR = d.useBaiduOCR !== false;
+                        if(d.baiduAccounts && d.baiduAccounts.length) {
+                            this.baiduAccounts = d.baiduAccounts;
+                            this.baiduActiveIdx = d.baiduActiveIdx || 0;
+                        } else if(d.baiduDirectToken) {
+                            this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }];
+                        }
+                        this.baiduResetMonth = d.baiduResetMonth || '';
+                        this.githubToken = d.githubToken || '';
+                        this.githubSyncTime = d.githubSyncTime || '';
+                        this.textbookLessons = d.textbookLessons || {};
+                        this.textbookSelections = d.textbookSelections || [];
+                        this.usingTextbookPlan = d.usingTextbookPlan || false;
+                        this.vocabUsage = d.vocabUsage || {};
+                        this.todayWrongReviewWords = d.todayWrongReviewWords || [];
+                        this.ttsVoiceId = d.ttsVoiceId || '5003';
+                        this.ttsToken = d.ttsToken || '';
+                        this.todayPlanDate = d.todayPlanDate || '';
+                        this.todayPlanWordIds = d.todayPlanWordIds || [];
+                    }
                 } catch(e) {
                     console.error('加载数据失败，使用默认数据:', e);
                     localStorage.removeItem(STORAGE_KEY);
@@ -1801,7 +1872,31 @@
                     this.baiduAccounts.forEach(a => a.used = 0);
                     this.baiduResetMonth = thisMonth;
                 }
-                if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords)); 
+                if(!this.words.length) this.words=JSON.parse(JSON.stringify(defaultWords));
+                // 迁移旧格式 sz_ ID（不含分类）到新格式（含 shizi/xiezhi 分类）
+                this.words.forEach(w => {
+                    if(w.id && w.id.startsWith('sz_')) {
+                        const parts = w.id.split('_');
+                        // 旧格式: sz_unit_lesson_char (parts[2] 是字名, 不是 shizi/xiezhi)
+                        // 新格式: sz_unit_lesson_cat_char (parts[2] 是 shizi 或 xiezhi)
+                        if(parts.length >= 3 && parts[2] !== 'shizi' && parts[2] !== 'xiezhi') {
+                            const newId = parts[0] + '_' + parts[1] + '_shizi_' + parts.slice(2).join('_');
+                            w.id = newId;
+                        }
+                    }
+                });
+                // 迁移 todayPlanWordIds 中的旧格式 ID
+                if(this.todayPlanWordIds && this.todayPlanWordIds.length) {
+                    this.todayPlanWordIds = this.todayPlanWordIds.map(id => {
+                        if(id && id.startsWith('sz_')) {
+                            const parts = id.split('_');
+                            if(parts.length >= 3 && parts[2] !== 'shizi' && parts[2] !== 'xiezhi') {
+                                return parts[0] + '_' + parts[1] + '_shizi_' + parts.slice(2).join('_');
+                            }
+                        }
+                        return id;
+                    });
+                }
                 this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w._planSkipDate === undefined) w._planSkipDate = null; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
                 this.saveDataImmediate(); 
             },
@@ -1981,9 +2076,9 @@
                                         wordObj._127_rollingStreak = (wordObj._127_rollingStreak || 0) + 1;
                                         if(wordObj._127_rollingStreak >= 3) {
                                             // 连续对3次 → 升级到Day7
-                                            wordObj._127_day7Entry = new Date().toISOString().slice(0,10);
+                                            wordObj._127_day7Entry = getLocalDateStr();
                                             wordObj._127_rollingStreak = 0;
-                                            wordObj.reviewDates = [this.addDaysToDateStr(new Date().toISOString().slice(0,10), 7)];
+                                            wordObj.reviewDates = [this.addDaysToDateStr(getLocalDateStr(), 7)];
                                         } else {
                                             this.generateReviewDates(wordObj);
                                         }
@@ -2012,7 +2107,7 @@
             },
             generateTodayPlan() {
                 if(this.usingTextbookPlan) return;
-                const today = new Date().toISOString().slice(0,10);
+                const today = getLocalDateStr();
 
                 // 如果今日计划已存在（todayPlanDate === today），直接从 todayPlanWordIds 恢复
                 // 避免重建时过滤掉已批改的词（ocrResult非空的词会被排除）
@@ -2109,7 +2204,7 @@
                     wordObj.status = 'learning';
                     this.generateReviewDates(wordObj);
                 }
-                this.saveData();
+                this.saveDataImmediate();
                 this.$forceUpdate();
             },
             // 家长判断字写错了（覆盖AI判断）
@@ -2132,7 +2227,7 @@
                 wordObj.reviewCorrected = true;
                 wordObj.status = 'learning';
                 this.generateReviewDates(wordObj);
-                this.saveData();
+                this.saveDataImmediate();
                 this.$forceUpdate();
             },
             // 撤销家长判断（恢复到AI原始判断）
@@ -2155,7 +2250,7 @@
                     wordObj.firstWrong = false;
                 }
                 this.generateReviewDates(wordObj);
-                this.saveData();
+                this.saveDataImmediate();
                 this.$forceUpdate();
             },
             // 统一默写入口：单字在前，词语在后
@@ -2652,8 +2747,9 @@
                         navigator.clipboard.writeText(url).catch(()=>{});
                     }
                     this.showConfirm('手动识别', '已复制链接到剪贴板，请：\n1. 打开浏览器新标签页\n2. 粘贴链接访问\n3. 把返回JSON中 words_result 的内容粘贴到下方', () => {
-                        const input = prompt('粘贴识别结果（如：花、草、树）：');
-                        resolve(input || '');
+                        this.showPrompt('手动识别', '粘贴识别结果（如：花、草、树）：', '花、草、树', (input) => {
+                            resolve(input || '');
+                        });
                     }, () => { resolve(''); });
                 });
             },
@@ -2855,7 +2951,7 @@
                 this.ocrBusy = true;
                 this.lastOcrEngine = '';
                 this.sessionCorrectCount = 0;
-                const today = new Date().toISOString().slice(0,10);
+                const today = getLocalDateStr();
                 const currentWeek = this.getWeekNumber(new Date());
                 // 诊断
                 const acc = this.baiduAccounts[this.baiduActiveIdx];
@@ -3149,7 +3245,7 @@
                     context: this.currentSessionWord.context
                 };
                 const wordObj = this.words.find(w=>w.id===this.currentSessionWord.id);
-                const today = new Date().toISOString().slice(0,10);
+                const today = getLocalDateStr();
                 const currentWeek = this.getWeekNumber(new Date());
                 if(isCorrect) {
                     wordObj.correctCount = (wordObj.correctCount || 0) + 1;
@@ -3231,7 +3327,7 @@
                         wordObj._127_day7Entry = null;
                         wordObj.status = 'learning';
                         wordObj.pendingReview = true;
-                        wordObj.pendingReviewDate = new Date().toISOString().slice(0,10);
+                        wordObj.pendingReviewDate = getLocalDateStr();
                         this.generateReviewDates(wordObj);
                         this.sessionRetryCount[wordObj.id] = 1;
                     } else {
@@ -3257,7 +3353,7 @@
                         wordObj._127_day7Entry = null;
                         wordObj.status = 'learning';
                         wordObj.pendingReview = true;
-                        wordObj.pendingReviewDate = new Date().toISOString().slice(0,10);
+                        wordObj.pendingReviewDate = getLocalDateStr();
                         this.generateReviewDates(wordObj);
                     }
                 }
@@ -3411,7 +3507,7 @@
 
             relativeDateStr(dateStr){
                 if(!dateStr) return '';
-                const today = new Date().toISOString().slice(0,10);
+                const today = getLocalDateStr();
                 if(dateStr === today) return '今天';
                 const diff = Math.round((new Date(today) - new Date(dateStr)) / (1000*60*60*24));
                 if(diff === 1) return '昨天';
@@ -3428,7 +3524,7 @@
             openReviewParentView(){ this.reviewFilter = 'all'; this.currentView='reviewParent'; },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
             addPlanToToday(plan) {
-                const today = new Date().toISOString().slice(0,10);
+                const today = getLocalDateStr();
                 let addedCount = 0;
                 // 将该日期的词添加到今日计划（去重）
                 for(const w of plan.words) {
@@ -3453,7 +3549,7 @@
                 );
                 
                 const doCommit = () => {
-                    const today = new Date().toISOString().slice(0,10);
+                    const today = getLocalDateStr();
                     // 清除 ALL 有 handwritingData 的词（不仅仅是 todayPlanWords，防止复核项反复出现）
                     this.words.forEach(w => {
                         if(w.handwritingData && w.handwritingData.length > 0) {
@@ -3526,7 +3622,7 @@
                     wordObj._127_day7Entry = null;
                     wordObj.status = 'learning';
                     wordObj.pendingReview = true;
-                    wordObj.pendingReviewDate = new Date().toISOString().slice(0,10);
+                    wordObj.pendingReviewDate = getLocalDateStr();
                     this.generateReviewDates(wordObj);
                     this.saveData();
                     this.generateTodayPlan();
@@ -3541,7 +3637,7 @@
             parseToStep2(){ let raw=this.rawWordsInput.trim(); if(!raw) { this.showAlert('提示', '请输入词语'); return; } let arr=raw.split(/[ ,，、\s]+/).filter(w=>w); this.pendingWords=arr.map(w=>({ word:w, pinyin:toPinyinWithTone(w), example:'' })); this.wizardStep=2; },
             confirmAddWords(){
                 let added=0, exists=0, reset=0;
-                const today = new Date().toISOString().slice(0,10);
+                const today = getLocalDateStr();
                 for(let it of this.pendingWords){
                     if(!this.words.some(w=>w.word===it.word)){
                         this.words.push({ id:Date.now()+it.word, word:it.word, char:it.word, pinyin:it.pinyin, context:it.example, words:[it.word], isWord:true, status:'learning', correctCount:0, wrongCount:0, firstWrong:false, reviewDates:[], pendingReview:false, reviewCorrected:false, _127_rollingStreak:0, _127_day7Entry:null, _127_randomCheckWeek:0 });
@@ -3649,13 +3745,20 @@
             confirmDeleteAll() {
                 const words = this.filteredWordBank;
                 if(!words.length) return;
-                this.showConfirm('清空词库', `确定删除全部 ${words.length} 个词语吗？此操作不可撤销！`, () => {
-                    const ids = new Set(words.map(w => w.id));
-                    this.words = this.words.filter(w => !ids.has(w.id));
-                    this.wordBankSelected = [];
-                    this.saveData();
-                    this.generateTodayPlan();
-                });
+                const isFiltered = this.wordBankFilter !== 'all';
+                this.showConfirm(
+                    isFiltered ? '删除筛选结果' : '清空词库',
+                    isFiltered 
+                        ? `当前只显示"${this.wordBankFilter}"分类，确定删除这 ${words.length} 个词语吗？其他分类的词不受影响。`
+                        : `确定删除全部 ${words.length} 个词语吗？此操作不可撤销！`,
+                    () => {
+                        const ids = new Set(words.map(w => w.id));
+                        this.words = this.words.filter(w => !ids.has(w.id));
+                        this.wordBankSelected = [];
+                        this.saveData();
+                        this.generateTodayPlan();
+                    }
+                );
             },
             exportData(){
                 const fullData = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime };
@@ -4140,10 +4243,10 @@
             confirmVocabSelect() {
                 // 保存当前标签的选择
                 this.vocabSelections[this.vocabSource] = { lessons: [...this.vocabSelectedLessons], chars: [...this.vocabSelectedChars] };
-                const today = new Date().toISOString().slice(0,10);
+                const today = getLocalDateStr();
                 let totalAdded = 0, totalExists = 0, totalReset = 0;
-                // 跟踪本次新添加的词ID（直接加入今日计划，不进看板）
-                const newlyAddedIds = [];
+                // 跟踪本次所有选中的词ID（新添加的+已存在的，都要加入今日计划）
+                const allSelectedIds = [];
                 // 1. 处理词语表（ciyu）的选择
                 for(const source of ['ciyu']) {
                     const sel = this.vocabSelections[source];
@@ -4187,6 +4290,7 @@
                     let added = 0, exists = 0, reset = 0;
                     for(let item of selectedWords) {
                         const wordId = 'yw_' + item.unitName + '_' + item.lesson.name + '_' + item.word;
+                        allSelectedIds.push(wordId);
                         const existingWord = this.words.find(w => w.id === wordId);
                         if(existingWord) {
                             exists++;
@@ -4202,7 +4306,6 @@
                             reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
                         };
                         this.words.push(newWord);
-                        newlyAddedIds.push(wordId);
                         added++;
                     }
                     totalAdded += added; totalExists += exists; totalReset += reset;
@@ -4221,10 +4324,10 @@
                             for(let lesson of unit.lessons) {
                                 if(unit.name + '||' + lesson.name === lessonKey) {
                                     for(let ch of (lesson.shizi || [])) {
-                                        selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                                        selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name, cat: 'shizi' });
                                     }
                                     for(let ch of (lesson.xiezhi || [])) {
-                                        selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name });
+                                        selectedChars.push({ lesson: lesson, ch: ch, unitName: unit.name, cat: 'xiezhi' });
                                     }
                                 }
                             }
@@ -4248,14 +4351,17 @@
                     }
                     const seen = new Set();
                     selectedChars = selectedChars.filter(item => {
-                        if(seen.has(item.ch.char)) return false;
-                        seen.add(item.ch.char);
+                        const key = item.ch.char + '_' + (item.cat || 'shizi');
+                        if(seen.has(key)) return false;
+                        seen.add(key);
                         return true;
                     });
                     let added = 0, exists = 0, reset = 0;
                     for(let item of selectedChars) {
                         const ch = item.ch;
-                        const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + ch.char;
+                        const cat = item.cat || 'shizi';
+                        const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + cat + '_' + ch.char;
+                        allSelectedIds.push(charId);
                         const existingChar = this.words.find(w => w.id === charId);
                         if(existingChar) {
                             exists++;
@@ -4271,7 +4377,6 @@
                             reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
                         };
                         this.words.push(newChar);
-                        newlyAddedIds.push(charId);
                         added++;
                     }
                     totalAdded += added; totalExists += exists; totalReset += reset;
@@ -4281,24 +4386,37 @@
                     return;
                 }
                 this.saveData();
-                // 将新添加的词加入今日计划（保留看板手动添加的词）
+                // 将所有选中的词加入今日计划（包括已存在的词）
                 if(!this.todayPlanWords) this.todayPlanWords = [];
                 if(!this.todayPlanWordIds) this.todayPlanWordIds = [];
                 if(!this.todayPlanDate) this.todayPlanDate = today;
-                // 只添加本次新添加的词（通过newlyAddedIds跟踪）
-                for(const id of newlyAddedIds) {
+                // 将本次选中的所有词加入今日计划（新添加的+已存在的）
+                for(const id of allSelectedIds) {
                     const w = this.words.find(x => x.id === id);
-                    if(w && !this.todayPlanWords.some(p => p.id === id)) {
-                        this.todayPlanWords.push(w);
+                    if(w) {
+                        // 确保 reviewDates 包含今天，以便 generateTodayPlan 能找到该词
+                        if(!w.reviewDates) w.reviewDates = [];
+                        if(!w.reviewDates.includes(today)) w.reviewDates.push(today);
+                        if(!this.todayPlanWords.some(p => p.id === id)) {
+                            this.todayPlanWords.push(w);
+                        }
                     }
                 }
                 this.todayPlanWordIds = this.todayPlanWords.map(w => w.id);
-                this.saveData();
+                this.saveDataImmediate();
+                this.generateTodayPlan();
                 this.showAlert('成功', `已添加 ${totalAdded} 个${totalExists ? '，'+totalExists+' 个已存在' : ''}${totalReset ? '，'+totalReset+' 个已重置状态' : ''}`);
                 this.currentView = 'parentHome';
             },
         }
-    }).mount('#app');
+    });
+    // 全局错误处理：防止页面白屏，自动保存数据
+    app.config.errorHandler = (err, vm, info) => {
+        console.error('应用错误:', err, info);
+        try { vm.saveDataImmediate(); } catch(e) {}
+        alert('页面出了点小问题，数据已自动保存。请刷新页面重试。');
+    };
+    app.mount('#app');
     </script>
     <script>
     // 防止长按弹出复制菜单
