@@ -4141,10 +4141,9 @@
                 // 保存当前标签的选择
                 this.vocabSelections[this.vocabSource] = { lessons: [...this.vocabSelectedLessons], chars: [...this.vocabSelectedChars] };
                 const today = new Date().toISOString().slice(0,10);
-                // 保存手动添加的词ID（不在reviewDates中但已在todayPlanWordIds里的词）
-                const reviewBasedIds = new Set(this.words.filter(w => w.reviewDates && w.reviewDates.includes(today)).map(w => w.id));
-                const manualIds = this.todayPlanWordIds.filter(id => !reviewBasedIds.has(id));
                 let totalAdded = 0, totalExists = 0, totalReset = 0;
+                // 跟踪本次新添加的词ID（直接加入今日计划，不进看板）
+                const newlyAddedIds = [];
                 // 1. 处理词语表（ciyu）的选择
                 for(const source of ['ciyu']) {
                     const sel = this.vocabSelections[source];
@@ -4196,13 +4195,14 @@
                             continue;
                         }
                         const wordPinyin = toPinyinForWord(item.word);
-                        this.words.push({
-                            id: wordId, word: item.word, char: item.word, pinyin: wordPinyin,
+                        const newWord = { id: wordId, word: item.word, char: item.word, pinyin: wordPinyin,
                             words: [item.word], isWord: true, correctCount: 0, wrongCount: 0,
                             status: 'learning', reviewCorrected: false,
                             _127_rollingStreak: 0, _127_day7Entry: null, _127_randomCheckWeek: 0,
-                            reviewDates: [today], pendingReview: false, pendingReviewDate: null, handwritingData: null
-                        });
+                            reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
+                        };
+                        this.words.push(newWord);
+                        newlyAddedIds.push(wordId);
                         added++;
                     }
                     totalAdded += added; totalExists += exists; totalReset += reset;
@@ -4264,13 +4264,14 @@
                             continue;
                         }
                         const charPinyin = toPinyinWithTone(ch.char);
-                        this.words.push({
-                            id: charId, word: ch.char, char: ch.char, pinyin: charPinyin,
+                        const newChar = { id: charId, word: ch.char, char: ch.char, pinyin: charPinyin,
                             words: ch.words || [ch.word1, ch.word2, ch.word3].filter(Boolean),
                             correctCount: 0, wrongCount: 0, status: 'learning', reviewCorrected: false,
                             _127_rollingStreak: 0, _127_day7Entry: null, _127_randomCheckWeek: 0,
-                            reviewDates: [today], pendingReview: false, pendingReviewDate: null, handwritingData: null
-                        });
+                            reviewDates: [], pendingReview: false, pendingReviewDate: null, handwritingData: null
+                        };
+                        this.words.push(newChar);
+                        newlyAddedIds.push(charId);
                         added++;
                     }
                     totalAdded += added; totalExists += exists; totalReset += reset;
@@ -4280,12 +4281,12 @@
                     return;
                 }
                 this.saveData();
-                // 清除计划缓存，强制重新生成（确保新添加的词能进入今日计划）
-                this.todayPlanWordIds = [];
-                this.todayPlanDate = '';
-                this.generateTodayPlan();
-                // 恢复手动添加的词（从看板添加但reviewDates不包含今天的词）
-                for(const id of manualIds) {
+                // 将新添加的词加入今日计划（保留看板手动添加的词）
+                if(!this.todayPlanWords) this.todayPlanWords = [];
+                if(!this.todayPlanWordIds) this.todayPlanWordIds = [];
+                if(!this.todayPlanDate) this.todayPlanDate = today;
+                // 只添加本次新添加的词（通过newlyAddedIds跟踪）
+                for(const id of newlyAddedIds) {
                     const w = this.words.find(x => x.id === id);
                     if(w && !this.todayPlanWords.some(p => p.id === id)) {
                         this.todayPlanWords.push(w);
