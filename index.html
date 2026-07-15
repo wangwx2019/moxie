@@ -271,7 +271,7 @@
             </div>
             <!-- 词语田字格：上一个 | 画布 | 下一个 -->
             <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px;">
-                <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:40px; height:40px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.1rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
+                <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:40px; height:40px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.1rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:40px; flex-shrink:0;"></div>
                 <div style="flex:1; min-width:0; display:flex; justify-content:center; gap:8px; padding:2px 0; overflow-x:auto; -webkit-overflow-scrolling:touch;" id="word_canvas_container">
                     <!-- 由 initWordCanvas 动态创建 -->
@@ -330,7 +330,7 @@
             </div>
             <!-- 写字的田字格canvas：上一个 | 田字格 | 下一个 -->
             <div style="display:flex; align-items:center; justify-content:center; gap:24px; margin-bottom:16px;">
-                <button v-if="sessionCanvasData.length > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
+                <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:56px; flex-shrink:0;"></div>
                 <div class="tian-ge-cell">
                     <canvas id="tg_c" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;" aria-label="手写区域，在此处用手指或鼠标写字"></canvas>
@@ -373,7 +373,7 @@
             </div>
             <div v-else>
                 <div style="font-size:1.3rem;">🎉 批改完成！错词已进入复习队列</div>
-                <div style="margin:12px 0; font-size:1rem;">✅ 正确 {{ sessionCorrectCount }} / {{ sessionCanvasData.length }}</div>
+                <div style="margin:12px 0; font-size:1rem;">✅ 正确 {{ sessionCorrectCount }} / {{ sessionCanvasCount }}</div>
                 <div v-if="lastOcrEngine" style="margin:8px 0; font-size:0.85rem; color:#92400e;">🤖 识别引擎: {{ lastOcrEngine }}{{ lastOcrEngine.includes('回退') ? '（请在设置中检查百度Token）' : '' }}</div>
                 <button class="cute-btn primary" style="width:100%; margin-top:20px; padding:18px 0; font-size:1.2rem; font-weight:700;" @click="finishAndGoHome">返回首页</button>
             </div>
@@ -1408,7 +1408,7 @@
                 sessionFinished: false,
                 sessionAnswer: '',
                 sessionPendingQueue: [],
-                sessionCanvasData: [],    // 批量提交用：保存每个词的canvas数据
+                sessionCanvasCount: 0,    // 批量提交计数（模板用，数据存在 _canvasStore 非响应式数组中）
                 sessionBatchSubmitted: false, // 是否已提交AI批改
                 sessionWrongWordIds: [], // 本次session中写错的词ID（供家长复核后生成错字复习）
                 todayWrongReviewWords: [], // (不再使用，保留向后兼容)
@@ -1697,7 +1697,7 @@
             ttsVoiceId:'saveData', 
             ttsToken:'saveData' 
         },
-        mounted() { this.loadData(); this.generateTodayPlan(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
+        mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); this.generateTodayPlan(); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } },
         methods: {
             async fetchRemoteData() {
                 try {
@@ -1914,12 +1914,50 @@
                 this._doSave();
             },
             _doSave() {
-                let toSave = { words: this.words, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: this.todayPlanWords.map(w => w.id), todayPlanDate: this.todayPlanDate || '' };
+                // 不再保存 handwritingData 到 localStorage（太大，卡界面）
+                // handwritingData 改存 IndexedDB（异步，不阻塞）
+                const wordsForSave = this.words.map(w => {
+                    const { handwritingData, ...rest } = w;
+                    return rest;
+                });
+                let toSave = { words: wordsForSave, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: this.todayPlanWords.map(w => w.id), todayPlanDate: this.todayPlanDate || '' };
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
                 } catch(e) {
                     console.error('保存数据失败:', e);
                 }
+            },
+            // ---- IndexedDB 手写图存储（异步，不阻塞界面） ----
+            _initHandwritingDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open('HandwritingDB', 1);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if(!db.objectStoreNames.contains('images')) {
+                            db.createObjectStore('images', { keyPath: 'id' });
+                        }
+                    };
+                    req.onsuccess = (e) => { this._handwritingDB = e.target.result; resolve(); };
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            async saveHandwriting(wordId, dataURLs) {
+                if(!this._handwritingDB) await this._initHandwritingDB();
+                return new Promise((resolve, reject) => {
+                    const tx = this._handwritingDB.transaction('images', 'readwrite');
+                    tx.objectStore('images').put({ id: wordId, data: dataURLs });
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                });
+            },
+            async getHandwriting(wordId) {
+                if(!this._handwritingDB) await this._initHandwritingDB();
+                return new Promise((resolve, reject) => {
+                    const tx = this._handwritingDB.transaction('images', 'readonly');
+                    const req = tx.objectStore('images').get(wordId);
+                    req.onsuccess = () => resolve(req.result?.data || []);
+                    req.onerror = () => reject(req.error);
+                });
             },
             // ---- 127 辅助方法 ----
             // 初始化繁体转简体映射
@@ -2276,7 +2314,8 @@
                 this.sessionFinished = false;
                 this.sessionAnswer = '';
                 this.sessionPendingQueue = [];
-                this.sessionCanvasData = [];
+                this._canvasStore = [];
+                this.sessionCanvasCount = 0;
                 this.sessionBatchSubmitted = false;
                 this.sessionWrongWordIds = [];
                 this.sessionWrongRetryQueue = [];
@@ -2311,7 +2350,8 @@
                 this.sessionFinished=false;
                 this.sessionAnswer='';
                 this.sessionPendingQueue=[];
-                this.sessionCanvasData=[];
+                this._canvasStore=[];
+                this.sessionCanvasCount=0;
                 this.sessionBatchSubmitted=false;
                 this.sessionWrongWordIds=[];
                 if(this.timerInterval) clearInterval(this.timerInterval);
@@ -2340,7 +2380,8 @@
                 this.sessionFinished = false;
                 this.sessionAnswer = '';
                 this.sessionPendingQueue = [];
-                this.sessionCanvasData = [];
+                this._canvasStore = [];
+                this.sessionCanvasCount = 0;
                 this.sessionBatchSubmitted = false;
                 this.sessionWrongWordIds = [];
                 this.sessionWrongRetryQueue = [];
@@ -2363,7 +2404,8 @@
                 this.sessionFinished=false;
                 this.sessionAnswer='';
                 this.sessionPendingQueue=[];
-                this.sessionCanvasData=[];
+                this._canvasStore=[];
+                this.sessionCanvasCount=0;
                 this.sessionBatchSubmitted=false;
                 this.sessionWrongWordIds=[];
                 if(this.timerInterval) clearInterval(this.timerInterval);
@@ -2710,19 +2752,18 @@
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.onload = () => {
-                        const SIZE = 512;
+                        // 直接用原图尺寸，不做放大（省掉放大+缩小的开销）
+                        const w = img.width, h = img.height;
                         const c = document.createElement('canvas');
-                        c.width = SIZE; c.height = SIZE;
+                        c.width = w; c.height = h;
                         const ctx = c.getContext('2d');
                         // 纯白背景
                         ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, SIZE, SIZE);
-                        // 原图居中放大绘制
-                        const pad = 32;
-                        const drawSize = SIZE - pad * 2;
-                        ctx.drawImage(img, pad, pad, drawSize, drawSize);
+                        ctx.fillRect(0, 0, w, h);
+                        // 绘制原图
+                        ctx.drawImage(img, 0, 0);
                         // 二值化：像素亮度 < 180 → 黑，否则 → 白
-                        const imageData = ctx.getImageData(0, 0, SIZE, SIZE);
+                        const imageData = ctx.getImageData(0, 0, w, h);
                         const d = imageData.data;
                         for(let i = 0; i < d.length; i += 4) {
                             const gray = d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114;
@@ -2755,10 +2796,11 @@
             },
             // 返回上一个字：恢复画布，保留之前的书写内容
             goToPrevWord() {
-                if(this.sessionCanvasData.length === 0) return;
+                if(this._canvasStore.length === 0) return;
                 this._isProcessingSubmit = false; // 重置提交锁
-                const prev = this.sessionCanvasData.pop();
+                const prev = this._canvasStore.pop();
                 if(!prev) return;
+                this.sessionCanvasCount--;
                 console.log('goToPrevWord:', { sessionMode: this.sessionMode, sessionCurrentIdx: this.sessionCurrentIdx, listLen: this.sessionTaskList.length, prev });
                 // 找到原始词对象，用完整数据恢复
                 const origWord = this.words.find(w => w.id === prev.charId);
@@ -2871,11 +2913,11 @@
                         const dataURLs = [];
                         for(let i = 0; i < chars.length; i++) {
                             const canvas = document.getElementById('tg_w' + i);
-                            dataURLs.push(canvas ? canvas.toDataURL() : '');
+                            dataURLs.push(canvas ? canvas.toDataURL('image/jpeg', 0.6) : '');
                         }
                         const wordObj = this.words.find(w => w.id === cur.id);
                         // handwritingData 不在此处设置，由 batchSubmitAll 在AI批改时统一设置
-                        this.sessionCanvasData.push({
+                        this._canvasStore.push({
                             charId: cur.id,
                             char: cur.word,
                             word: cur.word,
@@ -2883,6 +2925,7 @@
                             pinyin: cur.pinyin,
                             canvasDataURL: dataURLs.join('|||')
                         });
+                        this.sessionCanvasCount++;
                         this.totalDictateTimes++;
                         // todayCompletedCount 不在此处++，由 batchSubmitAll 在AI批改时统一计数
                         // 检查是否需要重试
@@ -2909,9 +2952,9 @@
                     }
                     // 单字模式
                     const canvas = document.getElementById('tg_c');
-                    const dataURL = canvas ? canvas.toDataURL() : '';
+                    const dataURL = canvas ? canvas.toDataURL('image/jpeg', 0.6) : '';
                     // handwritingData 不在此处设置，由 batchSubmitAll 在AI批改时统一设置
-                    this.sessionCanvasData.push({
+                    this._canvasStore.push({
                         charId: cur.id,
                         char: cur.word,
                         word: (cur.words || [cur.word])[this.sessionCurrentWordIdx],
@@ -2919,6 +2962,7 @@
                         pinyin: cur.pinyin,
                         canvasDataURL: dataURL
                     });
+                    this.sessionCanvasCount++;
                     this.totalDictateTimes++;
                     // todayCompletedCount 不在此处++，由 batchSubmitAll 在AI批改时统一计数
                     this.traceMode = false;
@@ -2949,6 +2993,8 @@
             // ---- 批量 AI 批改（合并所有画布为一张图，只调用1次OCR） ----
             async batchSubmitAll() {
                 this.ocrBusy = true;
+                try {
+                console.log('[OCR批改] 开始');
                 this.lastOcrEngine = '';
                 this.sessionCorrectCount = 0;
                 const today = getLocalDateStr();
@@ -2959,7 +3005,7 @@
 
                 // ====== Phase 1: 分组 & 准备每个组的子图 ======
                 const groups = {};
-                for(const item of this.sessionCanvasData) {
+                for(const item of this._canvasStore) {
                     if(!groups[item.charId]) groups[item.charId] = { charId: item.charId, char: item.char, items: [] };
                     groups[item.charId].items.push(item);
                 }
@@ -2995,40 +3041,43 @@
                 }
                 if(groupOrder.length === 0) { this.ocrBusy = false; return; }
 
-                // ====== Phase 2: 将每个子图缩小到合理尺寸，添加编号，再合并为一张大图 ======
-                const SUB_SIZE = 100; // 每个子图缩小到100×100
-                const LABEL_H = 20; // 编号区域高度
-                const CELL_H = SUB_SIZE + LABEL_H; // 每个单元格总高度
-                const SPACING = 4;
-                // 缩小每个子图并添加编号
+                // ====== Phase 2: 将每个子图缩小到合理尺寸，网格排列，再合并为一张大图 ======
+                const SUB_SIZE = 200; // 每个子图缩小到200×200（保持清晰度）
+                const COLS = 10; // 每行10个字
+                const CELL_H = SUB_SIZE; // 无编号，单元格高度=子图高度
+                const SPACING = 20; // 字间距加大，避免粘连
+                // 缩小每个子图（无编号，保持清晰）
                 const scaledList = [];
                 for(let gi = 0; gi < subImageList.length; gi++) {
                     const b = subImageList[gi];
                     const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('img fail')); i.src = 'data:image/png;base64,' + b; });
                     const c = document.createElement('canvas'); c.width = SUB_SIZE; c.height = CELL_H;
                     const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0,0,SUB_SIZE,CELL_H);
-                    // 绘制编号（顶部居中，14px字号）
-                    cx.fillStyle = '#666';
-                    cx.font = 'bold 14px Arial';
-                    cx.textAlign = 'center';
-                    cx.textBaseline = 'middle';
-                    cx.fillText(String(gi + 1), SUB_SIZE / 2, LABEL_H / 2);
-                    // 保持比例居中绘制子图（在编号下方）
+                    // 保持比例居中绘制子图
                     const scale = Math.min((SUB_SIZE - 8) / im.width, (SUB_SIZE - 8) / im.height);
                     const dw = im.width * scale, dh = im.height * scale;
-                    cx.drawImage(im, (SUB_SIZE - dw) / 2, LABEL_H + (SUB_SIZE - dh) / 2, dw, dh);
+                    cx.drawImage(im, (SUB_SIZE - dw) / 2, (CELL_H - dh) / 2, dw, dh);
                     scaledList.push(c);
                 }
                 // 合并
-                const totalW = SUB_SIZE * scaledList.length + SPACING * (scaledList.length - 1);
+                // 网格合并：每行COLS个字
+                const rows = Math.ceil(scaledList.length / COLS);
+                const totalW = COLS * SUB_SIZE + (COLS - 1) * SPACING;
+                const totalH = rows * CELL_H + (rows - 1) * SPACING;
                 const mergedCanvas = document.createElement('canvas');
-                mergedCanvas.width = totalW; mergedCanvas.height = CELL_H;
+                mergedCanvas.width = totalW; mergedCanvas.height = totalH;
                 const mCtx = mergedCanvas.getContext('2d');
                 mCtx.fillStyle = '#ffffff';
-                mCtx.fillRect(0, 0, totalW, CELL_H);
-                let mx = 0;
+                mCtx.fillRect(0, 0, totalW, totalH);
                 const subPositions = [];
-                for(const sc of scaledList) { mCtx.drawImage(sc, mx, 0); subPositions.push({ x: mx, w: SUB_SIZE }); mx += SUB_SIZE + SPACING; }
+                for(let gi = 0; gi < scaledList.length; gi++) {
+                    const row = Math.floor(gi / COLS);
+                    const col = gi % COLS;
+                    const x = col * (SUB_SIZE + SPACING);
+                    const y = row * (CELL_H + SPACING);
+                    mCtx.drawImage(scaledList[gi], x, y);
+                    subPositions.push({ x, y, w: SUB_SIZE, h: CELL_H });
+                }
 
                 // ====== Phase 3: 只调用1次OCR ======
                 let ocrWords = []; // Baidu OCR 返回的词列表 [{words, location}]
@@ -3080,84 +3129,47 @@
                     }
                 }
 
-                // ====== Phase 4: 按编号将OCR结果分配回每个group ======
+                // ====== Phase 4: 按坐标将OCR结果分配回每个group ======
                 const recognizedMap = {}; // charId → 识别文本
                 
-                // 辅助：从OCR文本中提取编号和内容（如"1大"→{num:1, text:"大"}）
-                const parseOcrEntry = (text) => {
-                    const m = text.match(/^(\d+)\s*(.+)/);
-                    if(m) return { num: parseInt(m[1]), text: m[2].trim() };
-                    return { num: null, text: text.trim() };
-                };
-                
-                if(ocrWords.length > 0) {
-                    // 优先按编号匹配
-                    const numMap = {}; // 编号 → 识别文本（去掉编号部分）
-                    const unmatched = []; // 无法按编号匹配的条目
+                if(ocrWords.length > 0 && subPositions.length > 0) {
+                    // 百度OCR返回了位置信息，直接按坐标匹配
                     for(const entry of ocrWords) {
-                        const parsed = parseOcrEntry(entry.words);
-                        if(parsed.num !== null && parsed.num >= 1 && parsed.num <= groupOrder.length) {
-                            // 按编号匹配：编号→groupOrder[num-1]
-                            const cid = groupOrder[parsed.num - 1];
-                            recognizedMap[cid] = (recognizedMap[cid] || '') + parsed.text;
-                        } else {
-                            unmatched.push(entry);
+                        if(!entry.location) continue;
+                        // 找到最匹配的单元格（根据中心点距离）
+                        const ecx = entry.location.left + entry.location.width / 2;
+                        const ecy = entry.location.top + entry.location.height / 2;
+                        let bestIdx = 0, bestDist = Infinity;
+                        for(let i = 0; i < subPositions.length; i++) {
+                            const sp = subPositions[i];
+                            const spcx = sp.x + sp.w / 2;
+                            const spcy = sp.y + sp.h / 2;
+                            const dist = Math.sqrt((ecx - spcx) ** 2 + (ecy - spcy) ** 2);
+                            if(dist < bestDist) { bestDist = dist; bestIdx = i; }
                         }
+                        const cid = groupOrder[bestIdx];
+                        recognizedMap[cid] = (recognizedMap[cid] || '') + entry.words;
                     }
-                    // 对未按编号匹配的条目，按位置就近匹配补充
-                    if(unmatched.length > 0) {
-                        for(const entry of unmatched) {
-                            if(!entry.location) continue;
-                            const ex = entry.location.left + entry.location.width / 2;
-                            let bestIdx = 0, bestDist = Infinity;
-                            for(let i = 0; i < subPositions.length; i++) {
-                                const sp = subPositions[i];
-                                const dist = Math.abs(ex - (sp.x + sp.w / 2));
-                                if(dist < bestDist) { bestDist = dist; bestIdx = i; }
-                            }
-                            const cid = groupOrder[bestIdx];
-                            const cleanText = entry.words.trim().replace(/^\d+\s*/, '');
-                            recognizedMap[cid] = (recognizedMap[cid] || '') + cleanText;
-                        }
+                } else if(ocrFullText && groupOrder.length > 0) {
+                    // 回退：只有全文（Tesseract）→ 按期望字数比例拆分
+                    let totalExpected = 0;
+                    const expectedLens = [];
+                    for(const cid of groupOrder) {
+                        const wo = this.words.find(w => w.id === cid);
+                        const expLen = wo ? (wo.char || wo.word || '').length : 1;
+                        expectedLens.push(expLen);
+                        totalExpected += expLen;
                     }
-                } else if(ocrFullText) {
-                    // 情况：只有全文（Tesseract）→ 按编号模式拆分（如"1大2小3学"）
-                    // 尝试按 "编号+内容" 模式拆分
-                    const numPattern = ocrFullText.match(/(\d+)([^\d]+)/g);
-                    if(numPattern && numPattern.length >= groupOrder.length * 0.5) {
-                        // 能识别出编号模式
-                        for(const seg of numPattern) {
-                            const m = seg.match(/^(\d+)(.+)/);
-                            if(m) {
-                                const num = parseInt(m[1]);
-                                const text = m[2];
-                                if(num >= 1 && num <= groupOrder.length) {
-                                    const cid = groupOrder[num - 1];
-                                    recognizedMap[cid] = (recognizedMap[cid] || '') + text;
-                                }
-                            }
+                    if(totalExpected > 0) {
+                        let pos = 0;
+                        for(let i = 0; i < groupOrder.length; i++) {
+                            const len = Math.round((expectedLens[i] / totalExpected) * ocrFullText.length);
+                            recognizedMap[groupOrder[i]] = ocrFullText.slice(pos, pos + len);
+                            pos += len;
                         }
-                    } else {
-                        // 无法识别编号模式 → 按期望字数比例拆分
-                        let totalExpected = 0;
-                        const expectedLens = [];
-                        for(const cid of groupOrder) {
-                            const wo = this.words.find(w => w.id === cid);
-                            const expLen = wo ? (wo.char || wo.word || '').length : 1;
-                            expectedLens.push(expLen);
-                            totalExpected += expLen;
-                        }
-                        if(totalExpected > 0) {
-                            let pos = 0;
-                            for(let i = 0; i < groupOrder.length; i++) {
-                                const len = Math.round((expectedLens[i] / totalExpected) * ocrFullText.length);
-                                recognizedMap[groupOrder[i]] = ocrFullText.slice(pos, pos + len);
-                                pos += len;
-                            }
-                            if(pos < ocrFullText.length && groupOrder.length > 0) {
-                                const lastCid = groupOrder[groupOrder.length - 1];
-                                recognizedMap[lastCid] = (recognizedMap[lastCid] || '') + ocrFullText.slice(pos);
-                            }
+                        if(pos < ocrFullText.length && groupOrder.length > 0) {
+                            const lastCid = groupOrder[groupOrder.length - 1];
+                            recognizedMap[lastCid] = (recognizedMap[lastCid] || '') + ocrFullText.slice(pos);
                         }
                     }
                 }
@@ -3181,16 +3193,19 @@
                         } else {
                             if(this.isRecognitionMatch(recognized, expectedChar)) anyCorrect = true;
                         }
-                        // 保存手写数据
+                        // 保存手写数据到 IndexedDB（异步，不阻塞）
+                        let handwritingURLs = [];
                         if(wordObj.isWord) {
                             const allCanvases = [];
                             group.items.forEach(it => {
                                 if(it.canvasDataURL) { allCanvases.push(...it.canvasDataURL.split('|||').filter(Boolean)); }
                             });
-                            wordObj.handwritingData = allCanvases;
+                            handwritingURLs = allCanvases;
                         } else {
-                            wordObj.handwritingData = group.items[0]?.canvasDataURL ? [group.items[0].canvasDataURL] : [];
+                            handwritingURLs = group.items[0]?.canvasDataURL ? [group.items[0].canvasDataURL] : [];
                         }
+                        wordObj.handwritingData = handwritingURLs; // 内存中保留，当前会话用
+                        this.saveHandwriting(group.charId, handwritingURLs).catch(()=>{}); // 异步存 IndexedDB，不卡界面
                         wordObj.ocrResult = anyCorrect ? 'correct' : 'wrong';
                         if(anyCorrect) {
                             wordObj.correctCount = (wordObj.correctCount || 0) + 1;
@@ -3231,9 +3246,15 @@
                         this.sessionWrongWordIds.push(charId);
                     }
                 }
-                this.ocrBusy = false;
                 this.sessionBatchSubmitted = true;
                 this.saveDataImmediate();
+                } catch(err) {
+                    console.error('[OCR批改错误]', err);
+                    this.showAlert('批改失败', 'AI批改过程出错：' + (err.message || err));
+                } finally {
+                    console.log('[OCR批改] 结束，ocrBusy设为false');
+                    this.ocrBusy = false;
+                }
             },
             // ---- 错字复习批量 AI 批改（每词3遍） ----
             // wrong review session removed
@@ -3251,7 +3272,9 @@
                     wordObj.correctCount = (wordObj.correctCount || 0) + 1;
                     // 保存手写图（供复核页查看）
                     const mergedCanvas = this.getMergedCanvas();
-                    wordObj.handwritingData = [mergedCanvas.toDataURL()];
+                    const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.7);
+                    wordObj.handwritingData = [hwDataURL];
+                    this.saveHandwriting(wordObj.id, [hwDataURL]).catch(()=>{}); // 异步存 IndexedDB
                     wordObj.ocrResult = 'correct';
                     // 127 逻辑：判断词的当前状态
                     if(wordObj._127_day7Entry) {
@@ -3298,7 +3321,9 @@
                     wordObj._127_day7Entry = null;  // 从 Day7 降级回滚动池
                     wordObj.status = 'learning';
                     const mergedCanvas = this.getMergedCanvas();
-                    wordObj.handwritingData = [mergedCanvas.toDataURL()];
+                    const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.7);
+                    wordObj.handwritingData = [hwDataURL];
+                    this.saveHandwriting(wordObj.id, [hwDataURL]).catch(()=>{}); // 异步存 IndexedDB
                     wordObj.ocrResult = 'wrong';
                     wordObj.pendingReview = true;
                     wordObj.pendingReviewDate = today;
@@ -3442,8 +3467,8 @@
                     return;
                 }
                 // 有已保存但未批改的数据 → 问用户是否先批改再退出
-                if(this.sessionCanvasData.length > 0 && !this.sessionBatchSubmitted) {
-                    this.showConfirm('退出', `有 ${this.sessionCanvasData.length} 个字已保存但尚未批改，是否先提交批改再退出？`, () => {
+                if(this._canvasStore.length > 0 && !this.sessionBatchSubmitted) {
+                    this.showConfirm('退出', `有 ${this._canvasStore.length} 个字已保存但尚未批改，是否先提交批改再退出？`, () => {
                         // 确认 → 先批改
                         this.batchSubmitAll().then(() => {
                             this.cleanupDictateSession();
@@ -3464,11 +3489,15 @@
             },
             cleanupDictateSession() {
                 this.closeStrokeOrder();
-                this.sessionCanvasData = [];
+                this._canvasStore = [];
+                this.sessionCanvasCount = 0;
                 this.sessionBatchSubmitted = false;
                 this.sessionWrongWordIds = [];
                 this.sessionFinished = false;
                 this.todayCompletedCount = 0;
+                this.todayPlanWords = [];
+                this.todayPlanDate = '';
+                this.todayPlanWordIds = [];
                 this.sessionCorrectCount = 0;
                 this.sessionCurrentWordIdx = 0;
                 this.sessionCharHadTrace = false;
@@ -3478,6 +3507,7 @@
                     window.removeEventListener('popstate', this._dictatePopstateHandler);
                     this._dictatePopstateHandler = null;
                 }
+                this.saveDataImmediate();
             },
             showParentPasswordModal() {
                 this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
@@ -3563,15 +3593,17 @@
                             w._planSkipDate = today;
                         }
                     });
-                    // 保存今日计划信息到data，供跨设备同步后自动检测
-                    this.todayPlanWordIds = this.todayPlanWords.map(w => w.id);
-                    this.todayPlanDate = today;
+                    // 清空今日计划（复核完成 = 今日流程结束）
+                    this.todayPlanWords = [];
+                    this.todayPlanDate = '';
+                    this.todayPlanWordIds = [];
+                    this.todayCompletedCount = 0;
                     // 重置 session 错字记录
                     this.sessionWrongWordIds = [];
                     this.saveDataImmediate();
                     this.generateTodayPlan();
-                    this.currentView='parentHome';
-                    this.showAlert('完成', '复核已处理。请返回孩子端点击「清除计划」完成今日流程。');
+                    this.currentView='childHome';
+                    this.showAlert('完成', '复核已处理，今日计划已清零。');
                 };
                 
                 if(unreviewed.length > 0) {
