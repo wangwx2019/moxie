@@ -2775,7 +2775,7 @@
                             d[i] = d[i+1] = d[i+2] = v;
                         }
                         ctx.putImageData(imageData, 0, 0);
-                        resolve(c.toDataURL('image/png'));
+                        resolve(c.toDataURL('image/jpeg', 0.95)); // JPG格式，百度OCR推荐
                     };
                     img.onerror = () => resolve(dataURL);
                     img.src = dataURL;
@@ -3086,7 +3086,9 @@
                 // ====== Phase 3: 只调用1次OCR ======
                 let ocrWords = []; // Baidu OCR 返回的词列表 [{words, location}]
                 let ocrFullText = ''; // 合并后的全文
-                const mergedBase64 = mergedCanvas.toDataURL('image/png').split(',')[1];
+                // 图片预处理：白底黑字 + JPG格式，提高OCR识别率
+                const processedDataURL = await this.preprocessForOCR(mergedCanvas.toDataURL());
+                const mergedBase64 = processedDataURL.split(',')[1];
                 //3a: 尝试百度OCR（仅1次调用）
                 if(this.useBaiduOCR) {
                     for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
@@ -3096,7 +3098,12 @@
                             if(this.isBaiduTokenExpired(bAcc) && bAcc.apiKey && bAcc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(bAcc), true); }
                             if(!bAcc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
                             try {
-                                const body = new URLSearchParams({ image: mergedBase64 });
+                                // 逐字定位 + 返回置信度，用于逐字比对
+                                const body = new URLSearchParams({ 
+                                    image: mergedBase64,
+                                    recognize_granularity: 'small',
+                                    probability: 'true'
+                                });
                                 const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + bAcc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
                                 const ocrData = await ocrRes.json();
                                 if(ocrData.error_code === 17) { bAcc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
@@ -3188,10 +3195,14 @@
                         let anyCorrect = false;
                         const expectedChar = group.char || '';
                         if(wordObj.isWord) {
-                            // 词语：以词语为单位整体比较，去除空格后完全匹配才算对
-                            // 例如："同学"必须识别为"同学"才算对，"同大"或"大同学"都算错
+                            // 词语：逐字比对，2字以上词语容错1个字
                             const cleanRecog = recognized.replace(/\s/g, '');
-                            if(cleanRecog === expectedChar) {
+                            let matchCount = 0;
+                            for(let ci = 0; ci < expectedChar.length; ci++) {
+                                if(cleanRecog[ci] === expectedChar[ci]) matchCount++;
+                            }
+                            // 全对 或 （2字以上且只错1字）算正确
+                            if(matchCount === expectedChar.length || (expectedChar.length > 2 && matchCount >= expectedChar.length - 1)) {
                                 anyCorrect = true;
                             }
                         } else {
