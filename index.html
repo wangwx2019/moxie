@@ -3106,8 +3106,10 @@
                                 });
                                 const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + bAcc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
                                 const ocrData = await ocrRes.json();
+                                console.log('[OCR原始返回]', JSON.stringify(ocrData).substring(0, 500));
                                 if(ocrData.error_code === 17) { bAcc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                if(ocrData.error_code === 110 || ocrData.error_code) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                if(ocrData.error_code && ocrData.error_code !== 0) { console.log('[OCR错误码]', ocrData.error_code, ocrData.error_msg); this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
                                 bAcc.used++;
                                 if(ocrData.words_result && ocrData.words_result.length > 0) {
                                     ocrWords = ocrData.words_result;
@@ -3186,6 +3188,7 @@
                 }
 
                 // ====== Phase 5: 处理每个group的判定结果（127逻辑） ======
+                console.log('[OCR识别结果]', 'recognizedMap:', JSON.stringify(recognizedMap), 'ocrWords:', ocrWords.length, 'ocrFullText:', ocrFullText);
                 for(const charId of groupOrder) {
                     try {
                         const group = groups[charId];
@@ -3194,6 +3197,7 @@
                         const recognized = recognizedMap[charId] || '';
                         let anyCorrect = false;
                         const expectedChar = group.char || '';
+                        console.log('[OCR比对]', '期望:', expectedChar, '识别:', recognized, 'isWord:', wordObj.isWord);
                         if(wordObj.isWord) {
                             // 词语：逐字比对，2字以上词语容错1个字
                             const cleanRecog = recognized.replace(/\s/g, '');
