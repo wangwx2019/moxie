@@ -37,7 +37,7 @@
         body { background: #fef5e8; padding: 16px; font-family: system-ui, 'Segoe UI', 'Quicksand', 'PingFang SC', sans-serif; }
         #app { margin: 0 auto; background: white; border-radius: 48px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); overflow: hidden; width: 100%; max-width: 1000px; -webkit-user-select: none; user-select: none; }
         #app * { -webkit-user-select: none; user-select: none; }
-        @media (min-width: 768px) { body { padding: 24px; } #app { max-width: 1100px; } .canvas-tg { width: 240px; height: 240px; } }
+        @media (min-width: 768px) { body { padding: 24px; } #app { max-width: 1100px; } .canvas-tg { width: 160px; height: 160px; } }
         .app-header { padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; background: #fffaef; border-bottom: 3px solid #ffd9b5; }
         .logo { font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, #f59e0b, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .parent-btn { background: #fff0e0; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 600; color: #d97706; cursor: pointer; font-size: 0.85rem; }
@@ -49,7 +49,7 @@
         .nav-back { display: inline-flex; align-items: center; gap: 6px; background: #fff2e6; padding: 6px 14px; border-radius: 40px; font-weight: 500; cursor: pointer; color: #f97316; margin-bottom: 20px; }
         .card-white { background: #fffef7; border-radius: 32px; padding: 1rem 1.2rem; margin-bottom: 1rem; border: 1px solid #ffe2cc; }
         .tian-ge-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin: 20px 0; }
-        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 24px; cursor: crosshair; width: 240px; height: 240px; touch-action: none; will-change: transform; }
+        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 24px; cursor: crosshair; width: 160px; height: 160px; touch-action: none; will-change: transform; }
         .tian-ge-cell { display: flex; justify-content: center; align-items: center; }
         .dictate-header-stats { background: #ffefe2; padding: 10px 18px; border-radius: 48px; margin: 8px 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 700; }
         .stat-chip { background: white; padding: 4px 16px; border-radius: 40px; font-size: 0.8rem; }
@@ -334,7 +334,7 @@
                 <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:56px; flex-shrink:0;"></div>
                 <div class="tian-ge-cell">
-                    <canvas id="tg_c" class="canvas-tg" width="240" height="240" style="width:240px; height:240px;" aria-label="手写区域，在此处用手指或鼠标写字"></canvas>
+                    <canvas id="tg_c" class="canvas-tg" width="160" height="160" style="width:160px; height:160px;" aria-label="手写区域，在此处用手指或鼠标写字"></canvas>
                 </div>
                 <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.5rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
@@ -2610,15 +2610,15 @@
                     requestAnimationFrame(() => this.initCanvasForCurrent());
                     return;
                 }
-                let ctx = canvas.getContext('2d'); 
+                let ctx = canvas.getContext('2d', { willReadFrequently: true });
                 if(!ctx) { 
                     requestAnimationFrame(() => this.initCanvasForCurrent());
                     return;
                 }
-                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240); 
-                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240); 
-                ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke(); 
-                ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke(); 
+                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,160,160); 
+                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,160,160); 
+                ctx.beginPath(); ctx.moveTo(80,0); ctx.lineTo(80,160); ctx.stroke(); 
+                ctx.moveTo(0,80); ctx.lineTo(160,80); ctx.stroke(); 
                 this.enableDrawing(canvas);
                 // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
                 this.speakCurrentWord();
@@ -2811,18 +2811,18 @@
                 }
             },
             drawTraceCharacter(canvas, char) {
-                let ctx = canvas.getContext('2d');
+                let ctx = canvas.getContext('2d', { willReadFrequently: true });
                 // 先清除canvas并画出米字格
-                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,240,240);
-                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,240,240);
-                ctx.beginPath(); ctx.moveTo(120,0); ctx.lineTo(120,240); ctx.stroke();
-                ctx.moveTo(0,120); ctx.lineTo(240,120); ctx.stroke();
-                // 画浅色字供描摹
+                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,160,160);
+                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,160,160);
+                ctx.beginPath(); ctx.moveTo(80,0); ctx.lineTo(80,160); ctx.stroke();
+                ctx.moveTo(0,80); ctx.lineTo(160,80); ctx.stroke();
+                // 画浅色字供描摹（字号按画布比例缩放：240→160px, 字号160→107px）
                 ctx.fillStyle = "rgba(249, 115, 22, 0.25)"; // 浅橙色半透明
-                ctx.font = "160px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
+                ctx.font = "107px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillText(char, 120, 130);
+                ctx.fillText(char, 80, 87);
                 // 重新绑定绘制事件（在浅色字上继续画）
                 this.enableDrawing(canvas);
             },
@@ -2837,7 +2837,7 @@
                     canvas.removeEventListener('mouseup', canvas._tgHandlers.end);
                     canvas.removeEventListener('mouseleave', canvas._tgHandlers.leave);
                 }
-                let ctx = canvas.getContext('2d');
+                let ctx = canvas.getContext('2d', { willReadFrequently: true });
                 ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
                 let drawing = false;
                 let lastX, lastY, prevX, prevY;
@@ -2912,7 +2912,7 @@
             clearCanvasCell(canvasId) { 
                 let canvas = typeof canvasId === 'number' ? document.getElementById(`tg_${canvasId}`) : document.getElementById(canvasId); 
                 if(canvas){ 
-                    let ctx = canvas.getContext('2d'); 
+                    let ctx = canvas.getContext('2d', { willReadFrequently: true }); 
                     const w = canvas.width;
                     const h = canvas.height;
                     const cx = w / 2;
@@ -2927,8 +2927,8 @@
                 let canvas = document.getElementById('tg_c');
                 if(!canvas) {
                     const fallback = document.createElement('canvas');
-                    fallback.width = 240;
-                    fallback.height = 240;
+                    fallback.width = 160;
+                    fallback.height = 160;
                     return fallback;
                 }
                 return canvas;
@@ -3256,7 +3256,7 @@
                 }
                 if(groupOrder.length === 0) { this.ocrBusy = false; return; }
 
-                // ====== Phase 2: 将每个子图缩小到合理尺寸，网格排列，再合并为一张大图 ======
+                // ====== Phase 2: 将每个子图缩小到合理尺寸 ======
                 const SUB_SIZE = 200; // 每个子图缩小到200×200（保持清晰度）
                 const COLS = 10; // 每行10个字
                 const CELL_H = SUB_SIZE; // 无编号，单元格高度=子图高度
@@ -3280,168 +3280,167 @@
                     cx.fillText(String(gi + 1), SUB_SIZE / 2, 10);
                     scaledList.push(c);
                 }
-                // 合并
-                // 网格合并：每行COLS个字
-                const rows = Math.ceil(scaledList.length / COLS);
-                const totalW = COLS * SUB_SIZE + (COLS - 1) * SPACING;
-                const totalH = rows * CELL_H + (rows - 1) * SPACING;
-                const mergedCanvas = document.createElement('canvas');
-                mergedCanvas.width = totalW; mergedCanvas.height = totalH;
-                const mCtx = mergedCanvas.getContext('2d');
-                mCtx.fillStyle = '#ffffff';
-                mCtx.fillRect(0, 0, totalW, totalH);
-                const subPositions = [];
-                for(let gi = 0; gi < scaledList.length; gi++) {
-                    const row = Math.floor(gi / COLS);
-                    const col = gi % COLS;
-                    const x = col * (SUB_SIZE + SPACING);
-                    const y = row * (CELL_H + SPACING);
-                    mCtx.drawImage(scaledList[gi], x, y);
-                    subPositions.push({ x, y, w: SUB_SIZE, h: CELL_H });
-                }
+                // ====== Phase 3: 分批合并 + OCR（每批BATCH_SIZE个字，保证识别率） ======
+                const recognizedMap = {}; // charId → 识别文本
+                const BATCH_SIZE = 25; // 每批最多25个字，字太多百度手写OCR识别率下降
+                const totalBatches = Math.ceil(scaledList.length / BATCH_SIZE);
+                let engineLabel = '';
 
-                // ====== Phase 3: 只调用1次OCR ======
-                let ocrWords = []; // Baidu OCR 返回的词列表 [{words, location}]
-                let ocrFullText = ''; // 合并后的全文
-                // 图片预处理：白底黑字 + JPG格式，提高OCR识别率
-                const processedDataURL = await this.preprocessForOCR(mergedCanvas.toDataURL());
-                const mergedBase64 = processedDataURL.split(',')[1];
-                //3a: 尝试百度OCR（仅1次调用）
-                if(this.useBaiduOCR) {
-                    for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
-                        const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
-                        const bAcc = this.baiduAccounts[idx];
-                        if(bAcc && bAcc.used < 500) {
-                            if(this.isBaiduTokenExpired(bAcc) && bAcc.apiKey && bAcc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(bAcc), true); }
-                            if(!bAcc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                            try {
-                                // 逐字定位 + 返回置信度，用于逐字比对
-                                const body = new URLSearchParams({ 
-                                    image: mergedBase64,
-                                    recognize_granularity: 'small',
-                                    probability: 'true'
-                                });
-                                const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + bAcc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-                                const ocrData = await ocrRes.json();
-                                console.log('[OCR原始返回]', JSON.stringify(ocrData).substring(0, 500));
-                                if(ocrData.error_code === 17) { bAcc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                if(ocrData.error_code && ocrData.error_code !== 0) { console.log('[OCR错误码]', ocrData.error_code, ocrData.error_msg); this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
-                                bAcc.used++;
-                                if(ocrData.words_result && ocrData.words_result.length > 0) {
-                                    ocrWords = ocrData.words_result;
-                                    ocrFullText = ocrWords.map(r => r.words).join('').trim().replace(/\s/g, '');
-                                    this.lastOcrEngine = `百度智能云（合并批改×1，共${groupOrder.length}组）`;
-                                    break;
+                for(let batchIdx = 0; batchIdx < totalBatches; batchIdx++) {
+                    const bStart = batchIdx * BATCH_SIZE;
+                    const bEnd = Math.min(bStart + BATCH_SIZE, scaledList.length);
+                    const batchScaled = scaledList.slice(bStart, bEnd);
+                    const batchGroup = groupOrder.slice(bStart, bEnd);
+                    // 当前批次内局部编号（从1开始）
+                    const localOffset = bStart;
+
+                    // 3-1: 网格合并当前批次
+                    const bRows = Math.ceil(batchScaled.length / COLS);
+                    const bW = COLS * SUB_SIZE + (COLS - 1) * SPACING;
+                    const bH = bRows * CELL_H + (bRows - 1) * SPACING;
+                    const batchCanvas = document.createElement('canvas');
+                    batchCanvas.width = bW; batchCanvas.height = bH;
+                    const bCtx = batchCanvas.getContext('2d');
+                    bCtx.fillStyle = '#ffffff';
+                    bCtx.fillRect(0, 0, bW, bH);
+                    const batchPositions = [];
+                    for(let gi = 0; gi < batchScaled.length; gi++) {
+                        const row = Math.floor(gi / COLS);
+                        const col = gi % COLS;
+                        const x = col * (SUB_SIZE + SPACING);
+                        const y = row * (CELL_H + SPACING);
+                        bCtx.drawImage(batchScaled[gi], x, y);
+                        batchPositions.push({ x, y, w: SUB_SIZE, h: CELL_H });
+                    }
+
+                    // 3-2: 调用OCR
+                    let bOcrWords = [];
+                    let bOcrFullText = '';
+                    const processedDataURL = await this.preprocessForOCR(batchCanvas.toDataURL());
+                    const bBase64 = processedDataURL.split(',')[1];
+
+                    // 百度OCR
+                    if(this.useBaiduOCR) {
+                        for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
+                            const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
+                            const bAcc = this.baiduAccounts[idx];
+                            if(bAcc && bAcc.used < 500) {
+                                if(this.isBaiduTokenExpired(bAcc) && bAcc.apiKey && bAcc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(bAcc), true); }
+                                if(!bAcc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                try {
+                                    const body = new URLSearchParams({ image: bBase64, recognize_granularity: 'small', probability: 'true' });
+                                    const ocrRes = await fetch('/proxy/baidu/rest/2.0/ocr/v1/handwriting?access_token=' + bAcc.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+                                    const ocrData = await ocrRes.json();
+                                    console.log(`[OCR批次${batchIdx+1}/${totalBatches}] 返回:`, JSON.stringify(ocrData).substring(0, 300));
+                                    if(ocrData.error_code === 17) { bAcc.used = 500; this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                    if(ocrData.error_code === 110) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                    if(ocrData.error_code && ocrData.error_code !== 0) { console.log('[OCR错误码]', ocrData.error_code, ocrData.error_msg); this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
+                                    bAcc.used++;
+                                    if(ocrData.words_result && ocrData.words_result.length > 0) {
+                                        bOcrWords = ocrData.words_result;
+                                        bOcrFullText = bOcrWords.map(r => r.words).join('').trim().replace(/\s/g, '');
+                                        if(totalBatches === 1) { engineLabel = `百度智能云（合并批改×1，共${groupOrder.length}组）`; }
+                                        else { engineLabel = `百度智能云（分批批改×${totalBatches}，共${groupOrder.length}组）`; }
+                                        break;
+                                    }
+                                } catch(fetchErr) {
+                                    this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                                 }
-                            } catch(fetchErr) {
-                                // 尝试手动OCR回退
-                                const manualResult = await this.manualOCR(mergedCanvas.toDataURL());
-                                if(manualResult) { ocrFullText = manualResult.replace(/\s/g, ''); this.lastOcrEngine = '百度智能云（手动合并×1）'; break; }
+                            } else {
                                 this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                             }
-                        } else {
-                            this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length;
                         }
                     }
-                }
-                // 3b: 如果百度OCR失败，回退到Tesseract（也只调1次）
-                if(!ocrFullText) {
-                    this.lastOcrEngine = this.useBaiduOCR ? '百度智能云（失败回退Tesseract合并×1）' : '本地 Tesseract（合并×1）';
-                    try {
-                        const { data: { text } } = await Promise.race([
-                            Tesseract.recognize(mergedCanvas, 'chi_sim', { logger: m => console.log(m) }),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))
-                        ]);
-                        ocrFullText = text.trim().replace(/\s/g, '');
-                    } catch(e) {
-                        console.log('Tesseract合并识别失败:', e);
+                    // Tesseract回退
+                    if(!bOcrFullText) {
+                        if(totalBatches === 1) { engineLabel = this.useBaiduOCR ? '百度智能云（失败回退Tesseract合并×1）' : '本地 Tesseract（合并×1）'; }
+                        else { engineLabel = this.useBaiduOCR ? `百度智能云（失败回退Tesseract×${totalBatches}）` : `本地 Tesseract（分批×${totalBatches}）`; }
+                        try {
+                            const { data: { text } } = await Promise.race([
+                                Tesseract.recognize(batchCanvas, 'chi_sim', { logger: m => console.log(m) }),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Tesseract识别超时')), 60000))
+                            ]);
+                            bOcrFullText = text.trim().replace(/\s/g, '');
+                        } catch(e) {
+                            console.log(`Tesseract批次${batchIdx+1}识别失败:`, e);
+                        }
                     }
-                }
 
-                // ====== Phase 4: 将OCR结果分配回每个group（编号优先 + 坐标兜底） ======
-                const recognizedMap = {}; // charId → 识别文本
-                
-                if(ocrWords.length > 0 && subPositions.length > 0) {
-                    // Step 1: 收集所有OCR结果中的字符（修复：遍历全部words_result，不是只取[0]）
-                    const allChars = [];
-                    for(const entry of ocrWords) {
-                        if(entry.chars && entry.chars.length > 0) {
-                            for(const ch of entry.chars) {
-                                if(ch.char && ch.char.trim()) allChars.push(ch);
+                    // 3-3: 匹配结果到当前批次的group（编号优先 + 坐标兜底）
+                    if(bOcrWords.length > 0 && batchPositions.length > 0) {
+                        const allChars = [];
+                        for(const entry of bOcrWords) {
+                            if(entry.chars && entry.chars.length > 0) {
+                                for(const ch of entry.chars) { if(ch.char && ch.char.trim()) allChars.push(ch); }
+                            } else if(entry.words && entry.words.trim()) {
+                                allChars.push({ char: entry.words.trim(), location: entry.location });
                             }
-                        } else if(entry.words && entry.words.trim()) {
-                            allChars.push({ char: entry.words.trim(), location: entry.location });
                         }
-                    }
-                    console.log('[OCR匹配] allChars总数:', allChars.length, '格子数:', subPositions.length);
-                    
-                    // Step 2: 编号优先匹配 — 解析 "1大" → {num:1, char:"大"}
-                    const usedChars = new Set();
-                    for(const ch of allChars) {
-                        const m = ch.char.match(/^(\d{1,2})\s*(.+)/);
-                        if(m) {
-                            const num = parseInt(m[1]);
-                            if(num >= 1 && num <= groupOrder.length) {
-                                const charText = m[2].trim();
-                                if(charText) {
-                                    const cid = groupOrder[num - 1];
-                                    recognizedMap[cid] = (recognizedMap[cid] || '') + charText;
-                                    usedChars.add(ch);
+                        console.log(`[OCR匹配批次${batchIdx+1}] allChars:`, allChars.length, '格子:', batchPositions.length);
+
+                        // 编号优先匹配：解析 "1大" → num=1, char="大"
+                        const usedChars = new Set();
+                        for(const ch of allChars) {
+                            const m = ch.char.match(/^(\d{1,2})\s*(.+)/);
+                            if(m) {
+                                const num = parseInt(m[1]);
+                                // 编号在当前批次范围内
+                                if(num >= 1 && num <= batchGroup.length) {
+                                    const charText = m[2].trim();
+                                    if(charText) {
+                                        recognizedMap[batchGroup[num - 1]] = (recognizedMap[batchGroup[num - 1]] || '') + charText;
+                                        usedChars.add(ch);
+                                    }
                                 }
                             }
                         }
-                    }
-                    console.log('[OCR匹配] 编号匹配成功:', Object.keys(recognizedMap).length, '个');
-                    
-                    // Step 3: 坐标距离匹配（兜底）— 处理没有有效编号的字符
-                    const MAX_DIST = SUB_SIZE * 1.5;
-                    for(const ch of allChars) {
-                        if(usedChars.has(ch)) continue;
-                        if(!ch.location) continue;
-                        const ecx = ch.location.left + ch.location.width / 2;
-                        const ecy = ch.location.top + ch.location.height / 2;
-                        let bestIdx = 0, bestDist = Infinity;
-                        for(let i = 0; i < subPositions.length; i++) {
-                            const sp = subPositions[i];
-                            const spcx = sp.x + sp.w / 2;
-                            const spcy = sp.y + sp.h / 2;
-                            const dist = Math.sqrt((ecx - spcx) ** 2 + (ecy - spcy) ** 2);
-                            if(dist < bestDist) { bestDist = dist; bestIdx = i; }
+
+                        // 坐标距离兜底
+                        const MAX_DIST = SUB_SIZE * 1.5;
+                        for(const ch of allChars) {
+                            if(usedChars.has(ch)) continue;
+                            if(!ch.location) continue;
+                            const ecx = ch.location.left + ch.location.width / 2;
+                            const ecy = ch.location.top + ch.location.height / 2;
+                            let bestIdx = 0, bestDist = Infinity;
+                            for(let i = 0; i < batchPositions.length; i++) {
+                                const sp = batchPositions[i];
+                                const dist = Math.sqrt((ecx - (sp.x + sp.w/2))**2 + (ecy - (sp.y + sp.h/2))**2);
+                                if(dist < bestDist) { bestDist = dist; bestIdx = i; }
+                            }
+                            if(bestDist < MAX_DIST) {
+                                const cleanText = ch.char.trim().replace(/^\d{1,2}\s*/, '');
+                                recognizedMap[batchGroup[bestIdx]] = (recognizedMap[batchGroup[bestIdx]] || '') + cleanText;
+                            }
                         }
-                        if(bestDist < MAX_DIST) {
-                            const cid = groupOrder[bestIdx];
-                            const cleanText = ch.char.trim().replace(/^\d{1,2}\s*/, '');
-                            recognizedMap[cid] = (recognizedMap[cid] || '') + cleanText;
+                        console.log(`[OCR匹配批次${batchIdx+1}] 该批匹配:`, batchGroup.filter(c => recognizedMap[c]).length, '/', batchGroup.length);
+                    } else if(bOcrFullText && batchGroup.length > 0) {
+                        // Tesseract全文回退：按期望字数比例拆分
+                        let totalExpected = 0;
+                        const expectedLens = [];
+                        for(const cid of batchGroup) {
+                            const wo = this.words.find(w => w.id === cid);
+                            const expLen = wo ? (wo.char || wo.word || '').length : 1;
+                            expectedLens.push(expLen);
+                            totalExpected += expLen;
                         }
-                    }
-                    console.log('[OCR匹配] 坐标兜底后总计:', Object.keys(recognizedMap).length, '个');
-                } else if(ocrFullText && groupOrder.length > 0) {
-                    // 回退：只有全文（Tesseract）→ 按期望字数比例拆分
-                    let totalExpected = 0;
-                    const expectedLens = [];
-                    for(const cid of groupOrder) {
-                        const wo = this.words.find(w => w.id === cid);
-                        const expLen = wo ? (wo.char || wo.word || '').length : 1;
-                        expectedLens.push(expLen);
-                        totalExpected += expLen;
-                    }
-                    if(totalExpected > 0) {
-                        let pos = 0;
-                        for(let i = 0; i < groupOrder.length; i++) {
-                            const len = Math.round((expectedLens[i] / totalExpected) * ocrFullText.length);
-                            recognizedMap[groupOrder[i]] = ocrFullText.slice(pos, pos + len);
-                            pos += len;
-                        }
-                        if(pos < ocrFullText.length && groupOrder.length > 0) {
-                            const lastCid = groupOrder[groupOrder.length - 1];
-                            recognizedMap[lastCid] = (recognizedMap[lastCid] || '') + ocrFullText.slice(pos);
+                        if(totalExpected > 0) {
+                            let pos = 0;
+                            for(let i = 0; i < batchGroup.length; i++) {
+                                const len = Math.round((expectedLens[i] / totalExpected) * bOcrFullText.length);
+                                recognizedMap[batchGroup[i]] = bOcrFullText.slice(pos, pos + len);
+                                pos += len;
+                            }
+                            if(pos < bOcrFullText.length && batchGroup.length > 0) {
+                                recognizedMap[batchGroup[batchGroup.length - 1]] = (recognizedMap[batchGroup[batchGroup.length - 1]] || '') + bOcrFullText.slice(pos);
+                            }
                         }
                     }
-                }
+                } // end for each batch
+                this.lastOcrEngine = engineLabel;
 
                 // ====== Phase 5: 处理每个group的判定结果（127逻辑） ======
-                console.log('[OCR识别结果]', 'recognizedMap:', JSON.stringify(recognizedMap), 'ocrWords:', ocrWords.length, 'ocrFullText:', ocrFullText);
+                console.log('[OCR识别结果]', 'recognizedMap:', JSON.stringify(recognizedMap), 'matched:', Object.keys(recognizedMap).length, '/', groupOrder.length);
                 for(const charId of groupOrder) {
                     try {
                         const group = groups[charId];
@@ -3620,7 +3619,8 @@
                 if(this.timerInterval) clearInterval(this.timerInterval); 
                 this.sessionFinished=true; 
                 this._isDictating = false; // 默写结束，恢复自动保存
-                this.generateTodayPlan(); 
+                // 不再重新生成计划，避免拉入不在原始计划中的字
+                // todayPlanWords 已在默写开始时确定，保持不变
             },
             finishAndGoHome() {
                 console.log('[退出诊断] finishAndGoHome被调用', new Error().stack);
@@ -3629,7 +3629,8 @@
                 this.sessionFinished=false; 
                 this._isDictating = false; // 默写结束，恢复自动保存
                 this.cleanupDictateSession();
-                this.generateTodayPlan(); 
+                // 不再重新生成计划，避免拉入不在原始计划中的字
+                // todayPlanWords 已在 cleanupDictateSession 中保留
             },
             showStrokeOrderAnimation(char) {
                 if(!char || !window.HanziWriter) return;
@@ -3822,6 +3823,11 @@
                             delete w._originalOcrResult;
                             delete w._originalWrongCount;
                             delete w._originalCorrectCount;
+                        }
+                    });
+                    // 标记所有 reviewDates 包含今天的词为跳过，防止 generateTodayPlan 重新扫描加入
+                    this.words.forEach(w => {
+                        if(w.reviewDates && w.reviewDates.includes(today)) {
                             w._planSkipDate = today;
                         }
                     });
@@ -3833,7 +3839,6 @@
                     // 重置 session 错字记录
                     this.sessionWrongWordIds = [];
                     this.saveDataImmediate();
-                    this.generateTodayPlan();
                     this.currentView='childHome';
                     this.showAlert('完成', '复核已处理，今日计划已清零。');
                 };
