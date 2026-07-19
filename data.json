@@ -1771,7 +1771,7 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "ocrResult": "correct",
+      "ocrResult": "",
       "firstWrong": false,
       "_planSkipDate": "2026-07-15",
       "_127_randomCheckEntry": null,
@@ -12383,6 +12383,1225 @@
       "_127_randomCheckLastCheckedRound": 0,
       "ocrResult": "correct",
       "_planSkipDate": "2026-07-18"
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_果子",
+      "word": "果子",
+      "char": "果子",
+      "pinyin": "guǒ zǐ",
+      "words": [
+        "果子"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_木工",
+      "word": "木工",
+      "char": "木工",
+      "pinyin": "mù gōng",
+      "words": [
+        "木工"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_身边",
+      "word": "身边",
+      "char": "身边",
+      "pinyin": "shēn biān",
+      "words": [
+        "身边"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_仔细",
+      "word": "仔细",
+      "char": "仔细",
+      "pinyin": "zǎi xì",
+      "words": [
+        "仔细"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_能干",
+      "word": "能干",
+      "char": "能干",
+      "pinyin": "néng gān",
+      "words": [
+        "能干"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_椅子",
+      "word": "椅子",
+      "char": "椅子",
+      "pinyin": "yǐ zǐ",
+      "words": [
+        "椅子"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_怎么",
+      "word": "怎么",
+      "char": "怎么",
+      "pinyin": "zěn me",
+      "words": [
+        "怎么"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_自信",
+      "word": "自信",
+      "char": "自信",
+      "pinyin": "zì xìn",
+      "words": [
+        "自信"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_从来",
+      "word": "从来",
+      "char": "从来",
+      "pinyin": "cóng lái",
+      "words": [
+        "从来"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文21_这么",
+      "word": "这么",
+      "char": "这么",
+      "pinyin": "zhè me",
+      "words": [
+        "这么"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文22_上面",
+      "word": "上面",
+      "char": "上面",
+      "pinyin": "shàng miàn",
+      "words": [
+        "上面"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文22_快乐",
+      "word": "快乐",
+      "char": "快乐",
+      "pinyin": "kuài lè",
+      "words": [
+        "快乐"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文22_可是",
+      "word": "可是",
+      "char": "可是",
+      "pinyin": "kě shì",
+      "words": [
+        "可是"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文22_难过",
+      "word": "难过",
+      "char": "难过",
+      "pinyin": "nán guò",
+      "words": [
+        "难过"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文22_但是",
+      "word": "但是",
+      "char": "但是",
+      "pinyin": "dàn shì",
+      "words": [
+        "但是"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文22_和好",
+      "word": "和好",
+      "char": "和好",
+      "pinyin": "hé hǎo",
+      "words": [
+        "和好"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_眼泪",
+      "word": "眼泪",
+      "char": "眼泪",
+      "pinyin": "yǎn lèi",
+      "words": [
+        "眼泪"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_水花",
+      "word": "水花",
+      "char": "水花",
+      "pinyin": "shuǐ huā",
+      "words": [
+        "水花"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_青草",
+      "word": "青草",
+      "char": "青草",
+      "pinyin": "qīng cǎo",
+      "words": [
+        "青草"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_游戏",
+      "word": "游戏",
+      "char": "游戏",
+      "pinyin": "yóu xì",
+      "words": [
+        "游戏"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_只有",
+      "word": "只有",
+      "char": "只有",
+      "pinyin": "zhī yǒu",
+      "words": [
+        "只有"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_可爱",
+      "word": "可爱",
+      "char": "可爱",
+      "pinyin": "kě ài",
+      "words": [
+        "可爱"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_可以",
+      "word": "可以",
+      "char": "可以",
+      "pinyin": "kě yǐ",
+      "words": [
+        "可以"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_多少",
+      "word": "多少",
+      "char": "多少",
+      "pinyin": "duō shǎo",
+      "words": [
+        "多少"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_咱们",
+      "word": "咱们",
+      "char": "咱们",
+      "pinyin": "zán men",
+      "words": [
+        "咱们"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_田野",
+      "word": "田野",
+      "char": "田野",
+      "pinyin": "tián yě",
+      "words": [
+        "田野"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_大地",
+      "word": "大地",
+      "char": "大地",
+      "pinyin": "dà dì",
+      "words": [
+        "大地"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "yw_第八单元·阅读_课文23_远方",
+      "word": "远方",
+      "char": "远方",
+      "pinyin": "yuǎn fāng",
+      "words": [
+        "远方"
+      ],
+      "isWord": true,
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_谁",
+      "word": "谁",
+      "char": "谁",
+      "pinyin": "shuí",
+      "words": [
+        "是谁",
+        "谁的",
+        "谁是谁非"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_拿",
+      "word": "拿",
+      "char": "拿",
+      "pinyin": "ná",
+      "words": [
+        "拿走",
+        "拿着",
+        "拿手"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_仔",
+      "word": "仔",
+      "char": "仔",
+      "pinyin": "zǎi",
+      "words": [
+        "仔细",
+        "牛仔"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_极",
+      "word": "极",
+      "char": "极",
+      "pinyin": "jí",
+      "words": [
+        "极致",
+        "北极",
+        "积极"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_送",
+      "word": "送",
+      "char": "送",
+      "pinyin": "sòng",
+      "words": [
+        "送行",
+        "送别",
+        "欢送会"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_椅",
+      "word": "椅",
+      "char": "椅",
+      "pinyin": "yǐ",
+      "words": [
+        "靠椅",
+        "椅子",
+        "转椅"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_怎",
+      "word": "怎",
+      "char": "怎",
+      "pinyin": "zěn",
+      "words": [
+        "怎样",
+        "怎么",
+        "自作自受"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_拉",
+      "word": "拉",
+      "char": "拉",
+      "pinyin": "lā",
+      "words": [
+        "拉手",
+        "拉扯",
+        "拉面"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_收",
+      "word": "收",
+      "char": "收",
+      "pinyin": "shōu",
+      "words": [
+        "丰收",
+        "收拾",
+        "收藏"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_接",
+      "word": "接",
+      "char": "接",
+      "pinyin": "jiē",
+      "words": [
+        "连接",
+        "接纳",
+        "拉扯"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_纸",
+      "word": "纸",
+      "char": "纸",
+      "pinyin": "zhǐ",
+      "words": [
+        "报纸",
+        "纸张",
+        "纸片"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_抓",
+      "word": "抓",
+      "char": "抓",
+      "pinyin": "zhuā",
+      "words": [
+        "抓紧",
+        "抓捕",
+        "抓牢"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_线",
+      "word": "线",
+      "char": "线",
+      "pinyin": "xiàn",
+      "words": [
+        "丝线",
+        "毛线",
+        "电线"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_吵",
+      "word": "吵",
+      "char": "吵",
+      "pinyin": "chǎo",
+      "words": [
+        "吵架",
+        "争吵",
+        "吵闹"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_但",
+      "word": "但",
+      "char": "但",
+      "pinyin": "dàn",
+      "words": [
+        "但是",
+        "但凡",
+        "但愿如此"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_受",
+      "word": "受",
+      "char": "受",
+      "pinyin": "shòu",
+      "words": [
+        "接受",
+        "难受",
+        "受益"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_句",
+      "word": "句",
+      "char": "句",
+      "pinyin": "jù",
+      "words": [
+        "语句",
+        "病句",
+        "诗句"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_哭",
+      "word": "哭",
+      "char": "哭",
+      "pinyin": "kū",
+      "words": [
+        "哭泣",
+        "哭笑不得",
+        "哭声"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_游",
+      "word": "游",
+      "char": "游",
+      "pinyin": "yóu",
+      "words": [
+        "游泳",
+        "游玩",
+        "春游"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_戏",
+      "word": "戏",
+      "char": "戏",
+      "pinyin": "xì",
+      "words": [
+        "嬉戏",
+        "游戏",
+        "戏曲"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_爱",
+      "word": "爱",
+      "char": "爱",
+      "pinyin": "ài",
+      "words": [
+        "喜爱",
+        "爱好",
+        "爱护"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_呢",
+      "word": "呢",
+      "char": "呢",
+      "pinyin": "ne",
+      "words": [
+        "来呢",
+        "哪儿呢",
+        "毛呢"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_跳",
+      "word": "跳",
+      "char": "跳",
+      "pinyin": "tiào",
+      "words": [
+        "跳高",
+        "跳远",
+        "活蹦乱跳"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
+    },
+    {
+      "id": "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_咱",
+      "word": "咱",
+      "char": "咱",
+      "pinyin": "zán",
+      "words": [
+        "咱们",
+        "咱俩",
+        "咱家"
+      ],
+      "correctCount": 0,
+      "wrongCount": 0,
+      "status": "learning",
+      "reviewCorrected": false,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": null,
+      "_127_randomCheckWeek": 0,
+      "reviewDates": [
+        "2026-07-20"
+      ],
+      "pendingReview": false,
+      "pendingReviewDate": null,
+      "handwritingData": null
     }
   ],
   "checkinDays": 1,
@@ -12439,7 +13658,59 @@
     "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_散",
     "sz_第七单元_shizi_课文20《雪孩子》要、伙、伴、歌、得、闭、忙_shizi_忙",
     "sz_第七单元_shizi_语文园地七_shizi_饥",
-    "sz_第七单元_shizi_语文园地七_shizi_宁"
+    "sz_第七单元_shizi_语文园地七_shizi_宁",
+    "yw_第八单元·阅读_课文21_果子",
+    "yw_第八单元·阅读_课文21_木工",
+    "yw_第八单元·阅读_课文21_身边",
+    "yw_第八单元·阅读_课文21_仔细",
+    "yw_第八单元·阅读_课文21_能干",
+    "yw_第八单元·阅读_课文21_椅子",
+    "yw_第八单元·阅读_课文21_怎么",
+    "yw_第八单元·阅读_课文21_自信",
+    "yw_第八单元·阅读_课文21_从来",
+    "yw_第八单元·阅读_课文21_这么",
+    "yw_第八单元·阅读_课文22_上面",
+    "yw_第八单元·阅读_课文22_快乐",
+    "yw_第八单元·阅读_课文22_可是",
+    "yw_第八单元·阅读_课文22_难过",
+    "yw_第八单元·阅读_课文22_但是",
+    "yw_第八单元·阅读_课文22_和好",
+    "yw_第八单元·阅读_课文23_眼泪",
+    "yw_第八单元·阅读_课文23_水花",
+    "yw_第八单元·阅读_课文23_青草",
+    "yw_第八单元·阅读_课文23_游戏",
+    "yw_第八单元·阅读_课文23_只有",
+    "yw_第八单元·阅读_课文23_可爱",
+    "yw_第八单元·阅读_课文23_可以",
+    "yw_第八单元·阅读_课文23_多少",
+    "yw_第八单元·阅读_课文23_咱们",
+    "yw_第八单元·阅读_课文23_田野",
+    "yw_第八单元·阅读_课文23_大地",
+    "yw_第八单元·阅读_课文23_远方",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_谁",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_拿",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_仔",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_极",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_送",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_椅",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_怎",
+    "sz_第八单元_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_拉",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_收",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_接",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_纸",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_抓",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_线",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_吵",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_但",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_受",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_句",
+    "sz_第八单元_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_哭",
+    "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_游",
+    "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_戏",
+    "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_爱",
+    "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_呢",
+    "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_跳",
+    "sz_第八单元_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_咱"
   ],
   "todayPlanDate": "2026-07-20"
 }
