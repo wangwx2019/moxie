@@ -416,8 +416,11 @@
                             <span style="font-weight:700; white-space:nowrap;" :style="{color: (word.wrongCount > 0) ? '#dc2626' : (word.correctCount > 0) ? '#16a34a' : '#1c1917'}">{{ word.word }}</span>
                             <span v-if="!isInReviewQueue(word)" style="color:#666; font-size:0.9em;">({{ word.pinyin }})</span>
                             <span class="word-badge" v-if="word.wrongCount >= 5" style="margin-left:4px;">顽固</span><span class="word-badge" v-else-if="word.wrongCount >= 3" style="margin-left:4px;">难点</span><span class="word-badge" v-else-if="word.wrongCount === 1" style="margin-left:4px;">初次</span><span class="word-badge" v-else-if="word.status === 'mastered'" style="margin-left:4px; background:#dcfce7;">已掌握</span>
-                            <div v-if="word.wrongCount > 0" class="text-small" style="margin-left:4px; color:#dc2626;">错{{ word.wrongCount }}次</div>
-                            <div v-else-if="word.correctCount > 0" class="text-small" style="margin-left:4px; color:#16a34a;">对{{ word.correctCount }}次</div>
+                            <div v-if="word.wrongCount > 0 || word.correctCount > 0" class="text-small" style="margin-left:4px;">
+                                <span v-if="word.wrongCount > 0" style="color:#dc2626;">错{{ word.wrongCount }}次</span>
+                                <span v-if="word.correctCount > 0" style="color:#16a34a; margin-left:4px;">对{{ word.correctCount }}次</span>
+                                <span v-if="word._127_rollingStreak > 0" style="color:#16a34a; margin-left:4px; font-weight:600;">连{{ word._127_rollingStreak }}</span>
+                            </div>
                             <div v-else class="text-small" style="margin-left:4px; color:#999;">未默写</div>
                         </div>
                     </div>
@@ -827,7 +830,7 @@
                     <span class="word-badge" v-else-if="word.wrongCount >= 5">顽固</span>
                     <span class="word-badge" v-else-if="word.wrongCount >= 3">困难</span>
                     <span class="word-badge" v-else>错误</span>
-                    <div class="text-small">{{ word.pinyin }} · 错了 {{ word.wrongCount || 0 }} 次</div>
+                    <div class="text-small">{{ word.pinyin }} · <span style="color:#dc2626;">错{{ word.wrongCount || 0 }}次</span><span v-if="word.correctCount > 0" style="color:#16a34a; margin-left:6px;">对{{ word.correctCount }}次</span><span v-if="word._127_rollingStreak > 0" style="color:#16a34a; margin-left:6px; font-weight:600;">连{{ word._127_rollingStreak }}</span></div>
                 </div>
                 <div v-if="word.handwritingData && word.handwritingData.length" class="handwriting-preview" @click="showWordDetail(word)" style="cursor:pointer;">
                     <div v-for="(imgSrc, cidx) in word.handwritingData.slice(0,3)" :key="cidx">
@@ -1437,6 +1440,7 @@
                 _planToastTotal: 0,
                 _planToastDup: 0,
                 _planToastAdded: 0,
+                _planCompletedToday: false,
                 resultModalVisible: false,
                 resultModalData: {},
                 resultModalCallback: null,
@@ -1504,10 +1508,12 @@
             reviewList() {
                 return this.words
                     .filter(w => {
-                        // 显式读取 ocrResult / reviewCorrected，确保 Vue 跟踪这些响应式依赖
+                        // 显式读取 ocrResult / reviewCorrected / wrongCount / correctCount，确保 Vue 跟踪这些响应式依赖
                         // 当 judgeAsCorrect / judgeAsWrong 修改这些属性时，computed 会被正确重算
                         void w.ocrResult;
                         void w.reviewCorrected;
+                        void w.wrongCount;
+                        void w.correctCount;
                         return w.handwritingData && w.handwritingData.length > 0;
                     })
                     .map(w => ({
@@ -1593,10 +1599,12 @@
             },
             categoryStats() {
                 const all = this.words.length;
-                const stubborn = this.words.filter(w => w.wrongCount >= 5 && w.status !== 'mastered').length;
-                const difficult = this.words.filter(w => w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered').length;
-                const learning = this.words.filter(w => w.status === 'learning' && w.wrongCount > 0 && w.wrongCount < 3).length;
-                const initial = this.words.filter(w => w.wrongCount === 1 && w.status !== 'mastered').length;
+                // 显式读取每个词的 wrongCount 和 status，确保 Vue 跟踪这些响应式依赖
+                // 当 judgeAsCorrect / judgeAsWrong 修改这些属性时，computed 会被正确重算
+                const stubborn = this.words.filter(w => { void w.wrongCount; void w.status; return w.wrongCount >= 5 && w.status !== 'mastered'; }).length;
+                const difficult = this.words.filter(w => { void w.wrongCount; void w.status; return w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered'; }).length;
+                const learning = this.words.filter(w => { void w.wrongCount; void w.status; return w.status === 'learning' && w.wrongCount > 0 && w.wrongCount < 3; }).length;
+                const initial = this.words.filter(w => { void w.wrongCount; void w.status; return w.wrongCount === 1 && w.status !== 'mastered'; }).length;
                 const mastered = this.masteredCount;
                 return [
                     { key:'all', label:'全部', count:all },
@@ -1609,11 +1617,11 @@
             },
             filteredWordBank() {
                 if(this.wordBankFilter === 'all') return this.words;
-                if(this.wordBankFilter === 'stubborn') return this.words.filter(w => w.wrongCount >= 5 && w.status !== 'mastered');
-                if(this.wordBankFilter === 'difficult') return this.words.filter(w => w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered');
-                if(this.wordBankFilter === 'learning') return this.words.filter(w => w.status === 'learning' && w.wrongCount > 0 && w.wrongCount < 3);
-                if(this.wordBankFilter === 'initial') return this.words.filter(w => w.wrongCount === 1 && w.status !== 'mastered');
-                if(this.wordBankFilter === 'mastered') return this.words.filter(w => w.status === 'mastered');
+                if(this.wordBankFilter === 'stubborn') return this.words.filter(w => { void w.wrongCount; void w.status; return w.wrongCount >= 5 && w.status !== 'mastered'; });
+                if(this.wordBankFilter === 'difficult') return this.words.filter(w => { void w.wrongCount; void w.status; return w.wrongCount >= 3 && w.wrongCount < 5 && w.status !== 'mastered'; });
+                if(this.wordBankFilter === 'learning') return this.words.filter(w => { void w.wrongCount; void w.status; return w.status === 'learning' && w.wrongCount > 0 && w.wrongCount < 3; });
+                if(this.wordBankFilter === 'initial') return this.words.filter(w => { void w.wrongCount; void w.status; return w.wrongCount === 1 && w.status !== 'mastered'; });
+                if(this.wordBankFilter === 'mastered') return this.words.filter(w => { void w.status; return w.status === 'mastered'; });
                 return this.words;
             },
             wordBankAllSelected() {
@@ -1652,6 +1660,9 @@
             allReviewPlans() {
                 let plansMap = new Map();
                 for(let word of this.words) {
+                    // 显式读取 status 和 reviewDates，确保 Vue 跟踪这些响应式依赖
+                    void word.status;
+                    void word.reviewDates;
                     if(word.status === 'mastered') continue;
                     if(word.reviewDates && word.reviewDates.length) {
                         for(let dateStr of word.reviewDates) {
@@ -1858,6 +1869,41 @@
                     if(s) {
                         let d = JSON.parse(s);
                         this.words = d.words;
+                        // 数据清洗：按 word 去重（合并所有字段到第一条，删除重复项）
+                        const seen = new Map();
+                        const deduped = [];
+                        for (const w of this.words) {
+                            const key = w.word || w.char || '';
+                            if (seen.has(key)) {
+                                const dup = seen.get(key);
+                                // counts: 取较大值（真实累计）
+                                dup.wrongCount = Math.max(dup.wrongCount || 0, w.wrongCount || 0);
+                                dup.correctCount = Math.max(dup.correctCount || 0, w.correctCount || 0);
+                                // rollingStreak: 取较大值
+                                dup._127_rollingStreak = Math.max(dup._127_rollingStreak || 0, w._127_rollingStreak || 0);
+                                // day7Entry: 保留非空的
+                                if (!dup._127_day7Entry && w._127_day7Entry) dup._127_day7Entry = w._127_day7Entry;
+                                // randomCheckWeek: 取较大值
+                                dup._127_randomCheckWeek = Math.max(dup._127_randomCheckWeek || 0, w._127_randomCheckWeek || 0);
+                                // reviewDates: 合并去重
+                                if (w.reviewDates && w.reviewDates.length) {
+                                    const merged = new Set([...(dup.reviewDates || []), ...w.reviewDates]);
+                                    dup.reviewDates = [...merged];
+                                }
+                                // handwritingData: 保留非空的
+                                if (!dup.handwritingData && w.handwritingData) dup.handwritingData = w.handwritingData;
+                                // status: 取更高级的状态
+                                const statusOrder = { mastered: 3, learning: 2, randomCheck: 1 };
+                                if ((statusOrder[w.status] || 0) > (statusOrder[dup.status] || 0)) {
+                                    dup.status = w.status;
+                                }
+                            } else {
+                                seen.set(key, w);
+                                deduped.push(w);
+                            }
+                        }
+                        this.words = deduped;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify({ words: this.words, checkinDays: d.checkinDays, parentPassword: d.parentPassword, useBaiduOCR: d.useBaiduOCR, baiduAccounts: d.baiduAccounts }));
                         this.checkinDays = d.checkinDays;
                         this.parentPassword = d.parentPassword;
                         this.useBaiduOCR = d.useBaiduOCR !== false;
@@ -1883,6 +1929,7 @@
                     this._planToastTotal = d._planToastTotal || 0;
                     this._planToastDup = d._planToastDup || 0;
                     this._planToastAdded = d._planToastAdded || 0;
+                    this._planCompletedToday = d._planCompletedToday || false;
                     }
                 } catch(e) {
                     console.error('加载数据失败，使用默认数据:', e);
@@ -1963,7 +2010,7 @@
                         }
                         return w;
                     });
-                    let toSave = { words: wordsForSave, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: (this.todayPlanWords || []).map(w => w.id), todayPlanDate: this.todayPlanDate || '', _planToastShown: this._planToastShown || '', _planToastTotal: this._planToastTotal || 0, _planToastDup: this._planToastDup || 0, _planToastAdded: this._planToastAdded || 0 };
+                    let toSave = { words: wordsForSave, checkinDays: this.checkinDays, parentPassword: this.parentPassword, useBaiduOCR: this.useBaiduOCR, baiduAccounts: this.baiduAccounts, baiduActiveIdx: this.baiduActiveIdx, baiduResetMonth: this.baiduResetMonth, githubToken: this.githubToken, githubSyncTime: this.githubSyncTime, textbookLessons: this.textbookLessons, textbookSelections: this.textbookSelections, usingTextbookPlan: this.usingTextbookPlan, vocabUsage: this.vocabUsage, todayWrongReviewWords: this.todayWrongReviewWords, ttsVoiceId: this.ttsVoiceId, ttsToken: this.ttsToken, todayPlanWordIds: (this.todayPlanWords || []).map(w => w.id), todayPlanDate: this.todayPlanDate || '', _planToastShown: this._planToastShown || '', _planToastTotal: this._planToastTotal || 0, _planToastDup: this._planToastDup || 0, _planToastAdded: this._planToastAdded || 0, _planCompletedToday: this._planCompletedToday || false };
                     try {
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); 
                     } catch(e) {
@@ -2049,9 +2096,12 @@
             getWordCountText(text) {
                 const w = this.words.find(x => x.word === text || x.char === text);
                 if(!w) return '';
-                if(w.wrongCount > 0) return '错' + w.wrongCount + '次';
-                if(w.correctCount > 0) return '对' + w.correctCount + '次';
-                return '未默写';
+                if(w.wrongCount === 0 && w.correctCount === 0) return '未默写';
+                let parts = [];
+                if(w.wrongCount > 0) parts.push('错' + w.wrongCount + '次');
+                if(w.correctCount > 0) parts.push('对' + w.correctCount + '次');
+                if(w._127_rollingStreak > 0) parts.push('连' + w._127_rollingStreak);
+                return parts.join(' ');
             },
             // 判断OCR识别结果是否与期望文字匹配
             isRecognitionMatch(recognized, expected) {
@@ -2168,6 +2218,7 @@
                         this.todayPlanDate = '';
                         this.todayPlanWordIds = [];
                         this.todayCompletedCount = 0;
+                        this._planCompletedToday = true;
                         this.saveDataImmediate();
                         this.showAlert('已延续', '今日计划已顺延至明天。');
                     },
@@ -2183,6 +2234,7 @@
                         this.todayPlanDate = '';
                         this.todayPlanWordIds = [];
                         this.todayCompletedCount = 0;
+                        this._planCompletedToday = true;
                         this.saveDataImmediate();
                         this.generateTodayPlan();
                         this.showAlert('已清除', '今日计划已清空，127状态已更新。');
@@ -2194,6 +2246,8 @@
             generateTodayPlan() {
                 if(this.usingTextbookPlan) return;
                 const today = getLocalDateStr();
+                // 今日已完成：不再重建计划
+                if(this._planCompletedToday) return;
 
                 // 保留已有的今日计划词（含用户手动添加、之前已恢复的）
                 let existingWords = [];
@@ -2212,31 +2266,12 @@
                         }
                     });
                 }
+                // 新的一天：重置完成标记
+                if(this.todayPlanDate !== today) this._planCompletedToday = false;
 
-                // 从 reviewDates 统一生成今日计划（单一事实来源）
-                // 读取所有 reviewDates 包含今天的词
-                let todayWords = this.words.filter(w =>
-                    w.reviewDates && w.reviewDates.includes(today)
-                    && w._planSkipDate !== today
-                    && !w.ocrResult  // 今天已批改过的跳过
-                );
-                // 诊断：查看所有词的reviewDates状态
-                const wordsWithDates = this.words.filter(w => w.reviewDates && w.reviewDates.length > 0);
-                const wordsWithToday = this.words.filter(w => w.reviewDates && w.reviewDates.includes(today));
-                console.log('[计划诊断] 重建模式 总词数:', this.words.length, '有reviewDates:', wordsWithDates.length, '含今天:', wordsWithToday.length, '跳过_skip:', todayWords.length);
-
-                // 排序：滚动池（错字多的优先）→ 新课 → Day7池 → 已掌握抽查
-                todayWords.sort((a, b) => {
-                    // 滚动池优先（wrongCount > 0）
-                    if(a.wrongCount > 0 && b.wrongCount === 0) return -1;
-                    if(a.wrongCount === 0 && b.wrongCount > 0) return 1;
-                    // 滚动池内按错误次数排序
-                    if(a.wrongCount > 0 && b.wrongCount > 0) return (b.wrongCount || 0) - (a.wrongCount || 0);
-                    // 其他保持原顺序
-                    return 0;
-                });
-                // 合并已有词 + 计划看板词，按 id 去重
-                let combined = [...new Map([...existingWords, ...todayWords].map(w => [w.id, w])).values()];
+                // 计划完全由看板驱动（autoAddPlanBoardWords 负责从看板加词）
+                // existingWords 用于保留用户手动添加的词
+                let combined = [...existingWords];
 
                 // 周六周日：自动加入5个抽查池的字
                 const dayOfWeek = new Date().getDay();
@@ -2259,13 +2294,14 @@
                 }
 
                 this.todayPlanWords = combined;
-                console.log('[计划诊断] 今日:', today, 'reviewDates匹配:', todayWords.length, 'combined:', combined.length, 'planDate:', this.todayPlanDate);
+                console.log('[计划诊断] 今日:', today, 'combined:', combined.length, 'planDate:', this.todayPlanDate);
                 // 保存今日计划信息，供跨设备同步后自动检测已提交的词
                 this.todayPlanDate = today;
                 this.todayPlanWordIds = combined.map(w => w.id);
             },
             autoAddPlanBoardWords() {
                 if(this.usingTextbookPlan) return;
+                if(this._planCompletedToday) return;
                 const today = getLocalDateStr();
                 if(this._planToastShown === today) return;
                 const todayBoard = this.allReviewPlans.find(p => {
@@ -2367,6 +2403,8 @@
                     }
                 } else {
                     // 错误：从任何池回退到滚动池
+                    // Day7检测失败 → correctCount清零（重新统计）
+                    if(wordObj._127_day7Entry) wordObj.correctCount = 0;
                     wordObj._127_rollingStreak = 0;
                     wordObj._127_day7Entry = null;
                     wordObj._127_randomCheckEntry = null;
@@ -2405,6 +2443,8 @@
                 // 更新127状态
                 this.updateWord127State(wordObj, true);
                 this.saveDataImmediate();
+                // ponytail: 替换数组引用强制Vue重算所有computed（词库/错字本/看板）
+                this.words = this.words.slice();
             },
             // 家长判断字写错了（覆盖AI判断）
             judgeAsWrong(wordObj) {
@@ -2432,6 +2472,8 @@
                 // 更新127状态：从任何池回退到滚动池
                 this.updateWord127State(wordObj, false);
                 this.saveDataImmediate();
+                // ponytail: 替换数组引用强制Vue重算所有computed（词库/错字本/看板）
+                this.words = this.words.slice();
             },
             // 撤销家长判断（恢复到AI原始判断）
             undoJudgment(wordObj) {
@@ -2471,7 +2513,8 @@
                 }
                 this.generateReviewDates(wordObj);
                 this.saveDataImmediate();
-                this.$forceUpdate();
+                // ponytail: 替换数组引用强制Vue重算所有computed（词库/错字本/看板）
+                this.words = this.words.slice();
             },
             // 统一默写入口：单字在前，词语在后
             startUnifiedSession() {
@@ -3223,35 +3266,39 @@
                     groups[item.charId].items.push(item);
                 }
                 const groupOrder = [];
-                const subImageList = []; // 每个group对应一张子图（base64）
+                const subImageList = [];
+                // 词语拆字映射：ocrKey → { wordCharId, charIdx }
+                const wordSplitMap = {};
                 for(const charId of Object.keys(groups)) {
                     const group = groups[charId];
                     const wordObj = this.words.find(w => w.id === group.charId);
                     if(!wordObj) continue;
-                    let subBase64 = '';
                     if(wordObj.isWord) {
-                        // 词语：合并该词的所有字画布到一个子图
+                        // 词语：拆成单字，每个单字独立生成子图
                         const parts = group.items.flatMap(it => (it.canvasDataURL || '').split('|||').filter(Boolean));
-                        if(parts.length > 0) {
-                            const imgs = await Promise.all(parts.map(p => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('img fail')); im.src = p; })));
-                            const tw = imgs.reduce((s, im) => s + im.width, 0);
-                            const mh = Math.max(...imgs.map(im => im.height));
-                            const c = document.createElement('canvas'); c.width = tw; c.height = mh;
-                            const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0,0,tw,mh);
-                            let px = 0; for(const im of imgs) { cx.drawImage(im, px, 0); px += im.width; }
-                            subBase64 = (await this.preprocessForOCR(c.toDataURL())).split(',')[1];
+                        for(let ci = 0; ci < parts.length; ci++) {
+                            const ocrKey = `${charId}_${ci}`;
+                            wordSplitMap[ocrKey] = { wordCharId: charId, charIdx: ci };
+                            let src = parts[ci];
+                            if(src.startsWith('blob:')) src = await this.blobUrlToDataURL(src);
+                            const subBase64 = (await this.preprocessForOCR(src)).split(',')[1];
+                            if(subBase64) {
+                                groupOrder.push(ocrKey);
+                                subImageList.push(subBase64);
+                            }
                         }
                     } else {
-                        // 单字：直接处理该字的画布（可能是Blob URL，需转为dataURL）
+                        // 单字：直接处理该字的画布
+                        let subBase64 = '';
                         if(group.items[0]?.canvasDataURL) {
                             let src = group.items[0].canvasDataURL;
                             if(src.startsWith('blob:')) src = await this.blobUrlToDataURL(src);
                             subBase64 = (await this.preprocessForOCR(src)).split(',')[1];
                         }
-                    }
-                    if(subBase64) {
-                        groupOrder.push(charId);
-                        subImageList.push(subBase64);
+                        if(subBase64) {
+                            groupOrder.push(charId);
+                            subImageList.push(subBase64);
+                        }
                     }
                 }
                 if(groupOrder.length === 0) { this.ocrBusy = false; return; }
@@ -3441,14 +3488,44 @@
 
                 // ====== Phase 5: 处理每个group的判定结果（127逻辑） ======
                 console.log('[OCR识别结果]', 'recognizedMap:', JSON.stringify(recognizedMap), 'matched:', Object.keys(recognizedMap).length, '/', groupOrder.length);
-                for(const charId of groupOrder) {
+                // 先聚合词语拆字的结果
+                const wordAggregated = {}; // wordCharId → { chars: [recognized...], expected: '努力', group: groups[wordCharId] }
+                for(const ocrKey of groupOrder) {
+                    const splitInfo = wordSplitMap[ocrKey];
+                    if(splitInfo) {
+                        // 词语拆字：聚合回词语
+                        const wcId = splitInfo.wordCharId;
+                        if(!wordAggregated[wcId]) {
+                            const g = groups[wcId];
+                            wordAggregated[wcId] = { chars: [], expected: g.char || '', group: g };
+                        }
+                        wordAggregated[wcId].chars[splitInfo.charIdx] = recognizedMap[ocrKey] || '';
+                    } else {
+                        // 单字：直接处理
+                        wordAggregated[ocrKey] = null; // 标记为单字，后面单独处理
+                    }
+                }
+                // 处理所有结果
+                for(const key of Object.keys(wordAggregated)) {
                     try {
-                        const group = groups[charId];
-                        const wordObj = this.words.find(w => w.id === group.charId);
-                        if(!wordObj) continue;
-                        const recognized = recognizedMap[charId] || '';
+                        let wordObj, recognized, expectedChar, group;
+                        if(wordAggregated[key] === null) {
+                            // 单字
+                            group = groups[key];
+                            wordObj = this.words.find(w => w.id === group.charId);
+                            if(!wordObj) continue;
+                            recognized = recognizedMap[key] || '';
+                            expectedChar = group.char || '';
+                        } else {
+                            // 词语（已聚合）
+                            const agg = wordAggregated[key];
+                            group = agg.group;
+                            wordObj = this.words.find(w => w.id === key);
+                            if(!wordObj) continue;
+                            recognized = agg.chars.join('');
+                            expectedChar = agg.expected;
+                        }
                         let anyCorrect = false;
-                        const expectedChar = group.char || '';
                         console.log('[OCR比对]', '期望:', expectedChar, '识别:', recognized, 'isWord:', wordObj.isWord);
                         if(wordObj.isWord) {
                             // 词语：逐字比对，2字以上词语容错1个字
@@ -3464,7 +3541,7 @@
                         } else {
                             if(this.isRecognitionMatch(recognized, expectedChar)) anyCorrect = true;
                         }
-                        // 保存手写数据到 IndexedDB（异步，不阻塞；Blob URL需转为dataURL才能持久化）
+                        // 保存手写数据到 IndexedDB
                         let handwritingURLs = [];
                         if(wordObj.isWord) {
                             const allCanvases = [];
@@ -3475,10 +3552,9 @@
                         } else {
                             handwritingURLs = group.items[0]?.canvasDataURL ? [group.items[0].canvasDataURL] : [];
                         }
-                        // 转换 Blob URL → dataURL（IndexedDB不能存Blob URL引用）
                         handwritingURLs = await Promise.all(handwritingURLs.map(u => u.startsWith('blob:') ? this.blobUrlToDataURL(u) : Promise.resolve(u)));
-                        wordObj.handwritingData = handwritingURLs; // 内存中保留，当前会话用
-                        this.saveHandwriting(group.charId, handwritingURLs).catch(()=>{}); // 异步存 IndexedDB，不卡界面
+                        wordObj.handwritingData = handwritingURLs;
+                        this.saveHandwriting(group.charId, handwritingURLs).catch(()=>{});
                         wordObj.ocrResult = anyCorrect ? 'correct' : 'wrong';
                         if(anyCorrect) {
                             wordObj.correctCount = (wordObj.correctCount || 0) + 1;
@@ -3495,7 +3571,7 @@
                         }
                     } catch(e) {
                         console.log('处理字符时出错:', e);
-                        this.sessionWrongWordIds.push(charId);
+                        this.sessionWrongWordIds.push(key);
                     }
                 }
                 this.sessionBatchSubmitted = true;
@@ -3618,9 +3694,11 @@
                 console.log('[退出诊断] finishSession被调用, sessionTaskList长度:', this.sessionTaskList.length);
                 if(this.timerInterval) clearInterval(this.timerInterval); 
                 this.sessionFinished=true; 
-                this._isDictating = false; // 默写结束，恢复自动保存
-                // 不再重新生成计划，避免拉入不在原始计划中的字
-                // todayPlanWords 已在默写开始时确定，保持不变
+                this._isDictating = false;
+                this._planCompletedToday = true;
+                this.todayPlanWordIds = [];
+                this.todayPlanDate = '';
+                this.saveDataImmediate();
             },
             finishAndGoHome() {
                 console.log('[退出诊断] finishAndGoHome被调用', new Error().stack);
@@ -3836,9 +3914,12 @@
                     this.todayPlanDate = '';
                     this.todayPlanWordIds = [];
                     this.todayCompletedCount = 0;
+                    this._planCompletedToday = true;
                     // 重置 session 错字记录
                     this.sessionWrongWordIds = [];
                     this.saveDataImmediate();
+                    // ponytail: 替换数组引用强制Vue重算所有computed（词库/错字本/看板）
+                    this.words = this.words.slice();
                     this.currentView='childHome';
                     this.showAlert('完成', '复核已处理，今日计划已清零。');
                 };
@@ -3853,22 +3934,30 @@
                     doCommit();
                 }
             },
-            // 从错字本中删除（同步重置127状态）
+            // 从错字本中删除 → 进入Day7池（7天后检测）
             removeFromWrongWords(word) {
                 const wordObj = this.words.find(w => w.id === word.id);
                 if(wordObj) {
-                    wordObj.wrongCount = 0;
+                    const today = getLocalDateStr();
+                    // wrongCount保留（滚动池需要>0），correctCount清零（重新统计）
+                    wordObj.correctCount = 0;
+                    wordObj.status = 'learning';
+                    wordObj._127_day7Entry = today;
                     wordObj._127_rollingStreak = 0;
-                    wordObj._127_day7Entry = null;
-                    wordObj.status = wordObj.correctCount > 0 ? 'mastered' : 'learning';
+                    wordObj._127_randomCheckEntry = null;
+                    wordObj._127_randomCheckSource = null;
                     wordObj.pendingReview = false;
                     wordObj.pendingReviewDate = null;
                     wordObj.firstWrong = false;
-                    wordObj.reviewDates = [];
+                    this.generateReviewDates(wordObj);
+                    // 从今日计划中移除（reviewDates已变为7天后，不应出现在今天的计划里）
+                    this.todayPlanWords = this.todayPlanWords.filter(w => w.id !== wordObj.id);
+                    this.todayPlanWordIds = this.todayPlanWordIds.filter(id => id !== wordObj.id);
                 }
                 this.saveData();
                 this.generateTodayPlan();
-                this.showAlert('已删除', `「${word.word}」已从错字本移除，127状态已重置。`);
+                this.words = this.words.slice();
+                this.showAlert('已删除', `「${word.word}」已从错字本移除，7天后检测。`);
             },
             // 新增错字
             openAddWrongWordModal() {
@@ -3895,6 +3984,7 @@
                     this.generateReviewDates(wordObj);
                     this.saveData();
                     this.generateTodayPlan();
+                    this.words = this.words.slice();
                     this.showAlert('已新增', `「${char}」已加入错字本，今日复习列表中。`);
                 });
             },
@@ -4275,9 +4365,10 @@
                     } else {
                         // 合并模式
                         const localIds = new Set(this.words.map(w => w.id));
+                        const localWords = new Set(this.words.map(w => w.word));
                         let added = 0;
                         for(const rw of remote.words) {
-                            if(!localIds.has(rw.id)) {
+                            if(!localIds.has(rw.id) && !localWords.has(rw.word)) {
                                 this.words.push(rw);
                                 added++;
                             } else {
@@ -4560,7 +4651,7 @@
                     for(let item of selectedWords) {
                         const wordId = 'yw_' + item.unitName + '_' + item.lesson.name + '_' + item.word;
                         allSelectedIds.push(wordId);
-                        const existingWord = this.words.find(w => w.id === wordId);
+                        const existingWord = this.words.find(w => w.id === wordId || w.word === item.word);
                         if(existingWord) {
                             exists++;
                             if(existingWord._planSkipDate === today) { existingWord._planSkipDate = ''; reset++; }
@@ -4631,7 +4722,7 @@
                         const cat = item.cat || 'shizi';
                         const charId = 'sz_' + item.unitName + '_' + item.lesson.name + '_' + cat + '_' + ch.char;
                         allSelectedIds.push(charId);
-                        const existingChar = this.words.find(w => w.id === charId);
+                        const existingChar = this.words.find(w => w.id === charId || w.word === ch.char);
                         if(existingChar) {
                             exists++;
                             if(existingChar._planSkipDate === today) { existingChar._planSkipDate = ''; reset++; }
