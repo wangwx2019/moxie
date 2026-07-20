@@ -98,7 +98,7 @@
         .cat-item.active { background: #f97316; color: white; }
         .date-badge { background: #fef3c7; color: #b45309; border-radius: 40px; padding: 1px 10px; font-size: 0.65rem; font-weight: 700; margin-left: 4px; vertical-align: middle; }
         .word-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0e4d8; }
-        .review-item-card { background: #fefaf5; border-radius: 28px; padding: 14px; margin-bottom: 14px; border: 1px solid #ffdec2; position: relative; }
+        .review-item-card { background: #fefaf5; border-radius: 28px; padding: 14px; margin-bottom: 14px; border: 1px solid #ffdec2; position: relative; content-visibility: auto; contain-intrinsic-size: auto 200px; }
         .handwriting-preview { background: #fef3e9; border-radius: 20px; padding: 8px; margin: 8px 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .preview-img { border: 1px solid #ffcd9c; border-radius: 12px; background: white; max-width: 70px; max-height: 70px; }
         .cute-btn-sm { background: #f97316; color: white; border: none; padding: 6px 16px; border-radius: 40px; font-weight: 500; cursor: pointer; }
@@ -1506,16 +1506,9 @@
             reviewTotalWrong() { return this.todayPlanWords.filter(w => w.wrongCount > 0).length; },
             // 复核列表：所有有手写数据的词（不依赖todayPlanIds，避免generateTodayPlan重建导致消失）
             reviewList() {
+                // 只在 handwritingData 变化时重算，ocrResult/reviewCorrected 等属性通过 word 引用自动更新
                 return this.words
-                    .filter(w => {
-                        // 显式读取 ocrResult / reviewCorrected / wrongCount / correctCount，确保 Vue 跟踪这些响应式依赖
-                        // 当 judgeAsCorrect / judgeAsWrong 修改这些属性时，computed 会被正确重算
-                        void w.ocrResult;
-                        void w.reviewCorrected;
-                        void w.wrongCount;
-                        void w.correctCount;
-                        return w.handwritingData && w.handwritingData.length > 0;
-                    })
+                    .filter(w => w.handwritingData && w.handwritingData.length > 0)
                     .map(w => ({
                         word: w,
                         handwritingImages: w.handwritingData
@@ -1988,6 +1981,8 @@
                 }, 300);
             },
             saveDataImmediate() {
+                // 默写/复核期间跳过自动保存（批改完成时 ocrBusy=true 允许保存）
+                if(this._isDictating && !this.ocrBusy) return;
                 // 立即保存（关键节点：AI批改、复核提交、清除计划等）
                 if(this._saveTimer) { clearTimeout(this._saveTimer); this._saveTimer = null; }
                 this._doSave();
@@ -3600,7 +3595,7 @@
                     wordObj.correctCount = (wordObj.correctCount || 0) + 1;
                     // 保存手写图（供复核页查看）
                     const mergedCanvas = this.getMergedCanvas();
-                    const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.7);
+                    const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.4);
                     wordObj.handwritingData = [hwDataURL];
                     this.saveHandwriting(wordObj.id, [hwDataURL]).catch(()=>{}); // 异步存 IndexedDB
                     wordObj.ocrResult = 'correct';
@@ -3623,7 +3618,7 @@
                     wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
                     this.updateWord127State(wordObj, false);
                     const mergedCanvas = this.getMergedCanvas();
-                    const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.7);
+                    const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.4);
                     wordObj.handwritingData = [hwDataURL];
                     this.saveHandwriting(wordObj.id, [hwDataURL]).catch(()=>{}); // 异步存 IndexedDB
                     wordObj.ocrResult = 'wrong';
