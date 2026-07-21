@@ -1997,6 +1997,7 @@
                 this._doSave();
             },
             flushSave() {
+                if(this._isPulling) return; // 拉取期间禁止保存，防止覆盖远程数据
                 if(this._saveTimer) { clearTimeout(this._saveTimer); this._saveTimer = null; }
                 this._doSave();
             },
@@ -4378,6 +4379,7 @@
                             _planCompletedToday: remote._planCompletedToday || false
                         };
                         // 第四步：直接写localStorage（不触发Vue watcher），然后刷新
+                        this._isPulling = true; // 标记拉取中，禁止flushSave覆盖
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
                         location.href = location.pathname + '?v=' + Date.now();
                     } else {
