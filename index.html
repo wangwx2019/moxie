@@ -49,12 +49,15 @@
         .nav-back { display: inline-flex; align-items: center; gap: 6px; background: #fff2e6; padding: 6px 14px; border-radius: 40px; font-weight: 500; cursor: pointer; color: #f97316; margin-bottom: 20px; }
         .card-white { background: #fffef7; border-radius: 32px; padding: 1rem 1.2rem; margin-bottom: 1rem; border: 1px solid #ffe2cc; }
         .tian-ge-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin: 20px 0; }
-        .canvas-tg { background: #fffcf5; border: 2px solid #fbc48d; border-radius: 24px; cursor: crosshair; width: 160px; height: 160px; touch-action: none; will-change: transform; }
-        .tian-ge-cell { display: flex; justify-content: center; align-items: center; }
+        .canvas-tg { background: transparent; border: 2px solid #fbc48d; border-radius: 24px; cursor: crosshair; width: 160px; height: 160px; touch-action: none; will-change: transform; }
+        .tian-ge-cell { display: flex; justify-content: center; align-items: center; position: relative; }
+        .canvas-layer { position: relative; display: inline-block; }
+        .canvas-grid { position: absolute; top: 0; left: 0; pointer-events: none; border-radius: 24px; }
+        .eraser-cursor { position: absolute; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.5); border: 2px solid #f97316; box-shadow: 0 0 8px rgba(249,115,22,0.4); pointer-events: none; display: none; transform: translate(-50%, -50%); z-index: 10; }
         .dictate-header-stats { background: #ffefe2; padding: 10px 18px; border-radius: 48px; margin: 8px 12px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 700; }
         .stat-chip { background: white; padding: 4px 16px; border-radius: 40px; font-size: 0.8rem; }
         .timer { background: #fbbf24; color: white; padding: 4px 14px; border-radius: 40px; }
-        .dictate-main-card { background: white; margin: 0 16px 20px; border-radius: 48px; padding: 24px 20px; border: 1px solid #ffd8bd; overflow-x: auto; touch-action: none; overscroll-behavior: contain; }
+        .dictate-main-card { background: white; margin: 0 16px 20px; border-radius: 48px; padding: 24px 20px; border: 1px solid #ffd8bd; overflow-x: auto; touch-action: manipulation; overscroll-behavior: contain; }
         .eraser-active { background: #f97316 !important; color: white !important; box-shadow: 0 0 0 3px rgba(249,115,22,0.3); }
         .pinyin-big { font-size: 2.5rem; font-weight: 800; color: #f97316; text-align: center; background: #fff1e6; display: inline-block; padding: 8px 32px; border-radius: 80px; margin-bottom: 16px; }
         .context-illustration { background: #fef5e8; border-radius: 32px; padding: 16px; margin: 16px 0; border-left: 8px solid #fbbf24; font-size: 1.2rem; }
@@ -263,28 +266,30 @@
             <span class="review-link" @click="goToReviewFromChild">💾 待复核 {{ pendingReviewCount }}</span>
         </div>
         <!-- 统一默写模式 -->
-        <div class="dictate-main-card" v-if="currentSessionWord">
+        <div class="dictate-main-card" v-if="currentSessionWord" style="position:relative;">
+            <div ref="eraserCursor" class="eraser-cursor"></div>
             <!-- 词语听写模式 -->
             <template v-if="currentSessionWord.isWord">
             <div style="text-align:center; margin-bottom:8px;">
                 <div style="font-size:2.4rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">{{ currentSessionWord.pinyin }}</div>
-                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:4px; padding:4px 12px; font-size:0.85rem;" @click="speakCurrentWord">🔊 重播</button>
+                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:4px; padding:4px 12px; font-size:0.85rem;" @pointerdown="speakCurrentWord">🔊 重播</button>
             </div>
-            <!-- 箭头行：上一个 | 下一个（远离田字格防误触） -->
-            <div style="display:flex; align-items:center; justify-content:center; gap:120px; margin-bottom:8px;">
-                <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:40px; height:40px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.1rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
-                <div v-else style="width:40px;"></div>
-                <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:40px; height:40px; border-radius:50%; background:#f97316; border:none; font-size:1.1rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
+            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
+                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem;" @pointerdown="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" :class="{'eraser-active': eraserActive}" style="flex:1; padding:8px 0; font-size:0.9rem;" @pointerdown="toggleEraser">{{ eraserActive ? '✏️ 写字' : '🧹 橡皮擦' }}</button>
+                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem; background:#fef2f2; color:#dc2626; border:1px solid #fecaca;" @pointerdown="clearAllCanvas">🗑️ 清空</button>
+            </div>
+            <!-- 箭头行 -->
+            <div style="display:flex; align-items:center; justify-content:center; gap:80px; margin-bottom:8px;">
+                <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @pointerdown="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.4rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
+                <div v-else style="width:56px;"></div>
+                <button class="nav-arrow-btn" @pointerdown="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.4rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
             <!-- 田字格 -->
             <div style="display:flex; justify-content:center; margin-bottom:10px;">
                 <div style="flex:1; min-width:0; display:flex; justify-content:center; gap:8px; padding:2px 0; overflow-x:auto; -webkit-overflow-scrolling:touch;" id="word_canvas_container">
                     <!-- 由 initWordCanvas 动态创建 -->
                 </div>
-            </div>
-            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:6px;">
-                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem;" @click="handleDontKnow">😵 不会</button>
-                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem;" @click="clearAllCanvas">🗑️ 清除</button>
             </div>
             <div class="text-small" style="font-size:0.75rem;">✏️ 看拼音，写出这个词语。◀ 上一个 · 下一个 ▶</div>
             </template>
@@ -293,13 +298,18 @@
             <!-- 拼音大号居中 -->
             <div style="text-align:center; margin-bottom:12px;">
                 <div style="font-size:3.5rem; font-weight:700; color:#f97316; line-height:1.2;">{{ currentSessionWord.pinyin }}</div>
-                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @click="speakCurrentWord">🔊 重播</button>
+                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @pointerdown="speakCurrentWord">🔊 重播</button>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
+                <button class="cute-btn" style="flex:1; padding:10px 0;" @pointerdown="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" :class="{'eraser-active': eraserActive}" style="flex:1; padding:10px 0;" @pointerdown="toggleEraser">{{ eraserActive ? '✏️ 写字' : '🧹 橡皮擦' }}</button>
+                <button class="cute-btn" style="flex:1; padding:10px 0; background:#fef2f2; color:#dc2626; border:1px solid #fecaca;" @pointerdown="clearAllCanvas">🗑️ 清空</button>
             </div>
             <!-- ◀ 词语 ▶ 箭头和词语同一行 -->
             <div style="display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:20px; flex-wrap:wrap;">
                 <!-- 左箭头 -->
-                <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @click="goToPrevWord" style="width:48px; height:48px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.2rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
-                <div v-else style="width:48px;"></div>
+                <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @pointerdown="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.4rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
+                <div v-else style="width:56px;"></div>
                 <!-- 词语逐字显示 -->
                 <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
                     <div v-for="(item, idx) in currentDictateWordChars" :key="idx"
@@ -338,18 +348,16 @@
                     </div>
                 </div>
                 <!-- 右箭头 -->
-                <button class="nav-arrow-btn" @click="recognizeAndSubmit" style="width:48px; height:48px; border-radius:50%; background:#f97316; border:none; font-size:1.2rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
+                <button class="nav-arrow-btn" @pointerdown="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.4rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
             <!-- 田字格 -->
             <div style="display:flex; justify-content:center; margin-bottom:16px;">
                 <div class="tian-ge-cell">
-                    <canvas id="tg_c" class="canvas-tg" width="160" height="160" style="width:160px; height:160px;" aria-label="手写区域，在此处用手指或鼠标写字"></canvas>
+                    <div class="canvas-layer">
+                        <canvas id="grid_c" class="canvas-grid" width="160" height="160" style="width:160px; height:160px;"></canvas>
+                        <canvas id="tg_c" class="canvas-tg" width="160" height="160" style="width:160px; height:160px;" aria-label="手写区域，在此处用手指或鼠标写字"></canvas>
+                    </div>
                 </div>
-            </div>
-            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
-                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="handleDontKnow">😵 不会</button>
-                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="clearCurrentCanvas">🧽 橡皮擦</button>
-                <button class="cute-btn" style="flex:1; padding:10px 0;" @click="clearAllCanvas">🗑️ 清除</button>
             </div>
             <div class="text-small" v-if="!traceMode">✏️ 看拼音，写出带 <span style="color:#f97316; font-weight:700;">?</span> 的字。◀ 上一个 · 下一个 ▶</div>
             <div class="text-small" v-else style="color:#d97706;">✏️ 照着浅色字描摹，然后点 ▶ 下一个。</div>
@@ -744,7 +752,7 @@
                     </div>
                     <div style="display:flex; gap:6px; margin-top:6px;">
                         <input type="text" v-model="acc.apiKey" placeholder="API Key" style="flex:1; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; box-sizing:border-box;">
-                        <input type="password" v-model="acc.secretKey" placeholder="Secret Key" style="flex:1; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; box-sizing:border-box;">
+                        <input type="text" v-model="acc.secretKey" placeholder="Secret Key" style="flex:1; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; box-sizing:border-box;">
                     </div>
                     <div style="margin-top:6px;">
                         <input type="text" v-model="acc.token" placeholder="access_token（从百度接口返回的 JSON 中复制过来）" style="width:100%; border-radius:40px; border:1px solid #ffca9a; padding:8px 14px; font-size:0.8rem; background:white; box-sizing:border-box;">
@@ -1733,7 +1741,7 @@
             ttsVoiceId:'saveData', 
             ttsToken:'saveData' 
         },
-        mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); const _today = getLocalDateStr(); if(this._planToastShown === _today) { const _tb = this.allReviewPlans.find(p => { const d = new Date(_today); return p.date === (d.getMonth()+1) + '/' + d.getDate(); }); if(_tb) { if(this._planToastAdded > 0) { this.toastMessage = '看板加入 ' + this._planToastAdded + '个词语，重复了' + this._planToastDup + '个'; } else { this.toastMessage = '看板计划 ' + _tb.date + '(' + _tb.weekday + ').' + this._planToastTotal + '个词语，已全部在今日计划中'; } } } this.generateTodayPlan(); this.autoAddPlanBoardWords(); window.addEventListener('beforeunload', this.flushSave); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } let _touchStartTarget = null; document.addEventListener('touchstart', (e) => { _touchStartTarget = e.target; }, { passive: true }); document.addEventListener('touchmove', (e) => { if(!this._isDictating) return; if(_touchStartTarget && _touchStartTarget.closest('#tg_c, #word_canvas_container')) return; e.preventDefault(); }, { passive: false }); },
+        mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); const _today = getLocalDateStr(); if(this._planToastShown === _today) { const _tb = this.allReviewPlans.find(p => { const d = new Date(_today); return p.date === (d.getMonth()+1) + '/' + d.getDate(); }); if(_tb) { if(this._planToastAdded > 0) { this.toastMessage = '看板加入 ' + this._planToastAdded + '个词语，重复了' + this._planToastDup + '个'; } else { this.toastMessage = '看板计划 ' + _tb.date + '(' + _tb.weekday + ').' + this._planToastTotal + '个词语，已全部在今日计划中'; } } } this.generateTodayPlan(); this.autoAddPlanBoardWords(); this.checkAndClearCompletedPlan(); const _pt = getLocalDateStr(); const _pk = 'practicedCheckShown_' + _pt; if(!sessionStorage.getItem(_pk)) { const _pi = this.todayPlanWordIds.filter(_id => { const _w = this.words.find(w => w.id === _id); return _w && _w._lastPracticedDate === _pt; }); if(_pi.length > 0) { const _pn = _pi.map(_id => { const _w = this.words.find(w => w.id === _id); return _w ? (_w.word || _w.char) : ''; }).filter(Boolean); this.showConfirm('今日已默写', _pn.length + '个字今日已经默写过：' + _pn.join('、') + '\n\n是否从今日计划中清除？', () => { this.todayPlanWordIds = this.todayPlanWordIds.filter(_id => !_pi.includes(_id)); this.todayPlanWords = this.todayPlanWords.filter(_w => !_pi.includes(_w.id)); this.saveDataImmediate(); this.showToast('已清除 ' + _pn.length + ' 个已默写的字'); }, () => {}); sessionStorage.setItem(_pk, '1'); } } window.addEventListener('beforeunload', this.flushSave); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } let _touchStartTarget = null; document.addEventListener('touchstart', (e) => { _touchStartTarget = e.target; }, { passive: true }); document.addEventListener('touchmove', (e) => { if(!this._isDictating) return; if(_touchStartTarget && _touchStartTarget.closest('#tg_c, #word_canvas_container')) return; e.preventDefault(); }, { passive: false }); },
         methods: {
             async fetchRemoteData() {
                 try {
@@ -1905,7 +1913,7 @@
                             }
                         }
                         this.words = deduped;
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify({ words: this.words, checkinDays: d.checkinDays, parentPassword: d.parentPassword, useBaiduOCR: d.useBaiduOCR, baiduAccounts: d.baiduAccounts }));
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...d, words: this.words }));
                         this.checkinDays = d.checkinDays;
                         this.parentPassword = d.parentPassword;
                         this.useBaiduOCR = d.useBaiduOCR !== false;
@@ -2317,7 +2325,7 @@
                     const d = new Date(today);
                     return p.date === (d.getMonth()+1) + '/' + d.getDate();
                 });
-                if(!todayBoard || todayBoard.words.length === 0) return;
+                if(!todayBoard || todayBoard.words.length === 0) { return; }
                 const missing = todayBoard.words.filter(w =>
                     !this.todayPlanWords.some(p => p.id === w.id)
                 );
@@ -2664,15 +2672,23 @@
                     requestAnimationFrame(() => this.initCanvasForCurrent());
                     return;
                 }
-                let ctx = canvas.getContext('2d', { willReadFrequently: true });
+                let ctx = canvas.getContext('2d');
                 if(!ctx) { 
                     requestAnimationFrame(() => this.initCanvasForCurrent());
                     return;
                 }
-                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,160,160); 
-                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,160,160); 
-                ctx.beginPath(); ctx.moveTo(80,0); ctx.lineTo(80,160); ctx.stroke(); 
-                ctx.moveTo(0,80); ctx.lineTo(160,80); ctx.stroke(); 
+                // 网格层：画田字格
+                let gridCanvas = document.getElementById('grid_c');
+                if(gridCanvas) {
+                    let gCtx = gridCanvas.getContext('2d');
+                    gCtx.fillStyle="#fffcf5"; gCtx.fillRect(0,0,160,160);
+                    gCtx.strokeStyle="#fbc48d"; gCtx.lineWidth=2; gCtx.strokeRect(0,0,160,160);
+                    gCtx.beginPath(); gCtx.moveTo(80,0); gCtx.lineTo(80,160); gCtx.stroke();
+                    gCtx.moveTo(0,80); gCtx.lineTo(160,80); gCtx.stroke();
+                }
+                // 书写层：清空为透明（GPU缓冲释放）
+                canvas.width = 0; canvas.width = 160; canvas.height = 160;
+                ctx = canvas.getContext('2d'); 
                 this.enableDrawing(canvas);
                 // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
                 this.speakCurrentWord();
@@ -2697,23 +2713,36 @@
                     const size = Math.min(180, Math.max(60, Math.floor((innerW - borderTotal - gapTotal) / chars.length)));
                     const half = size / 2;
                     chars.forEach((ch, idx) => {
+                        // 双层画布容器
+                        const layer = document.createElement('div');
+                        layer.className = 'canvas-layer';
+                        layer.style.cssText = 'flex-shrink:0;';
+                        // 网格层
+                        const gridCanvas = document.createElement('canvas');
+                        gridCanvas.id = 'grid_w' + idx;
+                        gridCanvas.width = size;
+                        gridCanvas.height = size;
+                        gridCanvas.className = 'canvas-grid';
+                        gridCanvas.style.cssText = 'width:'+size+'px;height:'+size+'px;border:2px solid #fbc48d;border-radius:16px;';
+                        const gCtx = gridCanvas.getContext('2d');
+                        gCtx.fillStyle = '#fffcf5';
+                        gCtx.fillRect(0, 0, size, size);
+                        gCtx.strokeStyle = '#fbc48d';
+                        gCtx.lineWidth = 2;
+                        gCtx.strokeRect(0, 0, size, size);
+                        gCtx.beginPath();
+                        gCtx.moveTo(half, 0); gCtx.lineTo(half, size); gCtx.stroke();
+                        gCtx.moveTo(0, half); gCtx.lineTo(size, half); gCtx.stroke();
+                        layer.appendChild(gridCanvas);
+                        // 书写层
                         const canvas = document.createElement('canvas');
                         canvas.id = 'tg_w' + idx;
                         canvas.width = size;
                         canvas.height = size;
                         canvas.className = 'canvas-tg';
-                        // flex-shrink:0 防止 flex 布局压缩画布
-                        canvas.style.cssText = 'width:'+size+'px;height:'+size+'px;border:2px solid #fbc48d;border-radius:16px;background:#fffcf5;flex-shrink:0;';
-                        container.appendChild(canvas);
-                        const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = '#fffcf5';
-                        ctx.fillRect(0, 0, size, size);
-                        ctx.strokeStyle = '#fbc48d';
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(0, 0, size, size);
-                        ctx.beginPath();
-                        ctx.moveTo(half, 0); ctx.lineTo(half, size); ctx.stroke();
-                        ctx.moveTo(0, half); ctx.lineTo(size, half); ctx.stroke();
+                        canvas.style.cssText = 'width:'+size+'px;height:'+size+'px;border:2px solid #fbc48d;border-radius:16px;background:transparent;flex-shrink:0;';
+                        layer.appendChild(canvas);
+                        container.appendChild(layer);
                         this.enableDrawing(canvas);
                     });
                 }
@@ -2726,15 +2755,9 @@
                     const canvas = document.getElementById('tg_w' + idx);
                     if(!canvas) return;
                     const w = canvas.width, h = canvas.height;
+                    // 清空书写层（网格在 grid_w* 上，不动）
+                    canvas.width = 0; canvas.width = w; canvas.height = h;
                     const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#fffcf5';
-                    ctx.fillRect(0, 0, w, h);
-                    ctx.strokeStyle = '#fbc48d';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(0, 0, w, h);
-                    ctx.beginPath();
-                    ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h); ctx.stroke();
-                    ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke();
                     ctx.fillStyle = 'rgba(249, 115, 22, 0.25)';
                     ctx.font = (w*0.67)+"px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
                     ctx.textAlign = 'center';
@@ -2784,7 +2807,14 @@
                     this._currentTtsAudio = audio;
                     audio.onended = () => { this._currentTtsAudio = null; URL.revokeObjectURL(audioUrl); };
                     audio.onerror = () => { this._currentTtsAudio = null; URL.revokeObjectURL(audioUrl); };
-                    await audio.play();
+                    // iPad Safari: 必须等音频解码完再 play，否则静默失败
+                    await new Promise((resolve) => {
+                        audio.oncanplaythrough = resolve;
+                        audio.onerror = resolve;
+                        if(audio.readyState >= 4) resolve();
+                        setTimeout(resolve, 2000); // 兜底超时
+                    });
+                    await audio.play().catch(e => { console.warn('audio.play失败:', e); this.speakFallback(text); });
                 } catch(e) { console.error('百度语音失败:', e); this.speakFallback(text); }
             },
             // 降级：浏览器原生 TTS
@@ -2800,6 +2830,8 @@
                     const zh = voices.find(v => /zh|Chinese|中文|普通话/i.test(v.lang + v.name));
                     if(zh) u.voice = zh;
                     window.speechSynthesis.speak(u);
+                    // iPad Safari speechSynthesis bug: 100ms后resume确保播放
+                    setTimeout(() => { if(window.speechSynthesis.speaking) window.speechSynthesis.resume(); }, 100);
                 } catch(e) { console.error('降级语音也失败:', e); }
             },
             // 试听语音
@@ -2865,12 +2897,10 @@
                 }
             },
             drawTraceCharacter(canvas, char) {
-                let ctx = canvas.getContext('2d', { willReadFrequently: true });
-                // 先清除canvas并画出米字格
-                ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,160,160);
-                ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,160,160);
-                ctx.beginPath(); ctx.moveTo(80,0); ctx.lineTo(80,160); ctx.stroke();
-                ctx.moveTo(0,80); ctx.lineTo(160,80); ctx.stroke();
+                let ctx = canvas.getContext('2d');
+                // 清空书写层（网格在 grid_c 上，不动）
+                canvas.width = 0; canvas.width = 160; canvas.height = 160;
+                ctx = canvas.getContext('2d');
                 // 画浅色字供描摹（字号按画布比例缩放：240→160px, 字号160→107px）
                 ctx.fillStyle = "rgba(249, 115, 22, 0.25)"; // 浅橙色半透明
                 ctx.font = "107px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
@@ -2886,30 +2916,35 @@
                     canvas.removeEventListener('touchstart', canvas._tgHandlers.start);
                     canvas.removeEventListener('touchmove', canvas._tgHandlers.draw);
                     canvas.removeEventListener('touchend', canvas._tgHandlers.end);
+                    canvas.removeEventListener('touchcancel', canvas._tgHandlers.cancel);
                     canvas.removeEventListener('mousedown', canvas._tgHandlers.start);
                     canvas.removeEventListener('mousemove', canvas._tgHandlers.draw);
                     canvas.removeEventListener('mouseup', canvas._tgHandlers.end);
                     canvas.removeEventListener('mouseleave', canvas._tgHandlers.leave);
                 }
-                let ctx = canvas.getContext('2d', { willReadFrequently: true });
+                // CSS层面拦截触摸手势，比JS的e.preventDefault()快一个量级
+                // 浏览器内核直接处理，不需要等JS执行完再传递后续触摸事件
+                canvas.style.touchAction = 'none';
+                let ctx = canvas.getContext('2d');
                 ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
                 let drawing = false;
                 let lastX, lastY, prevX, prevY;
                 let cachedRect = null; // 缓存 rect，避免每次 touchmove 都 reflow
                 let rafPending = false;
-                let pendingEvent = null;
+                let pendingX = 0, pendingY = 0; // 存坐标而非事件引用，避免事件被回收后数据丢失
                 const getCoord = (e, rect) => {
-                    let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    const t = e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0] : (e.touches && e.touches.length > 0 ? e.touches[0] : e);
+                    let clientX = t.clientX;
+                    let clientY = t.clientY;
                     let x = (clientX - rect.left) * canvas.width / rect.width;
                     let y = (clientY - rect.top) * canvas.height / rect.height;
                     return {x,y};
                 };
-                const doDraw = (e) => {
+                const doDraw = () => {
                     rafPending = false;
                     if(!drawing) return;
-                    // 使用缓存的 rect，不在 draw 时触发 reflow
-                    let {x,y}=getCoord(e, cachedRect);
+                    let x = (pendingX - cachedRect.left) * canvas.width / cachedRect.width;
+                    let y = (pendingY - cachedRect.top) * canvas.height / cachedRect.height;
                     let midX=(prevX+x)/2, midY=(prevY+y)/2;
                     ctx.quadraticCurveTo(prevX, prevY, midX, midY);
                     ctx.stroke();
@@ -2918,45 +2953,68 @@
                 };
                 const start = (e) => {
                     e.preventDefault();
-                    if(this.eraserActive) { this.clearCanvasCell(canvas.id); return; }
-                    // 互斥：如果其他canvas正在书写，不启动本canvas
-                    const allCanvases = document.querySelectorAll('#word_canvas_container canvas, #tg_c');
-                    for(const c of allCanvases) { if(c !== canvas && c._isDrawing) { return; } }
                     canvas._isDrawing = true;
                     drawing=true;
-                    // 只在 touchstart 时获取一次 rect，缓存起来复用
                     cachedRect = canvas.getBoundingClientRect();
                     let {x,y}=getCoord(e, cachedRect);
-                    ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                    if(this.eraserActive) {
+                        // 橡皮擦模式：用 destination-out 只擦墨迹，网格层不受影响
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.strokeStyle = 'rgba(0,0,0,1)'; ctx.lineWidth = 24; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                        // 显示光圈
+                        const cursor = this.$refs.eraserCursor;
+                        if(cursor) {
+                            const card = cursor.parentElement;
+                            const cardRect = card.getBoundingClientRect();
+                            const t = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0] : e;
+                            cursor.style.left = (t.clientX - cardRect.left) + 'px';
+                            cursor.style.top = (t.clientY - cardRect.top) + 'px';
+                            cursor.style.display = 'block';
+                        }
+                    } else {
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = '#000000'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                    }
                     ctx.beginPath(); ctx.moveTo(x,y);
                     lastX=prevX=x; lastY=prevY=y;
                 };
                 const draw = (e) => {
-                    if(!drawing) return; e.preventDefault();
-                    // 用 requestAnimationFrame 节流：多次触摸事件合并到下一帧
-                    pendingEvent = e;
+                    if(!drawing) return;
+                    // 立即提取坐标存下来，不存事件引用（事件会被浏览器回收）
+                    const t = e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0] : (e.touches && e.touches.length > 0 ? e.touches[0] : e);
+                    pendingX = t.clientX; pendingY = t.clientY;
+                    // 橡皮擦光圈跟随
+                    if(this.eraserActive) {
+                        const cursor = this.$refs.eraserCursor;
+                        if(cursor) {
+                            const card = cursor.parentElement;
+                            const cardRect = card.getBoundingClientRect();
+                            cursor.style.left = (t.clientX - cardRect.left) + 'px';
+                            cursor.style.top = (t.clientY - cardRect.top) + 'px';
+                        }
+                    }
                     if(!rafPending) {
                         rafPending = true;
-                        requestAnimationFrame(() => doDraw(pendingEvent));
+                        requestAnimationFrame(doDraw);
                     }
                 };
-                const end = () => { drawing=false; cachedRect=null; canvas._isDrawing=false; };
-                const leave = () => { drawing=false; cachedRect=null; canvas._isDrawing=false; };
-                canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); canvas.addEventListener('touchend', end, { passive: false });
+                const end = () => { drawing=false; cachedRect=null; canvas._isDrawing=false; ctx.globalCompositeOperation = 'source-over'; if(this.$refs.eraserCursor) this.$refs.eraserCursor.style.display='none'; };
+                const leave = () => { drawing=false; cachedRect=null; canvas._isDrawing=false; ctx.globalCompositeOperation = 'source-over'; if(this.$refs.eraserCursor) this.$refs.eraserCursor.style.display='none'; };
+                canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: true }); canvas.addEventListener('touchend', end, { passive: true }); canvas.addEventListener('touchcancel', end, { passive: true });
                 canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', leave);
-                canvas._tgHandlers = { start, draw, end, leave };
+                canvas._tgHandlers = { start, draw, end, leave, cancel: end };
             },
             clearCurrentCanvas() { 
                 this.clearCanvasCell('tg_c');
             },
             clearAllCanvas() { 
                 if (this.currentSessionWord && this.currentSessionWord.isWord) {
-                    // 词语模式：清除所有动态创建的画布
+                    // 词语模式：清除所有书写画布（不动网格层）
                     const container = document.getElementById('word_canvas_container');
                     if (container) {
                         const canvases = container.querySelectorAll('canvas');
                         canvases.forEach(canvas => {
-                            this.clearCanvasCell(canvas.id);
+                            if(canvas.id && canvas.id.startsWith('tg_')) this.clearCanvasCell(canvas.id);
                         });
                     }
                 } else {
@@ -2966,19 +3024,17 @@
             },
             toggleEraser() {
                 this.eraserActive = !this.eraserActive;
+                if(!this.eraserActive && this.$refs.eraserCursor) this.$refs.eraserCursor.style.display='none';
             },
             clearCanvasCell(canvasId) { 
                 let canvas = typeof canvasId === 'number' ? document.getElementById(`tg_${canvasId}`) : document.getElementById(canvasId); 
                 if(canvas){ 
-                    let ctx = canvas.getContext('2d', { willReadFrequently: true }); 
                     const w = canvas.width;
                     const h = canvas.height;
-                    const cx = w / 2;
-                    const cy = h / 2;
-                    ctx.fillStyle="#fffcf5"; ctx.fillRect(0,0,w,h); 
-                    ctx.strokeStyle="#fbc48d"; ctx.lineWidth=2; ctx.strokeRect(0,0,w,h); 
-                    ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,h); ctx.stroke(); 
-                    ctx.moveTo(0,cy); ctx.lineTo(w,cy); ctx.stroke();
+                    // 强制释放GPU缓冲，防止写了多字后笔触延迟
+                    canvas.width = 0;
+                    canvas.width = w;
+                    canvas.height = h;
                 } 
             },
             getMergedCanvas() {
@@ -3592,6 +3648,7 @@
                 }
                 this.sessionBatchSubmitted = true;
                 this.saveDataImmediate();
+                this.checkAndClearCompletedPlan();
                 } catch(err) {
                     console.error('[OCR批改错误]', err);
                     this.showAlert('批改失败', 'AI批改过程出错：' + (err.message || err));
@@ -3705,6 +3762,29 @@
             moveToNext() { 
                 this.closeStrokeOrder();
                 this.$nextTick(()=>{ this.initCanvasForCurrent(); }); 
+            },
+            // 检查今日计划是否全部默写完毕，如果是则自动清零
+            checkAndClearCompletedPlan() {
+                const today = getLocalDateStr();
+                if(!this.todayPlanWordIds || !this.todayPlanWordIds.length) {
+                    if(this.todayPlanDate === today) {
+                        this._planCompletedToday = true;
+                        this.saveDataImmediate();
+                    }
+                    return;
+                }
+                if(this.todayPlanDate !== today) return; // 不是今天的计划，不管
+                if(this._planCompletedToday) return; // 已经标记完成了
+                // 检查计划里所有字是否都已在今天默写过
+                const allPracticed = this.todayPlanWordIds.every(id => {
+                    const w = this.words.find(w => w.id === id);
+                    return w && w._lastPracticedDate === today;
+                });
+                if(allPracticed) {
+                    this._planCompletedToday = true;
+                    this.todayPlanWordIds = [];
+                    this.saveDataImmediate();
+                }
             },
             finishSession() {
                 console.log('[退出诊断] finishSession被调用, sessionTaskList长度:', this.sessionTaskList.length);
