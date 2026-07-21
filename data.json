@@ -1449,32 +1449,31 @@
         "小孩",
         "孩童"
       ],
-      "correctCount": 1,
+      "correctCount": 0,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_planSkipDate": "2026-07-15",
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
-      "_127_randomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_127_randomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_课文3_别",
@@ -1962,26 +1961,26 @@
         "披上",
         "披肩"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_planSkipDate": "2026-07-15",
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -1991,8 +1990,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_阅读3_脚",
@@ -4264,21 +4262,27 @@
         "尽头",
         "尽心"
       ],
-      "correctCount": 8,
+      "correctCount": 7,
       "wrongCount": 3,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
       "_planSkipDate": "2026-07-18",
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
@@ -4287,8 +4291,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第四单元_shizi_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_穷",
@@ -5746,26 +5749,26 @@
         "告诉"
       ],
       "isWord": true,
-      "correctCount": 6,
+      "correctCount": 5,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_planSkipDate": "2026-07-18",
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -5775,8 +5778,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "yw_第三单元·阅读_课文5_名字",
@@ -5983,20 +5985,26 @@
         "总是"
       ],
       "isWord": true,
-      "correctCount": 7,
+      "correctCount": 6,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_planSkipDate": "2026-07-18",
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -6006,8 +6014,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "yw_第三单元·阅读_课文6_爷爷",
@@ -6018,20 +6025,26 @@
         "爷爷"
       ],
       "isWord": true,
-      "correctCount": 7,
+      "correctCount": 6,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_planSkipDate": "2026-07-18",
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -6041,8 +6054,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "yw_第三单元·阅读_课文6_北边",
@@ -7692,26 +7704,26 @@
         "百货",
         "货车"
       ],
-      "correctCount": 4,
+      "correctCount": 3,
       "wrongCount": 6,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_planSkipDate": "2026-07-18",
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -7721,8 +7733,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第六单元_shizi_课文14《八角楼上》楼、代、穿、视、利、路_shizi_楼",
@@ -9039,21 +9050,21 @@
         "敌人"
       ],
       "isWord": true,
-      "correctCount": 4,
+      "correctCount": 3,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -9062,14 +9073,13 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_planSkipDate": "2026-07-18",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "yw_第六单元·阅读_课文15_生产",
@@ -9852,19 +9862,25 @@
         "消息"
       ],
       "isWord": true,
-      "correctCount": 4,
+      "correctCount": 3,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -9875,8 +9891,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第六单元_shizi_课文15《朱德的扁担》同、志、军、故、常、非、每_shizi_同",
@@ -10477,21 +10492,21 @@
         "爱戴",
         "戴眼镜"
       ],
-      "correctCount": 4,
-      "wrongCount": 6,
+      "correctCount": 3,
+      "wrongCount": 5,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -10500,14 +10515,13 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_反",
@@ -10624,21 +10638,21 @@
         "终于",
         "无济于事"
       ],
-      "correctCount": 5,
+      "correctCount": 4,
       "wrongCount": 5,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -10647,14 +10661,13 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_员",
@@ -10805,25 +10818,25 @@
         "于是"
       ],
       "isWord": true,
-      "correctCount": 3,
+      "correctCount": 2,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -10834,8 +10847,7 @@
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "yw_第七单元·阅读_课文19_无论",
@@ -11559,15 +11571,21 @@
         "泛舟",
         "同舟共济"
       ],
-      "correctCount": 4,
+      "correctCount": 3,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -11576,14 +11594,13 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第七单元_shizi_课文18《古诗二首》绝、灭、舟、独、阴、似、野、低_shizi_独",
@@ -11656,21 +11673,21 @@
         "似乎",
         "比拟"
       ],
-      "correctCount": 4,
+      "correctCount": 3,
       "wrongCount": 3,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -11679,9 +11696,8 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "ocrResult": "correct",
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "ocrResult": null,
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第七单元_shizi_课文18《古诗二首》绝、灭、舟、独、阴、似、野、低_shizi_野",
@@ -11781,19 +11797,25 @@
         "小船",
         "帆船"
       ],
-      "correctCount": 3,
+      "correctCount": 2,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "firstWrong": true,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -11804,8 +11826,7 @@
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_猫",
@@ -11845,15 +11866,21 @@
         "亲切",
         "切身"
       ],
-      "correctCount": 4,
+      "correctCount": 3,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -11862,9 +11889,8 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "ocrResult": "correct",
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "ocrResult": null,
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_该",
@@ -11906,15 +11932,21 @@
         "烟消云散",
         "零散"
       ],
-      "correctCount": 4,
+      "correctCount": 3,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -11923,9 +11955,8 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "ocrResult": "correct",
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "ocrResult": null,
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_步",
@@ -12166,19 +12197,25 @@
         "帮忙",
         "忙碌"
       ],
-      "correctCount": 3,
+      "correctCount": 2,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-21",
+      "_127_rollingStreak": 2,
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-28"
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "ocrResult": "correct",
+      "ocrResult": null,
       "firstWrong": true,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
@@ -12189,8 +12226,7 @@
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_planSkipDate": "2026-07-18",
-      "handwritingData": []
+      "_planSkipDate": "2026-07-18"
     },
     {
       "id": "sz_第七单元_shizi_语文园地七_shizi_饥",
@@ -12321,21 +12357,21 @@
         "木工"
       ],
       "isWord": true,
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -12345,8 +12381,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "yw_第八单元·阅读_课文21_身边",
@@ -13032,21 +13067,21 @@
         "远方"
       ],
       "isWord": true,
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13056,8 +13091,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_谁",
@@ -13097,21 +13131,21 @@
         "拿着",
         "拿手"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13121,8 +13155,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_仔",
@@ -13133,21 +13166,21 @@
         "仔细",
         "牛仔"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13157,8 +13190,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_极",
@@ -13170,21 +13202,21 @@
         "北极",
         "积极"
       ],
-      "correctCount": 2,
-      "wrongCount": 2,
+      "correctCount": 1,
+      "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13194,8 +13226,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_送",
@@ -13347,21 +13378,21 @@
         "接纳",
         "拉扯"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13371,8 +13402,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_纸",
@@ -13412,21 +13442,21 @@
         "抓捕",
         "抓牢"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13436,8 +13466,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_线",
@@ -13449,21 +13478,21 @@
         "毛线",
         "电线"
       ],
-      "correctCount": 2,
-      "wrongCount": 2,
+      "correctCount": 1,
+      "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13473,8 +13502,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_吵",
@@ -13486,21 +13514,21 @@
         "争吵",
         "吵闹"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13510,8 +13538,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_但",
@@ -13523,21 +13550,21 @@
         "但凡",
         "但愿如此"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13547,8 +13574,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_受",
@@ -13560,21 +13586,21 @@
         "难受",
         "受益"
       ],
-      "correctCount": 2,
-      "wrongCount": 2,
+      "correctCount": 1,
+      "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13584,8 +13610,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_句",
@@ -13681,21 +13706,21 @@
         "游戏",
         "戏曲"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13705,8 +13730,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_爱",
@@ -13746,21 +13770,21 @@
         "哪儿呢",
         "毛呢"
       ],
-      "correctCount": 2,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
+        "2026-07-21",
         "2026-07-22",
         "2026-07-23",
         "2026-07-24",
         "2026-07-25",
         "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-27"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13770,8 +13794,7 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
-      "ocrResult": "correct",
-      "handwritingData": []
+      "ocrResult": null
     },
     {
       "id": "sz_第八单元_shizi_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_跳",
@@ -13839,24 +13862,25 @@
         "狼狗",
         "狼嚎"
       ],
-      "correctCount": 1,
+      "correctCount": 0,
       "wrongCount": 0,
-      "status": "randomCheck",
+      "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
+      "reviewDates": [
+        "2026-07-21"
+      ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
+      "handwritingData": null,
       "firstWrong": false,
-      "_127_randomCheckEntry": "2026-07-21",
-      "_127_randomCheckSource": "firstTry",
-      "_127_randomCheckRound": 1,
+      "_127_randomCheckEntry": null,
+      "_127_randomCheckSource": null,
+      "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第八单元_shizi_语文园地八：狼、蛇_shizi_蛇",
@@ -13868,24 +13892,25 @@
         "蟒蛇",
         "蛇皮"
       ],
-      "correctCount": 1,
+      "correctCount": 0,
       "wrongCount": 0,
-      "status": "randomCheck",
+      "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
+      "reviewDates": [
+        "2026-07-21"
+      ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
+      "handwritingData": null,
       "firstWrong": false,
-      "_127_randomCheckEntry": "2026-07-21",
-      "_127_randomCheckSource": "firstTry",
-      "_127_randomCheckRound": 1,
+      "_127_randomCheckEntry": null,
+      "_127_randomCheckSource": null,
+      "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_蝴",
@@ -13897,24 +13922,25 @@
         "蝴蝶结",
         "蝴蝶兰"
       ],
-      "correctCount": 1,
+      "correctCount": 0,
       "wrongCount": 0,
-      "status": "randomCheck",
+      "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
+      "reviewDates": [
+        "2026-07-21"
+      ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
+      "handwritingData": null,
       "firstWrong": false,
-      "_127_randomCheckEntry": "2026-07-21",
-      "_127_randomCheckSource": "firstTry",
-      "_127_randomCheckRound": 1,
+      "_127_randomCheckEntry": null,
+      "_127_randomCheckSource": null,
+      "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_蝶",
@@ -13926,32 +13952,25 @@
         "彩蝶",
         "蝶翼"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_麦",
@@ -13963,32 +13982,25 @@
         "小麦",
         "麦田"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_嫩",
@@ -14000,32 +14012,25 @@
         "鲜嫩",
         "细嫩"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_勤",
@@ -14037,32 +14042,25 @@
         "勤快",
         "勤奋"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_归",
@@ -14074,32 +14072,25 @@
         "回归",
         "归家"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_场",
@@ -14111,24 +14102,25 @@
         "场院",
         "打场"
       ],
-      "correctCount": 1,
+      "correctCount": 0,
       "wrongCount": 0,
-      "status": "randomCheck",
+      "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
+      "reviewDates": [
+        "2026-07-21"
+      ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
+      "handwritingData": null,
       "firstWrong": false,
-      "_127_randomCheckEntry": "2026-07-21",
-      "_127_randomCheckSource": "firstTry",
-      "_127_randomCheckRound": 1,
+      "_127_randomCheckEntry": null,
+      "_127_randomCheckSource": null,
+      "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_制",
@@ -14140,32 +14132,25 @@
         "制度",
         "制约"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_恨",
@@ -14177,32 +14162,25 @@
         "怨恨",
         "悔恨"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_诚",
@@ -14214,24 +14192,25 @@
         "诚恳",
         "真诚"
       ],
-      "correctCount": 1,
+      "correctCount": 0,
       "wrongCount": 0,
-      "status": "randomCheck",
+      "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
+      "reviewDates": [
+        "2026-07-21"
+      ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
+      "handwritingData": null,
       "firstWrong": false,
-      "_127_randomCheckEntry": "2026-07-21",
-      "_127_randomCheckSource": "firstTry",
-      "_127_randomCheckRound": 1,
+      "_127_randomCheckEntry": null,
+      "_127_randomCheckSource": null,
+      "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_虚",
@@ -14243,32 +14222,25 @@
         "虚假",
         "空虚"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_假",
@@ -14280,32 +14252,25 @@
         "假话",
         "假象"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_漠",
@@ -14317,32 +14282,25 @@
         "冷漠",
         "荒漠"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_助",
@@ -14354,32 +14312,25 @@
         "助力",
         "互助"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_贫",
@@ -14391,32 +14342,25 @@
         "贫困",
         "贫苦"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_富",
@@ -14428,32 +14372,25 @@
         "富足",
         "财富"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 0,
+      "wrongCount": 0,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-24",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28"
+        "2026-07-21"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
-      "firstWrong": true,
+      "handwritingData": null,
+      "firstWrong": false,
       "_127_randomCheckEntry": null,
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_planSkipDate": null,
-      "ocrResult": "correct"
+      "_planSkipDate": null
     }
   ],
   "checkinDays": 1,
@@ -14462,11 +14399,11 @@
   "baiduAccounts": [
     {
       "name": "账号1",
+      "token": "24.a9d94a8625c88bd1b63315d473d3ad80.2592000.1786889736.282335-123506560",
+      "used": 304,
       "apiKey": "HzC9ACSpL9QF4TodXcQOvL5O",
       "secretKey": "EmEjVU5ZnSD0Q8SX7UyyUPwhgWehTkeN",
-      "token": "24.dbcf8af6ef432a91f792613487fb9bda.2592000.1787111669.282335-123506560",
-      "tokenExpiresAt": 1787111669178,
-      "used": 3
+      "tokenExpiresAt": 1786889738705
     }
   ],
   "baiduActiveIdx": 0,
@@ -14476,7 +14413,7 @@
   "usingTextbookPlan": false,
   "vocabUsage": {},
   "todayWrongReviewWords": [],
-  "ttsVoiceId": "5003",
+  "ttsVoiceId": "4",
   "ttsToken": "24.4fe7e622cb2385e0323fecfc543ca4e2.2592000.1786118372.282335-123931889",
   "todayPlanWordIds": [],
   "todayPlanDate": "2026-07-21"
