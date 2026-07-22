@@ -601,11 +601,12 @@
                             <div class="compare-item">
                                 <div class="compare-label">孩子写</div>
                                 <div v-if="item.handwritingImages && item.handwritingImages.length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
-                                    <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
-                                         :src="img" 
-                                         class="compare-img" 
-                                         style="width:60px; height:60px;"
-                                         @click="showLargePreview(img)" />
+                                <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
+                                     :src="img" 
+                                     class="compare-img" 
+                                     style="width:60px; height:60px;"
+                                     loading="lazy"
+                                     @click="showLargePreview(img)" />
                                 </div>
                                 <div v-else style="width:100px; height:100px; border:2px dashed #d4d4d4; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">无手写</div>
                             </div>
@@ -850,7 +851,7 @@
                 </div>
                 <div v-if="word.handwritingData && word.handwritingData.length" class="handwriting-preview" @click="showWordDetail(word)" style="cursor:pointer;">
                     <div v-for="(imgSrc, cidx) in word.handwritingData.slice(0,3)" :key="cidx">
-                        <img :src="imgSrc" class="preview-img">
+                        <img :src="imgSrc" class="preview-img" loading="lazy">
                     </div>
                 </div>
                 <div style="margin-left:8px;">
@@ -2686,9 +2687,10 @@
                     gCtx.beginPath(); gCtx.moveTo(80,0); gCtx.lineTo(80,160); gCtx.stroke();
                     gCtx.moveTo(0,80); gCtx.lineTo(160,80); gCtx.stroke();
                 }
-                // 书写层：清空为透明（GPU缓冲释放）
-                canvas.width = 0; canvas.width = 160; canvas.height = 160;
-                ctx = canvas.getContext('2d'); 
+                // 书写层：清空为透明
+                ctx.clearRect(0, 0, 160, 160);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
                 this.enableDrawing(canvas);
                 // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
                 this.speakCurrentWord();
@@ -2756,8 +2758,10 @@
                     if(!canvas) return;
                     const w = canvas.width, h = canvas.height;
                     // 清空书写层（网格在 grid_w* 上，不动）
-                    canvas.width = 0; canvas.width = w; canvas.height = h;
                     const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, w, h);
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
                     ctx.fillStyle = 'rgba(249, 115, 22, 0.25)';
                     ctx.font = (w*0.67)+"px 'KaiTi', 'STKaiti', 'SimKai', '楷体', serif";
                     ctx.textAlign = 'center';
@@ -3031,10 +3035,11 @@
                 if(canvas){ 
                     const w = canvas.width;
                     const h = canvas.height;
-                    // 强制释放GPU缓冲，防止写了多字后笔触延迟
-                    canvas.width = 0;
-                    canvas.width = w;
-                    canvas.height = h;
+                    // 清空画布像素，重置上下文状态
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, w, h);
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
                 } 
             },
             getMergedCanvas() {
