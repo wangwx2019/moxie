@@ -262,7 +262,10 @@
 
     <!-- 手写默写界面 -->
     <div v-if="currentView === 'dictateView'" class="dictate-session">
-        <div style="padding: 12px 16px 0;"><div class="nav-back" @click="confirmAbortDictate">🐣 返回首页</div></div>
+        <div style="padding: 12px 16px 0; display:flex; gap:12px; align-items:center;">
+            <div class="nav-back" @click="confirmAbortDictate">🐣 返回首页</div>
+            <div class="nav-back" @click="exitFullscreen" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca;">🔓 解除锁屏</div>
+        </div>
         <!-- 默写模式头部统计 -->
         <div class="dictate-header-stats">
             <span>📝 {{ sessionCorrectCount }}/{{ sessionTotalCount }}</span>
@@ -1740,7 +1743,7 @@
             ttsToken:'saveData',
             wrongWordsList: { handler() { this.initWrongWordSelection(); }, immediate: true }
         },
-        mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); const _today = getLocalDateStr(); if(this._planToastShown === _today) { const _tb = this.allReviewPlans.find(p => { const d = new Date(_today); return p.date === (d.getMonth()+1) + '/' + d.getDate(); }); if(_tb) { if(this._planToastAdded > 0) { this.toastMessage = '看板加入 ' + this._planToastAdded + '个词语，重复了' + this._planToastDup + '个'; } else { this.toastMessage = '看板计划 ' + _tb.date + '(' + _tb.weekday + ').' + this._planToastTotal + '个词语，已全部在今日计划中'; } } } this.generateTodayPlan(); this.autoAddPlanBoardWords(); this.checkAndClearCompletedPlan(); const _pt = getLocalDateStr(); const _pk = 'practicedCheckShown_' + _pt; if(!sessionStorage.getItem(_pk)) { const _pi = this.todayPlanWordIds.filter(_id => { const _w = this.words.find(w => w.id === _id); return _w && _w._lastPracticedDate === _pt; }); if(_pi.length > 0) { const _pn = _pi.map(_id => { const _w = this.words.find(w => w.id === _id); return _w ? (_w.word || _w.char) : ''; }).filter(Boolean); this.showConfirm('今日已默写', _pn.length + '个字今日已经默写过：' + _pn.join('、') + '\n\n是否从今日计划中清除？', () => { this.todayPlanWordIds = this.todayPlanWordIds.filter(_id => !_pi.includes(_id)); this.todayPlanWords = this.todayPlanWords.filter(_w => !_pi.includes(_w.id)); this.saveDataImmediate(); this.showToast('已清除 ' + _pn.length + ' 个已默写的字'); }, () => {}); sessionStorage.setItem(_pk, '1'); } } window.addEventListener('beforeunload', this.flushSave); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } let _touchStartTarget = null; document.addEventListener('touchstart', (e) => { _touchStartTarget = e.target; }, { passive: true }); document.addEventListener('touchmove', (e) => { if(!this._isDictating) return; if(_touchStartTarget && _touchStartTarget.closest('#tg_c, #word_canvas_container')) return; e.preventDefault(); }, { passive: false }); },
+        mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); this.showTextbookImport = false; console.log('[启动] Vue已挂载, showTextbookImport=', this.showTextbookImport); const _today = getLocalDateStr(); if(this._planToastShown === _today) { const _tb = this.allReviewPlans.find(p => { const d = new Date(_today); return p.date === (d.getMonth()+1) + '/' + d.getDate(); }); if(_tb) { if(this._planToastAdded > 0) { this.toastMessage = '看板加入 ' + this._planToastAdded + '个词语，重复了' + this._planToastDup + '个'; } else { this.toastMessage = '看板计划 ' + _tb.date + '(' + _tb.weekday + ').' + this._planToastTotal + '个词语，已全部在今日计划中'; } } } this.generateTodayPlan(); this.autoAddPlanBoardWords(); this.checkAndClearCompletedPlan(); const _pt = getLocalDateStr(); const _pk = 'practicedCheckShown_' + _pt; if(!sessionStorage.getItem(_pk)) { const _pi = this.todayPlanWordIds.filter(_id => { const _w = this.words.find(w => w.id === _id); return _w && _w._lastPracticedDate === _pt; }); if(_pi.length > 0) { const _pn = _pi.map(_id => { const _w = this.words.find(w => w.id === _id); return _w ? (_w.word || _w.char) : ''; }).filter(Boolean); this.showConfirm('今日已默写', _pn.length + '个字今日已经默写过：' + _pn.join('、') + '\n\n是否从今日计划中清除？', () => { this.todayPlanWordIds = this.todayPlanWordIds.filter(_id => !_pi.includes(_id)); this.todayPlanWords = this.todayPlanWords.filter(_w => !_pi.includes(_w.id)); this.saveDataImmediate(); this.showToast('已清除 ' + _pn.length + ' 个已默写的字'); }, () => {}); sessionStorage.setItem(_pk, '1'); } } window.addEventListener('beforeunload', this.flushSave); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } let _touchStartTarget = null; document.addEventListener('touchstart', (e) => { _touchStartTarget = e.target; }, { passive: true }); document.addEventListener('touchmove', (e) => { if(!this._isDictating) return; if(_touchStartTarget && _touchStartTarget.closest('#tg_c, #word_canvas_container')) return; e.preventDefault(); }, { passive: false }); },
         methods: {
             async fetchRemoteData() {
                 try {
@@ -1922,7 +1925,7 @@
                             this.baiduAccounts = d.baiduAccounts;
                             this.baiduActiveIdx = d.baiduActiveIdx || 0;
                         } else if(d.baiduDirectToken) {
-                            this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used:0 }];
+                            this.baiduAccounts = [{ name:'账号1', token:d.baiduDirectToken, used: 0 }];
                         }
                         this.baiduResetMonth = d.baiduResetMonth || '';
                         this.githubToken = d.githubToken || '';
@@ -1987,6 +1990,8 @@
                 }
                 this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.wrongBookPracticeCount === undefined) w.wrongBookPracticeCount=0; if(w.wrongBookCorrectCount === undefined) w.wrongBookCorrectCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w._127_randomCheckEntry === undefined) w._127_randomCheckEntry=null; if(w._127_randomCheckSource === undefined) w._127_randomCheckSource=null; if(w._127_randomCheckRound === undefined) w._127_randomCheckRound=0; if(w._127_randomCheckLastCheckedRound === undefined) w._127_randomCheckLastCheckedRound=0; if(w._planSkipDate === undefined) w._planSkipDate = null; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
                 this.saveDataImmediate(); 
+                // 防御性重置：确保页面加载时不会意外显示课本导入弹窗
+                this.showTextbookImport = false;
             },
             saveData() {
                 // 默写期间跳过自动保存，避免JSON.stringify(89词)阻塞主线程导致笔触延迟
@@ -3866,6 +3871,9 @@
                 this.todayPlanDate = getLocalDateStr(); // 保留今天的日期，第二天才能通过日期比较重置 _planCompletedToday
                 this.saveDataImmediate();
             },
+            exitFullscreen() {
+                try { document.exitFullscreen(); } catch(e) {}
+            },
             finishAndGoHome() {
                 console.log('[退出诊断] finishAndGoHome被调用', new Error().stack);
                 this.closeStrokeOrder();
@@ -4965,8 +4973,9 @@
     // 全局错误处理：防止页面白屏，自动保存数据
     app.config.errorHandler = (err, vm, info) => {
         console.error('应用错误:', err, info);
-        try { vm.saveDataImmediate(); } catch(e) {}
-        alert('页面出了点小问题，数据已自动保存。请刷新页面重试。');
+        console.error('[诊断] showTextbookImport=', vm.showTextbookImport, 'currentView=', vm.currentView);
+        try { vm.showTextbookImport = false; vm.saveDataImmediate(); } catch(e) {}
+        alert('页面出了点小问题，数据已自动保存。请刷新页面重试。\n错误: ' + (err?.message || err));
     };
     app.mount('#app');
     </script>
