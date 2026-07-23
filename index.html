@@ -222,15 +222,20 @@
             </div>
         </div>
         <div class="card-white" v-if="wrongWordsCount > 0">
-            <div><strong>🔁 累计错字 <span class="badge" style="background:#ef4444; color:#fff;">{{ wrongWordsCount }}</span></strong></div>
+            <div class="flex-between">
+                <div><strong>🔁 累计错字 <span class="badge" style="background:#ef4444; color:#fff;">{{ wrongWordsCount }}</span></strong></div>
+                <span style="font-size:0.8rem; color:#6366f1; cursor:pointer; text-decoration:underline;" @click.stop="toggleSelectAllWrongWords">{{ selectedWrongWordIds.length === wrongWordsCount ? '取消全选' : '全选' }}</span>
+            </div>
             <div style="margin:10px 0; display:flex; gap:6px; flex-wrap:wrap;">
-                <span v-for="w in allWrongWordsDisplay" :key="w.id" style="display:inline-flex; align-items:center; gap:6px; background:#fef2f2; padding:4px 10px; border-radius:20px;">
+                <label v-for="w in allWrongWordsDisplay" :key="w.id" style="display:inline-flex; align-items:center; gap:6px; background:#fef2f2; padding:4px 10px; border-radius:20px; cursor:pointer;">
+                    <input type="checkbox" :value="w.id" v-model="selectedWrongWordIds" style="accent-color:#ef4444; width:16px; height:16px;">
                     <span style="font-weight:700; font-size:1.1rem;">{{ w.word }}</span>
                     <span style="font-size:0.75rem; color:#9ca3af;">{{ w.wrongCount }}次</span>
-                </span>
+                    <span v-if="w.wrongBookPracticeCount > 0" style="font-size:0.75rem; color:#6366f1;">默{{ w.wrongBookPracticeCount }} 对{{ w.wrongBookCorrectCount }}</span>
+                </label>
             </div>
             <div style="text-align:center;">
-                <button class="cute-btn primary" style="width:100%; padding:14px 0; font-size:1rem; font-weight:700;" @click="practiceAllWrongWords">✍️ 练习全部错字</button>
+                <button class="cute-btn primary" style="width:100%; padding:14px 0; font-size:1rem; font-weight:700;" @click="practiceAllWrongWords" :disabled="selectedWrongWordIds.length === 0">✍️ 练习选中错字（{{ selectedWrongWordIds.length }}个）</button>
             </div>
         </div>
         <div class="card-white" v-if="Object.keys(textbookLessons).length > 0">
@@ -509,8 +514,8 @@
                         <div class="compare-arrow">→</div>
                         <div class="compare-item">
                             <div class="compare-label">孩子写</div>
-                            <div v-if="item.handwritingImages && item.handwritingImages.length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
-                                <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
+                            <div v-if="reviewImageCache[item.word.id] && reviewImageCache[item.word.id].length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+                                <img v-for="(img, imgIdx) in reviewImageCache[item.word.id]" :key="imgIdx"
                                      :src="img" 
                                      class="compare-img" 
                                      style="width:60px; height:60px;"
@@ -555,8 +560,8 @@
                         <div class="compare-arrow">→</div>
                         <div class="compare-item">
                             <div class="compare-label">孩子写</div>
-                            <div v-if="item.handwritingImages && item.handwritingImages.length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
-                                <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
+                            <div v-if="reviewImageCache[item.word.id] && reviewImageCache[item.word.id].length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+                                <img v-for="(img, imgIdx) in reviewImageCache[item.word.id]" :key="imgIdx"
                                      :src="img" 
                                      class="compare-img" 
                                      style="width:60px; height:60px;"
@@ -600,8 +605,8 @@
                             <div class="compare-arrow">→</div>
                             <div class="compare-item">
                                 <div class="compare-label">孩子写</div>
-                                <div v-if="item.handwritingImages && item.handwritingImages.length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
-                                <img v-for="(img, imgIdx) in item.handwritingImages" :key="imgIdx"
+                                <div v-if="reviewImageCache[item.word.id] && reviewImageCache[item.word.id].length > 0" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+                                <img v-for="(img, imgIdx) in reviewImageCache[item.word.id]" :key="imgIdx"
                                      :src="img" 
                                      class="compare-img" 
                                      style="width:60px; height:60px;"
@@ -748,7 +753,7 @@
                             <span v-else @click="baiduActiveIdx=i" style="color:#bbb; font-size:1.2rem; cursor:pointer;">○</span>
                             <input type="text" v-model="acc.name" style="border:none; background:transparent; font-weight:600; width:80px; font-size:0.85rem;">
                         </span>
-                        <span style="font-size:0.75rem; color:#a16207;">{{ acc.used }}/500 次</span>
+                        <span style="font-size:0.75rem; color:#a16207; display:flex; align-items:center; gap:4px;">已用 {{ acc.used }} 次 <span v-if="acc.used>0" style="color:#6366f1; cursor:pointer; text-decoration:underline; font-size:0.7rem;" @click.stop="acc.used=0; saveData()">归零</span></span>
                         <button v-if="baiduAccounts.length>1" class="cute-btn-sm" style="background:#eee; color:#999; padding:2px 10px; font-size:0.7rem;" @click="removeAccount(i)">✕</button>
                     </div>
                     <div style="display:flex; gap:6px; margin-top:6px;">
@@ -768,9 +773,6 @@
                     <div class="text-small" style="margin-top:4px; color:#b45309;">
                         <b>方式一：</b>在百度云控制台 → 文字识别 → 创建应用，拿到 API Key 和 Secret Key，点击「自动获取 Token」<br>
                         <b>方式二：</b>如果浏览器限制无法自动获取，点击「自动获取 Token」→ 复制链接 → 浏览器新标签页打开 → 返回的 JSON 中找到 <code>access_token</code> 字段 → 复制粘到上面的输入框 → 点「保存」
-                    </div>
-                    <div style="margin-top:6px; height:6px; background:#f0e4d0; border-radius:3px; overflow:hidden;">
-                        <div :style="'height:100%; width:' + Math.min(acc.used*100/500,100) + '%; background:' + (acc.used>=500?'#ef4444':'#f97316') + '; border-radius:3px;'"></div>
                     </div>
                 </div>
                 <button class="cute-btn-sm" style="width:100%;" @click="addAccount">+ 添加账号</button>
@@ -848,11 +850,6 @@
                     <span class="word-badge" v-else-if="word.wrongCount >= 3">困难</span>
                     <span class="word-badge" v-else>错误</span>
                     <div class="text-small">{{ word.pinyin }} · <span style="color:#dc2626;">错{{ word.wrongCount || 0 }}次</span><span v-if="word.correctCount > 0" style="color:#16a34a; margin-left:6px;">对{{ word.correctCount }}次</span><span v-if="word._127_rollingStreak > 0" style="color:#16a34a; margin-left:6px; font-weight:600;">连{{ word._127_rollingStreak }}</span></div>
-                </div>
-                <div v-if="word.handwritingData && word.handwritingData.length" class="handwriting-preview" @click="showWordDetail(word)" style="cursor:pointer;">
-                    <div v-for="(imgSrc, cidx) in word.handwritingData.slice(0,3)" :key="cidx">
-                        <img :src="imgSrc" class="preview-img" loading="lazy">
-                    </div>
                 </div>
                 <div style="margin-left:8px;">
                     <button class="cute-btn" style="padding:4px 10px; font-size:0.8rem; background:#fee2e2; color:#dc2626; border:none; border-radius:8px; cursor:pointer;" @click="removeFromWrongWords(word)">删除</button>
@@ -1440,12 +1437,15 @@
                 strokeOrderChar: '',
                 strokeOrderWriter: null,
                 parentPassword: '8899',
+                _sessionSource: null, // 默写来源：'wrongBook'=错字本, 'todayPlan'=今日计划
                 wordBankFilter: 'all',
                 wordBankSelected: [],
                 reviewFilter: 'all', // 默认显示全部（AI错+AI对）
+                reviewImageCache: {}, // 复核页图片缓存 { wordId: [imageDataURLs] }
                 largePreviewVisible: false,
                 largePreviewSrc: '',
                 wrongWordsFilter: 'all',
+                selectedWrongWordIds: [], // 选中要练习的错字ID
                 wizardStep: 1,
                 rawWordsInput: '',
                 pendingWords: [],
@@ -1524,12 +1524,11 @@
             reviewTotalWrong() { return this.todayPlanWords.filter(w => w.wrongCount > 0).length; },
             // 复核列表：所有有手写数据的词（不依赖todayPlanIds，避免generateTodayPlan重建导致消失）
             reviewList() {
-                // 只在 handwritingData 变化时重算，ocrResult/reviewCorrected 等属性通过 word 引用自动更新
                 return this.words
-                    .filter(w => w.handwritingData && w.handwritingData.length > 0)
+                    .filter(w => w._hasHandwriting || (w.handwritingData && w.handwritingData.length > 0))
                     .map(w => ({
                         word: w,
-                        handwritingImages: w.handwritingData
+                        handwritingImages: w.handwritingData || []
                     }));
             },
             // 预计算的筛选列表（避免模板内联filter导致重复遍历）
@@ -1594,7 +1593,7 @@
                 let firstWrong = 0;
                 let multipleAttempt = 0;
                 for(let w of this.todayPlanWords) {
-                    if(w.handwritingData && w.handwritingData.length > 0) {
+                    if(w._hasHandwriting || (w.handwritingData && w.handwritingData.length > 0)) {
                         if(w.ocrResult === 'correct') {
                             firstCorrect++;
                         } else if(w.ocrResult === 'wrong') {
@@ -1717,9 +1716,7 @@
             },
             // 累计错字卡片显示（最多20个）
             allWrongWordsDisplay() {
-                const list = this.wrongWordsList;
-                if(list.length <= 20) return list;
-                return list.slice(0, 20);
+                return this.wrongWordsList;
             },
             // 今日词语计划（isWord===true 的词）
             todayWordPlanWords() {
@@ -1740,7 +1737,8 @@
             githubSyncTime:'saveData', 
             vocabUsage:{ deep:true, handler:'saveData' }, 
             ttsVoiceId:'saveData', 
-            ttsToken:'saveData' 
+            ttsToken:'saveData',
+            wrongWordsList: { handler() { this.initWrongWordSelection(); }, immediate: true }
         },
         mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); const _today = getLocalDateStr(); if(this._planToastShown === _today) { const _tb = this.allReviewPlans.find(p => { const d = new Date(_today); return p.date === (d.getMonth()+1) + '/' + d.getDate(); }); if(_tb) { if(this._planToastAdded > 0) { this.toastMessage = '看板加入 ' + this._planToastAdded + '个词语，重复了' + this._planToastDup + '个'; } else { this.toastMessage = '看板计划 ' + _tb.date + '(' + _tb.weekday + ').' + this._planToastTotal + '个词语，已全部在今日计划中'; } } } this.generateTodayPlan(); this.autoAddPlanBoardWords(); this.checkAndClearCompletedPlan(); const _pt = getLocalDateStr(); const _pk = 'practicedCheckShown_' + _pt; if(!sessionStorage.getItem(_pk)) { const _pi = this.todayPlanWordIds.filter(_id => { const _w = this.words.find(w => w.id === _id); return _w && _w._lastPracticedDate === _pt; }); if(_pi.length > 0) { const _pn = _pi.map(_id => { const _w = this.words.find(w => w.id === _id); return _w ? (_w.word || _w.char) : ''; }).filter(Boolean); this.showConfirm('今日已默写', _pn.length + '个字今日已经默写过：' + _pn.join('、') + '\n\n是否从今日计划中清除？', () => { this.todayPlanWordIds = this.todayPlanWordIds.filter(_id => !_pi.includes(_id)); this.todayPlanWords = this.todayPlanWords.filter(_w => !_pi.includes(_w.id)); this.saveDataImmediate(); this.showToast('已清除 ' + _pn.length + ' 个已默写的字'); }, () => {}); sessionStorage.setItem(_pk, '1'); } } window.addEventListener('beforeunload', this.flushSave); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } let _touchStartTarget = null; document.addEventListener('touchstart', (e) => { _touchStartTarget = e.target; }, { passive: true }); document.addEventListener('touchmove', (e) => { if(!this._isDictating) return; if(_touchStartTarget && _touchStartTarget.closest('#tg_c, #word_canvas_container')) return; e.preventDefault(); }, { passive: false }); },
         methods: {
@@ -1832,6 +1830,7 @@
                     if (data.access_token) {
                         acc.token = data.access_token;
                         acc.tokenExpiresAt = Date.now() + (data.expires_in || 2592000) * 1000;
+                        acc.used = 0; // 刷新token时重置调用计数
                         this.saveData();
                         if(!silent) {
                             const expireDate = new Date(acc.tokenExpiresAt);
@@ -1902,6 +1901,7 @@
                                     dup.reviewDates = [...merged];
                                 }
                                 // handwritingData: 保留非空的
+                                if (!dup._hasHandwriting && w._hasHandwriting) dup._hasHandwriting = w._hasHandwriting;
                                 if (!dup.handwritingData && w.handwritingData) dup.handwritingData = w.handwritingData;
                                 // status: 取更高级的状态
                                 const statusOrder = { mastered: 3, learning: 2, randomCheck: 1 };
@@ -1985,7 +1985,7 @@
                         return id;
                     });
                 }
-                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w._127_randomCheckEntry === undefined) w._127_randomCheckEntry=null; if(w._127_randomCheckSource === undefined) w._127_randomCheckSource=null; if(w._127_randomCheckRound === undefined) w._127_randomCheckRound=0; if(w._127_randomCheckLastCheckedRound === undefined) w._127_randomCheckLastCheckedRound=0; if(w._planSkipDate === undefined) w._planSkipDate = null; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
+                this.words.forEach(w=>{ if(!w.reviewDates) w.reviewDates=[]; if(!w.status) w.status='learning'; if(w.correctCount === undefined) w.correctCount=0; if(w.wrongCount === undefined) w.wrongCount=0; if(w.wrongBookPracticeCount === undefined) w.wrongBookPracticeCount=0; if(w.wrongBookCorrectCount === undefined) w.wrongBookCorrectCount=0; if(w.firstWrong === undefined) w.firstWrong=false; if(w.pendingReview === undefined) w.pendingReview=false; if(w.pendingReviewDate === undefined) w.pendingReviewDate=null; if(w.reviewCorrected === undefined) w.reviewCorrected=false;                 if(w._127_rollingStreak === undefined) w._127_rollingStreak=0; if(w._127_day7Entry === undefined) w._127_day7Entry=null; if(w._127_randomCheckWeek === undefined) w._127_randomCheckWeek=0; if(w._127_randomCheckEntry === undefined) w._127_randomCheckEntry=null; if(w._127_randomCheckSource === undefined) w._127_randomCheckSource=null; if(w._127_randomCheckRound === undefined) w._127_randomCheckRound=0; if(w._127_randomCheckLastCheckedRound === undefined) w._127_randomCheckLastCheckedRound=0; if(w._planSkipDate === undefined) w._planSkipDate = null; if(w.char === undefined) w.char = w.word || ''; if(w.words === undefined) w.words = [w.word || '', w.word || '', w.word || '']; });  
                 this.saveDataImmediate(); 
             },
             saveData() {
@@ -2048,11 +2048,13 @@
             },
             async saveHandwriting(wordId, dataURLs) {
                 if(!this._handwritingDB) await this._initHandwritingDB();
+                // 透明背景合成到奶油底色，避免显示为黑图
+                const composited = await Promise.all(dataURLs.map(u => this._compositeOnCreamBG(u)));
                 return new Promise((resolve, reject) => {
                     const tx = this._handwritingDB.transaction('images', 'readwrite');
-                    tx.objectStore('images').put({ id: wordId, data: dataURLs });
-                    tx.oncomplete = () => resolve();
-                    tx.onerror = () => reject(tx.error);
+                    tx.objectStore('images').put({ id: wordId, data: composited });
+                    tx.oncomplete = () => { resolve(); };
+                    tx.onerror = () => { console.error('[saveHandwriting] 写入失败 wordId:', wordId, tx.error); reject(tx.error); };
                 });
             },
             async getHandwriting(wordId) {
@@ -2060,8 +2062,34 @@
                 return new Promise((resolve, reject) => {
                     const tx = this._handwritingDB.transaction('images', 'readonly');
                     const req = tx.objectStore('images').get(wordId);
-                    req.onsuccess = () => resolve(req.result?.data || []);
-                    req.onerror = () => reject(req.error);
+                    req.onsuccess = () => { resolve(req.result?.data || []); };
+                    req.onerror = () => { console.error('[getHandwriting] 读取失败 wordId:', wordId, req.error); reject(req.error); };
+                });
+            },
+            async deleteHandwriting(wordId) {
+                if(!this._handwritingDB) await this._initHandwritingDB();
+                return new Promise((resolve, reject) => {
+                    const tx = this._handwritingDB.transaction('images', 'readwrite');
+                    tx.objectStore('images').delete(wordId);
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                });
+            },
+            // 将透明背景的手写图合成到奶油色底色上，避免保存后显示为黑图
+            _compositeOnCreamBG(dataURL) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const c = document.createElement('canvas');
+                        c.width = img.width; c.height = img.height;
+                        const ctx = c.getContext('2d');
+                        ctx.fillStyle = '#fffcf5';
+                        ctx.fillRect(0, 0, c.width, c.height);
+                        ctx.drawImage(img, 0, 0);
+                        resolve(c.toDataURL('image/png'));
+                    };
+                    img.onerror = () => resolve(dataURL);
+                    img.src = dataURL;
                 });
             },
             // ---- 127 辅助方法 ----
@@ -2214,8 +2242,8 @@
                 return word.pendingReview || word.isInReviewQueue === true;
             },
             cancelTodayPlan() {
-                // 检查今日计划是否已全部默写（handwritingData为空表示已提交）
-                const allDictated = this.todayPlanWords.length > 0 && this.todayPlanWords.every(w => !w.handwritingData || w.handwritingData.length === 0);
+                // 检查今日计划是否已全部默写（handwritingData为空且无_hasHandwriting标记表示已提交）
+                const allDictated = this.todayPlanWords.length > 0 && this.todayPlanWords.every(w => !w._hasHandwriting && (!w.handwritingData || w.handwritingData.length === 0));
                 const statusText = allDictated ? '今日默写已完成' : '今日默写尚未完成';
                 this.showConfirm(
                     '今日计划处理',
@@ -2278,11 +2306,11 @@
                 }
 
                 // 新的一天或无计划：重新生成
-                // 对已提交的词（handwritingData为空）设置 _planSkipDate，避免重复
+                // 对已提交的词（handwritingData为空且无_hasHandwriting标记）设置 _planSkipDate，避免重复
                 if(this.todayPlanDate && this.todayPlanDate !== today && this.todayPlanWordIds && this.todayPlanWordIds.length) {
                     this.todayPlanWordIds.forEach(id => {
                         const w = this.words.find(t => t.id === id);
-                        if(w && !w._planSkipDate && (!w.handwritingData || w.handwritingData.length === 0)) {
+                        if(w && !w._planSkipDate && !w._hasHandwriting && (!w.handwritingData || w.handwritingData.length === 0)) {
                             w._planSkipDate = today;
                         }
                     });
@@ -2564,6 +2592,7 @@
                 this.sessionWrongRetryQueue = [];
                 this._isProcessingSubmit = false;
                 this.sessionRetryCount = {};
+                this._sessionSource = 'todayPlan';
                 this._isDictating = true; // 默写期间跳过自动保存
                 if(this.timerInterval) clearInterval(this.timerInterval);
                 this.timerInterval = setInterval(() => { if(!this.sessionFinished) this.sessionTimerSeconds++; }, 1000);
@@ -2639,10 +2668,24 @@
                 this.currentView = 'dictateView';
                 this.$nextTick(()=>{ this.initWordCanvas(); });
             },
-            // 练习所有错字：复用三词连练流程
+            // 自动初始化选中错字（首次加载时全选）
+            initWrongWordSelection() {
+                if(this.selectedWrongWordIds.length === 0 && this.wrongWordsList.length > 0) {
+                    this.selectedWrongWordIds = this.wrongWordsList.map(w => w.id);
+                }
+            },
+            toggleSelectAllWrongWords() {
+                if(this.selectedWrongWordIds.length === this.wrongWordsCount) {
+                    this.selectedWrongWordIds = [];
+                } else {
+                    this.selectedWrongWordIds = this.wrongWordsList.map(w => w.id);
+                }
+            },
+            // 练习选中错字：复用三词连练流程
             practiceAllWrongWords() {
-                const wrongWords = this.wrongWordsList;
-                if(wrongWords.length === 0){ this.showAlert('提示', '暂无错字'); return; }
+                const selectedIds = new Set(this.selectedWrongWordIds);
+                const wrongWords = this.wrongWordsList.filter(w => selectedIds.has(w.id));
+                if(wrongWords.length === 0){ this.showAlert('提示', '请至少选择一个错字'); return; }
                 this.sessionTaskList = JSON.parse(JSON.stringify(wrongWords));
                 this.sessionCurrentIdx=0;
                 this.sessionCharHadTrace=false;
@@ -2656,6 +2699,7 @@
                 this.sessionCanvasCount=0;
                 this.sessionBatchSubmitted=false;
                 this.sessionWrongWordIds=[];
+                this._sessionSource = 'wrongBook';
                 this._isDictating = true; // 默写期间跳过自动保存
                 if(this.timerInterval) clearInterval(this.timerInterval);
                 this.timerInterval = setInterval(()=>{ if(!this.sessionFinished) this.sessionTimerSeconds++; },1000);
@@ -3209,9 +3253,16 @@
                 } catch(e) { return false; }
             },
             async canvasToDataURL(canvas, quality) {
-                // 直接返回 dataURL 字符串，不创建 Blob URL，避免 Blob 对象累积在内存中
+                // 先合成白色背景，避免 JPEG 把透明区域转为黑色导致 OCR 全黑
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.fillStyle = '#ffffff';
+                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                tempCtx.drawImage(canvas, 0, 0);
                 return new Promise((resolve) => {
-                    canvas.toBlob((blob) => {
+                    tempCanvas.toBlob((blob) => {
                         const reader = new FileReader();
                         reader.onloadend = () => resolve(reader.result);
                         reader.readAsDataURL(blob);
@@ -3325,8 +3376,8 @@
             // ---- 批量 AI 批改（合并所有画布为一张图，只调用1次OCR） ----
             async batchSubmitAll() {
                 this.ocrBusy = true;
+                const _pendingSaves = []; // 收集所有异步保存手写图的 Promise，结束前统一 await
                 try {
-                console.log('[OCR批改] 开始');
                 this.lastOcrEngine = '';
                 this.sessionCorrectCount = 0;
                 const today = getLocalDateStr();
@@ -3447,7 +3498,7 @@
                         for(let attempt = 0; attempt < this.baiduAccounts.length; attempt++) {
                             const idx = (this.baiduActiveIdx + attempt) % this.baiduAccounts.length;
                             const bAcc = this.baiduAccounts[idx];
-                            if(bAcc && bAcc.used < 500) {
+                            if(bAcc) {
                                 if(this.isBaiduTokenExpired(bAcc) && bAcc.apiKey && bAcc.secretKey) { await this.refreshBaiduToken(this.baiduAccounts.indexOf(bAcc), true); }
                                 if(!bAcc.token) { this.baiduActiveIdx = (this.baiduActiveIdx + 1) % this.baiduAccounts.length; continue; }
                                 try {
@@ -3629,12 +3680,20 @@
                             handwritingURLs = group.items[0]?.canvasDataURL ? [group.items[0].canvasDataURL] : [];
                         }
                         handwritingURLs = await Promise.all(handwritingURLs.map(u => u.startsWith('blob:') ? this.blobUrlToDataURL(u) : Promise.resolve(u)));
-                        wordObj.handwritingData = handwritingURLs;
-                        this.saveHandwriting(group.charId, handwritingURLs).catch(()=>{});
+                        wordObj._hasHandwriting = true;
+                        wordObj.handwritingData = null;
+                        _pendingSaves.push(this.saveHandwriting(group.charId, handwritingURLs).catch(e => console.warn('[saveHandwriting失败]', e)));
                         wordObj.ocrResult = anyCorrect ? 'correct' : 'wrong';
                         wordObj._lastPracticedDate = getLocalDateStr();
+                        // 错字本来源：累加错字本专属计数
+                        if(this._sessionSource === 'wrongBook') {
+                            wordObj.wrongBookPracticeCount = (wordObj.wrongBookPracticeCount || 0) + 1;
+                        }
                         if(anyCorrect && !this.sessionRetryCount[group.charId]) {
                             wordObj.correctCount = (wordObj.correctCount || 0) + 1;
+                            if(this._sessionSource === 'wrongBook') {
+                                wordObj.wrongBookCorrectCount = (wordObj.wrongBookCorrectCount || 0) + 1;
+                            }
                             this.updateWord127State(wordObj, true);
                             this.sessionCorrectCount++;
                             this.todayCompletedCount++;
@@ -3652,13 +3711,17 @@
                     }
                 }
                 this.sessionBatchSubmitted = true;
+                this._sessionSource = null; // 清除默写来源标记
                 this.saveDataImmediate();
                 this.checkAndClearCompletedPlan();
                 } catch(err) {
                     console.error('[OCR批改错误]', err);
                     this.showAlert('批改失败', 'AI批改过程出错：' + (err.message || err));
                 } finally {
-                    console.log('[OCR批改] 结束，ocrBusy设为false');
+                    // 确保所有手写图保存到 IndexedDB 完成后再结束
+                    if(_pendingSaves.length) {
+                        await Promise.all(_pendingSaves).catch(e => console.warn('[批量保存手写图失败]', e));
+                    }
                     this.ocrBusy = false;
                 }
             },
@@ -3679,7 +3742,8 @@
                     // 保存手写图（供复核页查看）
                     const mergedCanvas = this.getMergedCanvas();
                     const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.4);
-                    wordObj.handwritingData = [hwDataURL];
+                    wordObj._hasHandwriting = true;
+                    wordObj.handwritingData = null;
                     this.saveHandwriting(wordObj.id, [hwDataURL]).catch(()=>{}); // 异步存 IndexedDB
                     wordObj.ocrResult = 'correct';
                     // 127 逻辑：判断词的当前状态
@@ -3702,7 +3766,8 @@
                     this.updateWord127State(wordObj, false);
                     const mergedCanvas = this.getMergedCanvas();
                     const hwDataURL = mergedCanvas.toDataURL('image/jpeg', 0.4);
-                    wordObj.handwritingData = [hwDataURL];
+                    wordObj._hasHandwriting = true;
+                    wordObj.handwritingData = null;
                     this.saveHandwriting(wordObj.id, [hwDataURL]).catch(()=>{}); // 异步存 IndexedDB
                     wordObj.ocrResult = 'wrong';
                     wordObj.pendingReview = true;
@@ -3939,15 +4004,17 @@
             goToReviewFromChild() {
                 this.showPrompt('家长验证', '请输入家长密码', '密码', (pwd) => {
                     if(pwd === this.parentPassword) {
-                        this.reviewFilter = 'all';
-                        this.currentView='reviewParent';
+                        this.openReviewParentView();
                     } else {
                         this.showAlert('密码错误', '密码不正确');
                     }
                 });
             },
             openWordBankView(){ this.wordBankFilter='all'; this.currentView='wordBank'; },
-            openWrongWordsView(){ this.wrongWordsFilter='all'; this.currentView='wrongWordsView'; },
+            async openWrongWordsView(){ 
+                this.wrongWordsFilter='all'; 
+                this.currentView='wrongWordsView';
+            },
 
             relativeDateStr(dateStr){
                 if(!dateStr) return '';
@@ -3965,7 +4032,24 @@
                 this.largePreviewSrc = imgSrc;
                 this.largePreviewVisible = true;
             },
-            openReviewParentView(){ this.reviewFilter = 'all'; this.currentView='reviewParent'; },
+            async openReviewParentView(){ 
+                this.reviewFilter = 'all'; 
+                this.reviewImageCache = {};
+                this.currentView='reviewParent';
+                // 从 IndexedDB 加载图片（新提交的词只有 _hasHandwriting 标记）
+                const wordsWithHandwriting = this.words.filter(w => w._hasHandwriting || (w.handwritingData && w.handwritingData.length > 0));
+                for(const w of wordsWithHandwriting) {
+                    let imgs = await this.getHandwriting(w.id);
+                    if(imgs && imgs.length) {
+                        this.reviewImageCache[w.id] = imgs;
+                    } else if(w.handwritingData && w.handwritingData.length) {
+                        // 兼容旧数据：localStorage 有但 IndexedDB 没有，迁移过去
+                        this.reviewImageCache[w.id] = w.handwritingData;
+                        this.saveHandwriting(w.id, w.handwritingData).catch(()=>{});
+                        w.handwritingData = null;
+                    }
+                }
+            },
             openPlanCalendarView(){ this.currentView='planCalendar'; },
             addPlanToToday(plan) {
                 const today = getLocalDateStr();
@@ -3989,14 +4073,15 @@
             commitParentReview(){
                 // 检查是否有未复核的错字
                 const unreviewed = this.todayPlanWords.filter(w => 
-                    w.ocrResult === 'wrong' && !w.reviewCorrected && w.handwritingData && w.handwritingData.length > 0
+                    w.ocrResult === 'wrong' && !w.reviewCorrected && (w._hasHandwriting || (w.handwritingData && w.handwritingData.length > 0))
                 );
                 
                 const doCommit = () => {
                     const today = getLocalDateStr();
                     // 清除 ALL 有 handwritingData 的词（不仅仅是 todayPlanWords，防止复核项反复出现）
                     this.words.forEach(w => {
-                        if(w.handwritingData && w.handwritingData.length > 0) {
+                        if(w._hasHandwriting || (w.handwritingData && w.handwritingData.length > 0)) {
+                            w._hasHandwriting = false;
                             w.handwritingData = [];
                             w.pendingReview = false;
                             w.pendingReviewDate = null;
@@ -4004,8 +4089,10 @@
                             delete w._originalOcrResult;
                             delete w._originalWrongCount;
                             delete w._originalCorrectCount;
+                            this.deleteHandwriting(w.id).catch(()=>{});
                         }
                     });
+                    this.reviewImageCache = {};
                     // 标记所有 reviewDates 包含今天的词为跳过，防止 generateTodayPlan 重新扫描加入
                     this.words.forEach(w => {
                         if(w.reviewDates && w.reviewDates.includes(today)) {
