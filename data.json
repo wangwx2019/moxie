@@ -97,11 +97,11 @@
         "旅途",
         "旅游"
       ],
-      "correctCount": 9,
+      "correctCount": 10,
       "wrongCount": 1,
       "status": "randomCheck",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 28,
       "reviewDates": [],
@@ -117,8 +117,8 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "handwritingData": [],
-      "_lastPracticedDate": "2026-07-25"
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": []
     },
     {
       "id": "sz_第一单元_shizi_阅读3_准",
@@ -532,28 +532,41 @@
         "羊群",
         "群体"
       ],
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 3,
-      "status": "randomCheck",
+      "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
+      "reviewDates": [
+        "2026-07-27",
+        "2026-07-28",
+        "2026-07-29",
+        "2026-07-30",
+        "2026-07-31",
+        "2026-08-01",
+        "2026-08-02"
+      ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": false,
       "_planSkipDate": "2026-07-15",
       "ocrResult": "correct",
-      "_127_randomCheckEntry": "2026-07-21",
-      "_127_randomCheckSource": "day7",
-      "_127_randomCheckRound": 1,
-      "_127_randomCheckLastCheckedRound": 1,
-      "_lastPracticedDate": "2026-07-25",
+      "_127_randomCheckEntry": null,
+      "_127_randomCheckSource": null,
+      "_127_randomCheckRound": 0,
+      "_127_randomCheckLastCheckedRound": 0,
+      "_lastPracticedDate": "2026-07-26",
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "handwritingData": []
+      "handwritingData": [],
+      "_originalStatus": "learning",
+      "_originalRandomCheckEntry": null,
+      "_originalRandomCheckSource": null,
+      "_originalRandomCheckRound": 0,
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第二单元_shizi_课文1_队",
@@ -892,27 +905,40 @@
         "世代"
       ],
       "correctCount": 2,
-      "wrongCount": 3,
-      "status": "randomCheck",
+      "wrongCount": 4,
+      "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [],
+      "reviewDates": [
+        "2026-07-27",
+        "2026-07-28",
+        "2026-07-29",
+        "2026-07-30",
+        "2026-07-31",
+        "2026-08-01",
+        "2026-08-02"
+      ],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": false,
       "_planSkipDate": "2026-07-15",
-      "ocrResult": "correct",
-      "_127_randomCheckEntry": "2026-07-21",
-      "_127_randomCheckSource": "day7",
-      "_127_randomCheckRound": 1,
-      "_127_randomCheckLastCheckedRound": 1,
-      "_lastPracticedDate": "2026-07-25",
+      "ocrResult": "wrong",
+      "_127_randomCheckEntry": null,
+      "_127_randomCheckSource": null,
+      "_127_randomCheckRound": 0,
+      "_127_randomCheckLastCheckedRound": 0,
+      "_lastPracticedDate": "2026-07-26",
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "handwritingData": []
+      "handwritingData": [],
+      "_originalStatus": "learning",
+      "_originalRandomCheckEntry": null,
+      "_originalRandomCheckSource": null,
+      "_originalRandomCheckRound": 0,
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第二单元_shizi_课文3_界",
@@ -924,11 +950,11 @@
         "外界",
         "界限"
       ],
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 3,
       "status": "randomCheck",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [],
@@ -946,7 +972,7 @@
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
@@ -1577,8 +1603,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第一单元_shizi_课文3_别",
@@ -5367,11 +5392,11 @@
         "窗外",
         "外边"
       ],
-      "correctCount": 9,
+      "correctCount": 10,
       "wrongCount": 5,
       "status": "randomCheck",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [],
@@ -5389,7 +5414,7 @@
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
@@ -6143,21 +6168,21 @@
         "告诉"
       ],
       "isWord": true,
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 3,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -6176,7 +6201,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "handwritingData": []
     },
     {
@@ -7434,24 +7459,22 @@
         "味道"
       ],
       "isWord": true,
-      "correctCount": 5,
+      "correctCount": 6,
       "wrongCount": 1,
-      "status": "learning",
+      "status": "randomCheck",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-19",
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [
-        "2026-07-26"
-      ],
+      "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
       "ocrResult": "correct",
       "_planSkipDate": "2026-07-18",
-      "_127_randomCheckEntry": null,
-      "_127_randomCheckSource": null,
-      "_127_randomCheckRound": 0,
+      "_127_randomCheckEntry": "2026-07-26",
+      "_127_randomCheckSource": "day7",
+      "_127_randomCheckRound": 1,
       "_127_randomCheckLastCheckedRound": 0,
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
@@ -7459,7 +7482,10 @@
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
       "wrongBookPracticeCount": 0,
-      "wrongBookCorrectCount": 0
+      "wrongBookCorrectCount": 0,
+      "_hasHandwriting": false,
+      "handwritingData": [],
+      "_lastPracticedDate": "2026-07-26"
     },
     {
       "id": "yw_第四单元·阅读_课文10_有名",
@@ -8391,24 +8417,22 @@
         "便利",
         "利益"
       ],
-      "correctCount": 4,
+      "correctCount": 5,
       "wrongCount": 2,
-      "status": "learning",
+      "status": "randomCheck",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-19",
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [
-        "2026-07-26"
-      ],
+      "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
       "_planSkipDate": "2026-07-18",
       "ocrResult": "correct",
-      "_127_randomCheckEntry": null,
-      "_127_randomCheckSource": null,
-      "_127_randomCheckRound": 0,
+      "_127_randomCheckEntry": "2026-07-26",
+      "_127_randomCheckSource": "day7",
+      "_127_randomCheckRound": 1,
       "_127_randomCheckLastCheckedRound": 0,
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
@@ -8416,7 +8440,10 @@
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
       "wrongBookPracticeCount": 0,
-      "wrongBookCorrectCount": 0
+      "wrongBookCorrectCount": 0,
+      "_hasHandwriting": false,
+      "handwritingData": [],
+      "_lastPracticedDate": "2026-07-26"
     },
     {
       "id": "sz_第六单元_shizi_课文14《八角楼上》楼、代、穿、视、利、路_shizi_路",
@@ -8660,24 +8687,22 @@
         "当作"
       ],
       "isWord": true,
-      "correctCount": 4,
+      "correctCount": 5,
       "wrongCount": 1,
-      "status": "learning",
+      "status": "randomCheck",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-19",
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [
-        "2026-07-26"
-      ],
+      "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
       "_planSkipDate": "2026-07-18",
       "ocrResult": "correct",
-      "_127_randomCheckEntry": null,
-      "_127_randomCheckSource": null,
-      "_127_randomCheckRound": 0,
+      "_127_randomCheckEntry": "2026-07-26",
+      "_127_randomCheckSource": "day7",
+      "_127_randomCheckRound": 1,
       "_127_randomCheckLastCheckedRound": 0,
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
@@ -8685,7 +8710,10 @@
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
       "wrongBookPracticeCount": 0,
-      "wrongBookCorrectCount": 0
+      "wrongBookCorrectCount": 0,
+      "_hasHandwriting": false,
+      "handwritingData": [],
+      "_lastPracticedDate": "2026-07-26"
     },
     {
       "id": "yw_第五单元·阅读_课文12_前面",
@@ -9517,22 +9545,20 @@
         "胜利"
       ],
       "isWord": true,
-      "correctCount": 3,
+      "correctCount": 4,
       "wrongCount": 1,
-      "status": "learning",
+      "status": "randomCheck",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-19",
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [
-        "2026-07-26"
-      ],
+      "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "_127_randomCheckEntry": null,
-      "_127_randomCheckSource": null,
-      "_127_randomCheckRound": 0,
+      "_127_randomCheckEntry": "2026-07-26",
+      "_127_randomCheckSource": "day7",
+      "_127_randomCheckRound": 1,
       "_127_randomCheckLastCheckedRound": 0,
       "ocrResult": "correct",
       "_planSkipDate": "2026-07-18",
@@ -9542,7 +9568,10 @@
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
       "wrongBookPracticeCount": 0,
-      "wrongBookCorrectCount": 0
+      "wrongBookCorrectCount": 0,
+      "_hasHandwriting": false,
+      "handwritingData": [],
+      "_lastPracticedDate": "2026-07-26"
     },
     {
       "id": "yw_第六单元·阅读_课文14_道路",
@@ -10844,22 +10873,20 @@
         "忘怀",
         "淡忘"
       ],
-      "correctCount": 4,
+      "correctCount": 5,
       "wrongCount": 1,
-      "status": "learning",
+      "status": "randomCheck",
       "reviewCorrected": false,
       "_127_rollingStreak": 0,
-      "_127_day7Entry": "2026-07-19",
+      "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
-      "reviewDates": [
-        "2026-07-26"
-      ],
+      "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
       "firstWrong": true,
-      "_127_randomCheckEntry": null,
-      "_127_randomCheckSource": null,
-      "_127_randomCheckRound": 0,
+      "_127_randomCheckEntry": "2026-07-26",
+      "_127_randomCheckSource": "day7",
+      "_127_randomCheckRound": 1,
       "_127_randomCheckLastCheckedRound": 0,
       "ocrResult": "correct",
       "_planSkipDate": "2026-07-18",
@@ -10869,7 +10896,10 @@
       "_originalRandomCheckRound": 0,
       "_originalRandomCheckLastCheckedRound": 0,
       "wrongBookPracticeCount": 0,
-      "wrongBookCorrectCount": 0
+      "wrongBookCorrectCount": 0,
+      "_hasHandwriting": false,
+      "handwritingData": [],
+      "_lastPracticedDate": "2026-07-26"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_民",
@@ -14028,8 +14058,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_送",
@@ -14191,21 +14220,15 @@
         "接纳",
         "拉扯"
       ],
-      "correctCount": 4,
+      "correctCount": 5,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-26",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28",
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01"
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -14219,7 +14242,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "handwritingData": []
     },
     {
@@ -14318,8 +14341,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_吵",
@@ -14400,20 +14422,20 @@
         "受益"
       ],
       "correctCount": 3,
-      "wrongCount": 3,
+      "wrongCount": 4,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -14423,11 +14445,11 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": "2026-07-23",
-      "ocrResult": "correct",
+      "ocrResult": "wrong",
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
@@ -14805,8 +14827,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_麦",
@@ -14840,8 +14861,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_嫩",
@@ -14875,8 +14895,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_勤",
@@ -14888,21 +14907,15 @@
         "勤快",
         "勤奋"
       ],
-      "correctCount": 3,
+      "correctCount": 4,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-26",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28",
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01"
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -14916,7 +14929,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "handwritingData": []
     },
     {
@@ -14951,8 +14964,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_场",
@@ -14994,21 +15006,15 @@
         "制度",
         "制约"
       ],
-      "correctCount": 3,
+      "correctCount": 4,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-26",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28",
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01"
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -15022,7 +15028,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "handwritingData": []
     },
     {
@@ -15057,8 +15063,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_诚",
@@ -15122,8 +15127,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_假",
@@ -15157,8 +15161,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_漠",
@@ -15192,8 +15195,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_助",
@@ -15227,8 +15229,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-25"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_贫",
@@ -15240,21 +15241,15 @@
         "贫困",
         "贫苦"
       ],
-      "correctCount": 3,
+      "correctCount": 4,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-26",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
-        "2026-07-27",
-        "2026-07-28",
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01"
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -15268,7 +15263,7 @@
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
+      "_lastPracticedDate": "2026-07-26",
       "handwritingData": []
     },
     {
@@ -15281,21 +15276,21 @@
         "富足",
         "财富"
       ],
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -15305,17 +15300,17 @@
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": "2026-07-23",
-      "ocrResult": "wrong",
+      "ocrResult": "correct",
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": [],
+      "_lastPracticedDate": "2026-07-26",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0
+      "_originalRandomCheckLastCheckedRound": 0,
+      "handwritingData": []
     },
     {
       "id": "sz_第一单元_shizi_阅读1_shizi_蝌",
@@ -15337,7 +15332,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15370,7 +15364,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15403,7 +15396,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15436,7 +15428,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15469,7 +15460,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15502,7 +15492,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15535,7 +15524,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15568,7 +15556,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15591,25 +15578,24 @@
         "屋子",
         "屋顶"
       ],
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -15620,7 +15606,8 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": []
     },
     {
       "id": "sz_第一单元_shizi_阅读2_shizi_灾",
@@ -15633,24 +15620,23 @@
         "水灾"
       ],
       "correctCount": 1,
-      "wrongCount": 1,
+      "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -15660,8 +15646,14 @@
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": "",
       "_hasHandwriting": false,
-      "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "ocrResult": "wrong",
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": [],
+      "_originalStatus": "learning",
+      "_originalRandomCheckEntry": null,
+      "_originalRandomCheckSource": null,
+      "_originalRandomCheckRound": 0,
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_阅读3_shizi_植",
@@ -15683,7 +15675,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15716,7 +15707,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15749,7 +15739,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15782,7 +15771,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15805,25 +15793,24 @@
         "海底",
         "底细"
       ],
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -15834,7 +15821,8 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": []
     },
     {
       "id": "sz_第一单元_shizi_阅读3_shizi_备",
@@ -15856,7 +15844,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15889,7 +15876,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15922,7 +15908,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -15945,25 +15930,24 @@
         "朗读",
         "明朗"
       ],
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -15974,7 +15958,8 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": []
     },
     {
       "id": "sz_第二单元_shizi_识字2_shizi_榕",
@@ -15986,25 +15971,24 @@
         "榕叶",
         "榕城"
       ],
-      "correctCount": 1,
-      "wrongCount": 1,
+      "correctCount": 2,
+      "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -16015,7 +15999,8 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": []
     },
     {
       "id": "sz_第二单元_shizi_识字2_shizi_壮",
@@ -16037,7 +16022,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -16070,7 +16054,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -16093,25 +16076,24 @@
         "掌心",
         "巴掌"
       ],
-      "correctCount": 0,
+      "correctCount": 1,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -16121,13 +16103,14 @@
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": "",
       "_hasHandwriting": false,
-      "ocrResult": "wrong",
-      "_lastPracticedDate": "2026-07-25",
+      "ocrResult": "correct",
+      "_lastPracticedDate": "2026-07-26",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0
+      "_originalRandomCheckLastCheckedRound": 0,
+      "handwritingData": []
     },
     {
       "id": "sz_第二单元_shizi_识字2_shizi_枫",
@@ -16149,7 +16132,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -16182,7 +16164,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -16205,25 +16186,24 @@
         "桦树",
         "桦木"
       ],
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -16234,7 +16214,8 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": []
     },
     {
       "id": "sz_第二单元_shizi_识字2_shizi_守",
@@ -16256,7 +16237,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -16279,25 +16259,24 @@
         "杉树",
         "水杉"
       ],
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -16308,7 +16287,8 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": []
     },
     {
       "id": "sz_第二单元_shizi_识字3_shizi_鹰",
@@ -16577,24 +16557,23 @@
         "雄伟"
       ],
       "correctCount": 1,
-      "wrongCount": 1,
+      "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -16604,8 +16583,14 @@
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": "2026-07-23",
       "_hasHandwriting": false,
-      "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "ocrResult": "wrong",
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": [],
+      "_originalStatus": "learning",
+      "_originalRandomCheckEntry": null,
+      "_originalRandomCheckSource": null,
+      "_originalRandomCheckRound": 0,
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_课文2_shizi_升",
@@ -17033,21 +17018,21 @@
         "短小",
         "短处"
       ],
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -17060,14 +17045,14 @@
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
       "_hasHandwriting": false,
-      "ocrResult": "wrong",
-      "_lastPracticedDate": "2026-07-25",
-      "handwritingData": [],
+      "ocrResult": "correct",
+      "_lastPracticedDate": "2026-07-26",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0
+      "_originalRandomCheckLastCheckedRound": 0,
+      "handwritingData": []
     },
     {
       "id": "sz_第一单元_shizi_课文1_shizi_成",
@@ -17377,7 +17362,6 @@
       "reviewDates": [],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": false,
@@ -17401,24 +17385,23 @@
         "虹桥"
       ],
       "correctCount": 1,
-      "wrongCount": 1,
+      "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 0,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-26",
         "2026-07-27",
         "2026-07-28",
         "2026-07-29",
         "2026-07-30",
         "2026-07-31",
-        "2026-08-01"
+        "2026-08-01",
+        "2026-08-02"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
-      "handwritingData": [],
       "wrongBookPracticeCount": 0,
       "wrongBookCorrectCount": 0,
       "firstWrong": true,
@@ -17428,8 +17411,14 @@
       "_127_randomCheckLastCheckedRound": 0,
       "_planSkipDate": null,
       "_hasHandwriting": false,
-      "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-25"
+      "ocrResult": "wrong",
+      "_lastPracticedDate": "2026-07-26",
+      "handwritingData": [],
+      "_originalStatus": "learning",
+      "_originalRandomCheckEntry": null,
+      "_originalRandomCheckSource": null,
+      "_originalRandomCheckRound": 0,
+      "_originalRandomCheckLastCheckedRound": 0
     }
   ],
   "checkinDays": 1,
@@ -17442,7 +17431,7 @@
       "secretKey": "vRmxCF6bvXGX6Vonu0kFzHnS2uT6qlxS",
       "token": "24.c0d8a846d0692f3f3b5c07e0f1388329.2592000.1787393040.282335-124020947",
       "tokenExpiresAt": 1787393040283,
-      "used": 3
+      "used": 5
     }
   ],
   "baiduActiveIdx": 0,
@@ -17455,6 +17444,6 @@
   "ttsVoiceId": "5003",
   "ttsToken": "24.4fe7e622cb2385e0323fecfc543ca4e2.2592000.1786118372.282335-123931889",
   "todayPlanWordIds": [],
-  "todayPlanDate": "2026-07-25",
+  "todayPlanDate": "2026-07-26",
   "_planCompletedToday": true
 }
