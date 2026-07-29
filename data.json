@@ -119,8 +119,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第一单元_shizi_阅读3_准",
@@ -240,8 +239,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第一单元_shizi_语文园地一_暴",
@@ -278,8 +276,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第一单元_shizi_语文园地一_雾",
@@ -404,8 +401,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_课文1_处",
@@ -495,8 +491,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_课文1_园",
@@ -563,8 +558,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第二单元_shizi_课文1_队",
@@ -685,8 +679,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_课文2_杨",
@@ -903,21 +896,15 @@
         "世间",
         "世代"
       ],
-      "correctCount": 4,
+      "correctCount": 5,
       "wrongCount": 5,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-29",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01",
-        "2026-08-02",
-        "2026-08-03",
-        "2026-08-04"
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -928,7 +915,7 @@
       "_127_randomCheckSource": null,
       "_127_randomCheckRound": 0,
       "_127_randomCheckLastCheckedRound": 0,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
@@ -974,8 +961,7 @@
       "_lastPracticedDate": "2026-07-28",
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
-      "_hasHandwriting": false,
-      "handwritingData": []
+      "_hasHandwriting": false
     },
     {
       "id": "sz_第二单元_shizi_课文3_彩",
@@ -1214,8 +1200,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_港",
@@ -1247,8 +1232,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_湾",
@@ -1280,8 +1264,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_塘",
@@ -1313,8 +1296,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_稻",
@@ -1346,8 +1328,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_行",
@@ -1408,8 +1389,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_溪",
@@ -1446,8 +1426,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_翠",
@@ -1484,8 +1463,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字1_号",
@@ -1522,8 +1500,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第一单元·阅读_课文1_妈妈",
@@ -1611,8 +1588,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第一单元_shizi_课文3_别",
@@ -2159,8 +2135,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第一单元_shizi_阅读3_脚",
@@ -3067,8 +3042,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第一单元·阅读_课文1_过去",
@@ -4037,8 +4011,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_课文4_体",
@@ -4554,8 +4527,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_依",
@@ -4587,8 +4559,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_尽",
@@ -4600,21 +4571,21 @@
         "尽头",
         "尽心"
       ],
-      "correctCount": 10,
-      "wrongCount": 4,
+      "correctCount": 11,
+      "wrongCount": 5,
       "status": "learning",
       "reviewCorrected": false,
       "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
         "2026-07-30",
         "2026-07-31",
         "2026-08-01",
         "2026-08-02",
         "2026-08-03",
-        "2026-08-04"
+        "2026-08-04",
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -4633,7 +4604,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "handwritingData": []
     },
     {
@@ -4671,8 +4642,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_层",
@@ -4709,8 +4679,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_照",
@@ -4777,8 +4746,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_烟",
@@ -4817,8 +4785,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文7《古诗二首》依、尽、穷、层、照、炉、烟、川、直、银_川",
@@ -4945,8 +4912,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_顶",
@@ -5013,8 +4979,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_位",
@@ -5081,8 +5046,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文8《黄山奇石》仙、顶、巨、位、闪、狗、形、状_狗",
@@ -5179,8 +5143,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_湖",
@@ -5247,8 +5210,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_胜",
@@ -5285,8 +5247,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_岛",
@@ -5323,8 +5284,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文9《日月潭》湖、区、胜、岛、弯、现、就、外_弯",
@@ -5451,8 +5411,7 @@
       "_lastPracticedDate": "2026-07-28",
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
-      "_hasHandwriting": false,
-      "handwritingData": []
+      "_hasHandwriting": false
     },
     {
       "id": "sz_第四单元_shizi_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_份",
@@ -5489,8 +5448,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_枝",
@@ -5532,21 +5490,15 @@
         "乘客",
         "宾客"
       ],
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-29",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01",
-        "2026-08-02",
-        "2026-08-03",
-        "2026-08-04"
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -5565,7 +5517,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "handwritingData": []
     },
     {
@@ -5603,8 +5555,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_市",
@@ -5671,8 +5622,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_钉",
@@ -5709,8 +5659,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第四单元_shizi_课文10《葡萄沟》份、枝、客、城、市、孔、钉、味_味",
@@ -6240,8 +6189,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第三单元·阅读_课文5_名字",
@@ -6277,8 +6225,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第三单元·阅读_课文5_出门",
@@ -6488,8 +6435,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第三单元·阅读_课文6_爷爷",
@@ -6525,8 +6471,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第三单元·阅读_课文6_北边",
@@ -6591,8 +6536,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第三单元·阅读_课文6_转动",
@@ -7527,8 +7471,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第四单元·阅读_课文10_有名",
@@ -7654,8 +7597,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第五单元_shizi_课文11《坐井观天》观、呀、答、话、抬、能、信_shizi_话",
@@ -7784,8 +7726,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第五单元_shizi_课文12《寒号鸟》阵、做、冻、第、像、冷、冰、亮_shizi_做",
@@ -7852,8 +7793,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第五单元_shizi_课文12《寒号鸟》阵、做、冻、第、像、冷、冰、亮_shizi_像",
@@ -7950,8 +7890,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第五单元_shizi_课文12《寒号鸟》阵、做、冻、第、像、冷、冰、亮_shizi_亮",
@@ -8168,8 +8107,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第五单元_shizi_课文13《我要的是葫芦》种、棵、以、次、想、邻、居、吧、奇、怪_shizi_居",
@@ -8326,8 +8264,7 @@
       "_lastPracticedDate": "2026-07-28",
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
-      "_hasHandwriting": false,
-      "handwritingData": []
+      "_hasHandwriting": false
     },
     {
       "id": "sz_第六单元_shizi_课文14《八角楼上》楼、代、穿、视、利、路_shizi_楼",
@@ -8364,8 +8301,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文14《八角楼上》楼、代、穿、视、利、路_shizi_代",
@@ -8492,8 +8428,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文14《八角楼上》楼、代、穿、视、利、路_shizi_路",
@@ -8737,21 +8672,21 @@
         "当作"
       ],
       "isWord": true,
-      "correctCount": 5,
+      "correctCount": 6,
       "wrongCount": 3,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 0,
+      "_127_rollingStreak": 1,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
         "2026-07-30",
         "2026-07-31",
         "2026-08-01",
         "2026-08-02",
         "2026-08-03",
-        "2026-08-04"
+        "2026-08-04",
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -8770,7 +8705,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "handwritingData": []
     },
     {
@@ -9416,8 +9351,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文14_年代",
@@ -9559,8 +9493,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文14_中国",
@@ -9630,8 +9563,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文14_道路",
@@ -9667,8 +9599,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文15_同志",
@@ -9704,8 +9635,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文15_红军",
@@ -9775,8 +9705,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文15_生产",
@@ -9812,8 +9741,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文15_常常",
@@ -10427,8 +10355,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第六单元·阅读_课文17_年轻",
@@ -10634,8 +10561,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文15《朱德的扁担》同、志、军、故、常、非、每_shizi_同",
@@ -10709,8 +10635,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文15《朱德的扁担》同、志、军、故、常、非、每_shizi_军",
@@ -10747,8 +10672,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文15《朱德的扁担》同、志、军、故、常、非、每_shizi_故",
@@ -10822,8 +10746,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文15《朱德的扁担》同、志、军、故、常、非、每_shizi_非",
@@ -10969,8 +10892,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_民",
@@ -11044,8 +10966,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_理",
@@ -11082,8 +11003,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_串",
@@ -11095,21 +11015,21 @@
         "串联",
         "串通"
       ],
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 1,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
         "2026-07-30",
         "2026-07-31",
         "2026-08-01",
         "2026-08-02",
         "2026-08-03",
-        "2026-08-04"
+        "2026-08-04",
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -11128,7 +11048,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 0,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "handwritingData": []
     },
     {
@@ -11166,8 +11086,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_令",
@@ -11204,8 +11123,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_战",
@@ -11244,8 +11162,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_士",
@@ -11282,8 +11199,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文16《难忘的泼水节》难、忘、民、因、理、串、裤、令、战、士、戴_shizi_戴",
@@ -11320,8 +11236,7 @@
       "_lastPracticedDate": "2026-07-28",
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
-      "_hasHandwriting": false,
-      "handwritingData": []
+      "_hasHandwriting": false
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_反",
@@ -11333,21 +11248,15 @@
         "反复",
         "反对"
       ],
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-29",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01",
-        "2026-08-02",
-        "2026-08-03",
-        "2026-08-04"
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -11366,7 +11275,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "handwritingData": []
     },
     {
@@ -11406,8 +11315,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_由",
@@ -11444,8 +11352,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_于",
@@ -11482,8 +11389,7 @@
       "_lastPracticedDate": "2026-07-28",
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
-      "_hasHandwriting": false,
-      "handwritingData": []
+      "_hasHandwriting": false
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_员",
@@ -11520,8 +11426,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_被",
@@ -11558,8 +11463,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_课文17《刘胡兰》反、村、由、于、员、被、声_shizi_声",
@@ -11596,8 +11500,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第六单元_shizi_语文园地六_shizi_抄",
@@ -11634,8 +11537,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第七单元·阅读_课文19_于是",
@@ -11671,8 +11573,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第七单元·阅读_课文19_无论",
@@ -11712,21 +11613,15 @@
         "船只"
       ],
       "isWord": true,
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 3,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-29",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01",
-        "2026-08-02",
-        "2026-08-03",
-        "2026-08-04"
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -11740,7 +11635,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "handwritingData": []
     },
     {
@@ -11772,8 +11667,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第七单元·阅读_课文19_行人",
@@ -11833,8 +11727,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第七单元·阅读_课文19_上空",
@@ -12019,21 +11912,15 @@
         "消失"
       ],
       "isWord": true,
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 3,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-29",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01",
-        "2026-08-02",
-        "2026-08-03",
-        "2026-08-04"
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -12047,7 +11934,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "handwritingData": []
     },
     {
@@ -12493,8 +12380,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文18《古诗二首》绝、灭、舟、独、阴、似、野、低_shizi_独",
@@ -12591,8 +12477,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文18《古诗二首》绝、灭、舟、独、阴、似、野、低_shizi_野",
@@ -12624,8 +12509,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文18《古诗二首》绝、灭、舟、独、阴、似、野、低_shizi_低",
@@ -12687,8 +12571,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_船",
@@ -12725,8 +12608,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_猫",
@@ -12788,8 +12670,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_该",
@@ -12821,8 +12702,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_散",
@@ -12854,8 +12734,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_课文19《雾在哪里》论、船、猫、切、该、散、步、失_shizi_步",
@@ -13137,8 +13016,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_语文园地七_shizi_饥",
@@ -13175,8 +13053,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第七单元_shizi_语文园地七_shizi_饿",
@@ -13218,21 +13095,15 @@
         "宁静",
         "康宁"
       ],
-      "correctCount": 2,
+      "correctCount": 3,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-29",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01",
-        "2026-08-02",
-        "2026-08-03",
-        "2026-08-04"
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -13246,7 +13117,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
@@ -13312,8 +13183,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "yw_第八单元·阅读_课文21_身边",
@@ -14069,8 +13939,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_谁",
@@ -14132,8 +14001,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_仔",
@@ -14164,8 +14032,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_极",
@@ -14197,8 +14064,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文21《称赞》谁、汽、拿、仔、极、送、椅、怎、拉_shizi_送",
@@ -14380,8 +14246,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_纸",
@@ -14443,8 +14308,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_线",
@@ -14476,8 +14340,7 @@
       "wrongBookPracticeCount": 2,
       "wrongBookCorrectCount": 2,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_吵",
@@ -14509,8 +14372,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_但",
@@ -14542,8 +14404,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文22《纸船和风筝》收、接、纸、抓、线、吵、但、受、句、哭_shizi_受",
@@ -14555,21 +14416,15 @@
         "难受",
         "受益"
       ],
-      "correctCount": 5,
+      "correctCount": 6,
       "wrongCount": 5,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 2,
-      "_127_day7Entry": null,
+      "_127_rollingStreak": 0,
+      "_127_day7Entry": "2026-07-29",
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
-        "2026-07-30",
-        "2026-07-31",
-        "2026-08-01",
-        "2026-08-02",
-        "2026-08-03",
-        "2026-08-04"
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -14583,7 +14438,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
@@ -14711,8 +14566,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_爱",
@@ -14774,8 +14628,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第八单元_shizi_课文23《快乐的小河》游、戏、爱、呢、跳、咱_shizi_跳",
@@ -14957,8 +14810,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_麦",
@@ -14990,8 +14842,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_嫩",
@@ -15023,8 +14874,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_勤",
@@ -15056,8 +14906,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_归",
@@ -15089,8 +14938,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字4_shizi_场",
@@ -15152,8 +15000,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_恨",
@@ -15185,8 +15032,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_诚",
@@ -15248,8 +15094,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_假",
@@ -15281,8 +15126,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_漠",
@@ -15314,8 +15158,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_助",
@@ -15347,8 +15190,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_贫",
@@ -15380,8 +15222,7 @@
       "wrongBookPracticeCount": 1,
       "wrongBookCorrectCount": 1,
       "_hasHandwriting": false,
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_语文园地二_shizi_富",
@@ -15418,8 +15259,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_阅读1_shizi_蝌",
@@ -15707,8 +15547,7 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第一单元_shizi_阅读2_shizi_灾",
@@ -15747,8 +15586,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_阅读3_shizi_植",
@@ -15908,8 +15746,7 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第一单元_shizi_阅读3_shizi_备",
@@ -16037,8 +15874,7 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字2_shizi_榕",
@@ -16070,8 +15906,7 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字2_shizi_壮",
@@ -16147,21 +15982,21 @@
         "掌心",
         "巴掌"
       ],
-      "correctCount": 1,
+      "correctCount": 2,
       "wrongCount": 2,
       "status": "learning",
       "reviewCorrected": false,
-      "_127_rollingStreak": 1,
+      "_127_rollingStreak": 2,
       "_127_day7Entry": null,
       "_127_randomCheckWeek": 0,
       "reviewDates": [
-        "2026-07-29",
         "2026-07-30",
         "2026-07-31",
         "2026-08-01",
         "2026-08-02",
         "2026-08-03",
-        "2026-08-04"
+        "2026-08-04",
+        "2026-08-05"
       ],
       "pendingReview": false,
       "pendingReviewDate": null,
@@ -16175,7 +16010,7 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-28",
+      "_lastPracticedDate": "2026-07-29",
       "_originalStatus": "learning",
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
@@ -16277,8 +16112,7 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字2_shizi_守",
@@ -16342,8 +16176,7 @@
       "_planSkipDate": "",
       "_hasHandwriting": false,
       "ocrResult": "correct",
-      "_lastPracticedDate": "2026-07-28",
-      "handwritingData": []
+      "_lastPracticedDate": "2026-07-28"
     },
     {
       "id": "sz_第二单元_shizi_识字3_shizi_鹰",
@@ -16638,8 +16471,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_课文2_shizi_升",
@@ -17092,8 +16924,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     },
     {
       "id": "sz_第一单元_shizi_课文1_shizi_成",
@@ -17452,8 +17283,7 @@
       "_originalRandomCheckEntry": null,
       "_originalRandomCheckSource": null,
       "_originalRandomCheckRound": 0,
-      "_originalRandomCheckLastCheckedRound": 0,
-      "handwritingData": []
+      "_originalRandomCheckLastCheckedRound": 0
     }
   ],
   "checkinDays": 1,
@@ -17466,7 +17296,7 @@
       "secretKey": "vRmxCF6bvXGX6Vonu0kFzHnS2uT6qlxS",
       "token": "24.c0d8a846d0692f3f3b5c07e0f1388329.2592000.1787393040.282335-124020947",
       "tokenExpiresAt": 1787393040283,
-      "used": 20
+      "used": 21
     }
   ],
   "baiduActiveIdx": 0,
@@ -17479,6 +17309,6 @@
   "ttsVoiceId": "5003",
   "ttsToken": "24.4fe7e622cb2385e0323fecfc543ca4e2.2592000.1786118372.282335-123931889",
   "todayPlanWordIds": [],
-  "todayPlanDate": "2026-07-28",
+  "todayPlanDate": "2026-07-29",
   "_planCompletedToday": true
 }
