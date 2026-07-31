@@ -34,7 +34,7 @@
     <style>
         [v-cloak] { display: none !important; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: #fef5e8; padding: 16px; font-family: system-ui, 'Segoe UI', 'Quicksand', 'PingFang SC', sans-serif; }
+        body { background: #fef5e8; padding: 16px; font-family: system-ui, 'Segoe UI', 'Quicksand', 'PingFang SC', sans-serif; overflow-anchor: none; }
         #app { margin: 0 auto; background: white; border-radius: 48px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12); overflow: hidden; width: 100%; max-width: 1000px; -webkit-user-select: none; user-select: none; }
         #app * { -webkit-user-select: none; user-select: none; }
         @media (min-width: 768px) { body { padding: 24px; } #app { max-width: 1100px; } .canvas-tg { width: 160px; height: 160px; } }
@@ -278,28 +278,29 @@
             <div ref="eraserCursor" class="eraser-cursor"></div>
             <!-- 词语听写模式 -->
             <template v-if="currentSessionWord.isWord">
-            <div style="text-align:center; margin-bottom:8px;">
-                <div style="font-size:2.4rem; font-weight:700; color:#f97316; line-height:1.2; letter-spacing:0.1em;">{{ currentSessionWord.pinyin }}</div>
-                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:4px; padding:4px 12px; font-size:0.85rem;" @pointerdown="speakCurrentWord">🔊 重播</button>
+            <div style="text-align:center; margin-bottom:12px;">
+                <div style="font-size:3.5rem; font-weight:700; color:#f97316; line-height:1.2;">{{ currentSessionWord.pinyin }}</div>
+                <button class="cute-btn-sm" style="background:#fff7ed; color:#f97316; border:1px solid #ffca9a; margin-top:6px;" @pointerdown="speakCurrentWord">🔊 重播</button>
             </div>
             <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
-                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem;" @pointerdown="handleDontKnow">😵 不会</button>
-                <button class="cute-btn" :class="{'eraser-active': eraserActive}" style="flex:1; padding:8px 0; font-size:0.9rem;" @pointerdown="toggleEraser">{{ eraserActive ? '✏️ 写字' : '🧹 橡皮擦' }}</button>
-                <button class="cute-btn" style="flex:1; padding:8px 0; font-size:0.9rem; background:#fef2f2; color:#dc2626; border:1px solid #fecaca;" @pointerdown="clearAllCanvas">🗑️ 清空</button>
+                <button class="cute-btn" style="flex:1; padding:10px 0; font-size:1rem;" @pointerdown="handleDontKnow">😵 不会</button>
+                <button class="cute-btn" :class="{'eraser-active': eraserActive}" style="flex:1; padding:10px 0; font-size:1rem;" @pointerdown="toggleEraser">{{ eraserActive ? '✏️ 写字' : '🧹 橡皮擦' }}</button>
+                <button class="cute-btn" style="flex:1; padding:10px 0; font-size:1rem; background:#fef2f2; color:#dc2626; border:1px solid #fecaca;" @pointerdown="clearAllCanvas">🗑️ 清空</button>
             </div>
             <!-- 箭头行 -->
-            <div style="display:flex; align-items:center; justify-content:center; gap:80px; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:80px; padding:8px 0; margin-bottom:20px;">
                 <button v-if="sessionCanvasCount > 0" class="nav-arrow-btn" @pointerdown="goToPrevWord" style="width:56px; height:56px; border-radius:50%; background:#fff0e0; border:2px solid #fbbf24; font-size:1.4rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#d97706;">◀</button>
                 <div v-else style="width:56px;"></div>
                 <button class="nav-arrow-btn" @pointerdown="recognizeAndSubmit" style="width:56px; height:56px; border-radius:50%; background:#f97316; border:none; font-size:1.4rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 3px 0 #b45309;">▶</button>
             </div>
             <!-- 田字格 -->
-            <div style="display:flex; justify-content:center; margin-bottom:10px;">
-                <div style="flex:1; min-width:0; display:flex; justify-content:center; gap:8px; padding:2px 0; overflow-x:auto; -webkit-overflow-scrolling:touch;" id="word_canvas_container">
+            <div style="display:flex; justify-content:center; margin-bottom:16px;">
+                <div style="flex:1; min-width:0; display:flex; justify-content:center; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;" id="word_canvas_container">
                     <!-- 由 initWordCanvas 动态创建 -->
                 </div>
             </div>
-            <div class="text-small" style="font-size:0.75rem;">✏️ 看拼音，写出这个词语。◀ 上一个 · 下一个 ▶</div>
+            <div class="text-small">✏️ 看拼音，写出这个词语。◀ 上一个 · 下一个 ▶</div>
+            <div class="api-status">🤖 当前引擎: {{ lastOcrEngine || (useBaiduOCR ? '百度智能云' : '本地 Tesseract') }}{{ lastOcrEngine && lastOcrEngine !== (useBaiduOCR ? '百度智能云' : '本地 Tesseract') ? '（已回退）' : '' }}</div>
             </template>
             <!-- 单字默写模式 -->
             <template v-else>
@@ -1741,7 +1742,17 @@
             vocabUsage:{ deep:true, handler:'saveData' }, 
             ttsVoiceId:'saveData', 
             ttsToken:'saveData',
-            wrongWordsList: { handler() { this.initWrongWordSelection(); }, immediate: true }
+            wrongWordsList: { handler() { this.initWrongWordSelection(); }, immediate: true },
+            currentView(v) {
+                if(v !== 'dictateView') {
+                    this.exitFullscreen();
+                    this._isDictating = false;
+                    if(this._dictatePopstateHandler) {
+                        window.removeEventListener('popstate', this._dictatePopstateHandler);
+                        this._dictatePopstateHandler = null;
+                    }
+                }
+            }
         },
         mounted() { this._handwritingDB = null; this._initHandwritingDB().catch(()=>{}); this.loadData(); this.showTextbookImport = false; console.log('[启动] Vue已挂载, showTextbookImport=', this.showTextbookImport); const _today = getLocalDateStr(); if(this._planToastShown === _today) { const _tb = this.allReviewPlans.find(p => { const d = new Date(_today); return p.date === (d.getMonth()+1) + '/' + d.getDate(); }); if(_tb) { if(this._planToastAdded > 0) { this.toastMessage = '看板加入 ' + this._planToastAdded + '个词语，重复了' + this._planToastDup + '个'; } else { this.toastMessage = '看板计划 ' + _tb.date + '(' + _tb.weekday + ').' + this._planToastTotal + '个词语，已全部在今日计划中'; } } } this.generateTodayPlan(); this.autoAddPlanBoardWords(); this.checkAndClearCompletedPlan(); const _pt = getLocalDateStr(); const _pk = 'practicedCheckShown_' + _pt; if(!sessionStorage.getItem(_pk)) { const _pi = this.todayPlanWordIds.filter(_id => { const _w = this.words.find(w => w.id === _id); return _w && _w._lastPracticedDate === _pt; }); if(_pi.length > 0) { const _pn = _pi.map(_id => { const _w = this.words.find(w => w.id === _id); return _w ? (_w.word || _w.char) : ''; }).filter(Boolean); this.showConfirm('今日已默写', _pn.length + '个字今日已经默写过：' + _pn.join('、') + '\n\n是否从今日计划中清除？', () => { this.todayPlanWordIds = this.todayPlanWordIds.filter(_id => !_pi.includes(_id)); this.todayPlanWords = this.todayPlanWords.filter(_w => !_pi.includes(_w.id)); this.saveDataImmediate(); this.showToast('已清除 ' + _pn.length + ' 个已默写的字'); }, () => {}); sessionStorage.setItem(_pk, '1'); } } window.addEventListener('beforeunload', this.flushSave); if('speechSynthesis' in window){ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); } let _touchStartTarget = null; document.addEventListener('touchstart', (e) => { _touchStartTarget = e.target; }, { passive: true }); document.addEventListener('touchmove', (e) => { if(!this._isDictating) return; if(_touchStartTarget && _touchStartTarget.closest('#tg_c, #word_canvas_container')) return; e.preventDefault(); }, { passive: false }); },
         methods: {
@@ -2743,6 +2754,11 @@
                 this.enableDrawing(canvas);
                 // 自动语音播报：词语 + 的 + 目标字（如"两个的两"）
                 this.speakCurrentWord();
+                const _el = document.getElementById('tg_c');
+                if(_el) {
+                    const top = _el.getBoundingClientRect().top + window.scrollY;
+                    window.scrollTo(0, Math.max(0, top - window.innerHeight * 0.2));
+                }
             },
             // 词语听写：初始化双田字格画布
             initWordCanvas() {
@@ -2761,7 +2777,7 @@
                     const borderTotal = 4 * chars.length;
                     const gap = 8;
                     const gapTotal = gap * Math.max(0, chars.length - 1);
-                    const size = Math.min(180, Math.max(60, Math.floor((innerW - borderTotal - gapTotal) / chars.length)));
+                    const size = Math.min(160, Math.max(60, Math.floor((innerW - borderTotal - gapTotal) / chars.length)));
                     const half = size / 2;
                     chars.forEach((ch, idx) => {
                         // 双层画布容器
@@ -2798,6 +2814,11 @@
                     });
                 }
                 this.speakCurrentWord();
+                const _el = document.getElementById('word_canvas_container');
+                if(_el) {
+                    const top = _el.getBoundingClientRect().top + window.scrollY;
+                    window.scrollTo(0, Math.max(0, top - window.innerHeight * 0.2));
+                }
             },
             // 词语听写：画描红
             drawWordTrace(word) {
@@ -3249,8 +3270,9 @@
                     const ctx = canvas.getContext('2d');
                     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     const d = imgData.data;
-                    // 背景色 #fffcf5 = rgb(255,252,245)，允许少量偏差
+                    // 背景色 #fffcf5 = rgb(255,252,245)，允许少量偏差；透明像素(a≈0)视为空白
                     for(let i = 0; i < d.length; i += 16) { // 每4像素采样一次，提速
+                        if(d[i+3] < 10) continue; // 完全透明 = 没有墨迹
                         const r = d[i], g = d[i+1], b = d[i+2];
                         if(r < 250 || g < 245 || b < 235) return true; // 非背景色
                     }
@@ -3320,21 +3342,20 @@
                         const retryCount = this.sessionRetryCount[cur.id] || 0;
                         if(this.traceMode && retryCount < 3) {
                             // 还需要重试：重新初始化画布，不清除重试计数
-                            this.$nextTick(() => { this.initWordCanvas(); });
+                            await this.$nextTick(() => { this.initWordCanvas(); });
                             return;
                         }
                         // 完成：移除当前词，进入下一个
                         this.traceMode = false;
                         this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                         if(this.sessionTaskList.length === 0) {
-                            if(this.timerInterval) clearInterval(this.timerInterval);
-                            this.sessionFinished = true;
+                            this.finishSession();
                         } else {
                             if(this.sessionCurrentIdx >= this.sessionTaskList.length) this.sessionCurrentIdx = 0;
                             // 统一模式：根据下一个项切换模式
                             const nextItem = this.sessionTaskList[this.sessionCurrentIdx];
                             this.sessionMode = nextItem.isWord ? 'word' : 'dictate';
-                            this.$nextTick(() => { this.initCanvasForCurrent(); });
+                            await this.$nextTick(() => { this.initCanvasForCurrent(); });
                         }
                         return;
                     }
@@ -3356,20 +3377,19 @@
                     this.traceMode = false;
                     if(this.sessionCharHadTrace && this.sessionCurrentWordIdx < 2) {
                         this.sessionCurrentWordIdx++;
-                        this.$nextTick(()=>{ this.initCanvasForCurrent(); });
+                        await this.$nextTick(()=>{ this.initCanvasForCurrent(); });
                     } else {
                         this.sessionCurrentWordIdx = 0;
                         this.sessionCharHadTrace = false;
                         this.sessionTaskList.splice(this.sessionCurrentIdx, 1);
                         if(this.sessionTaskList.length === 0) {
-                            if(this.timerInterval) clearInterval(this.timerInterval);
-                            this.sessionFinished = true;
+                            this.finishSession();
                         } else {
                             if(this.sessionCurrentIdx >= this.sessionTaskList.length) this.sessionCurrentIdx = 0;
                             // 统一模式：根据下一个项切换模式
                             const nextItem = this.sessionTaskList[this.sessionCurrentIdx];
                             this.sessionMode = nextItem.isWord ? 'word' : 'dictate';
-                            this.$nextTick(()=>{ this.initCanvasForCurrent(); });
+                            await this.$nextTick(()=>{ this.initCanvasForCurrent(); });
                         }
                     }
                 } catch(e) {
@@ -3703,12 +3723,17 @@
                             this.sessionCorrectCount++;
                             this.todayCompletedCount++;
                         } else {
-                            if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) { wordObj.firstWrong = true; }
-                            wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
-                            this.updateWord127State(wordObj, false);
-                            wordObj.pendingReview = true;
-                            wordObj.pendingReviewDate = today;
-                            this.sessionWrongWordIds.push(group.charId);
+                            if(this.sessionRetryCount[group.charId]) {
+                                // 点过"不会"：handleDontKnow 已记1次错/进滚动池，批改不再重复计
+                                this.sessionWrongWordIds.push(group.charId);
+                            } else {
+                                if(wordObj.wrongCount === 0 && wordObj.correctCount === 0) { wordObj.firstWrong = true; }
+                                wordObj.wrongCount = (wordObj.wrongCount || 0) + 1;
+                                this.updateWord127State(wordObj, false);
+                                wordObj.pendingReview = true;
+                                wordObj.pendingReviewDate = today;
+                                this.sessionWrongWordIds.push(group.charId);
+                            }
                         }
                     } catch(e) {
                         console.log('处理字符时出错:', e);
@@ -3866,13 +3891,19 @@
                 if(this.timerInterval) clearInterval(this.timerInterval); 
                 this.sessionFinished=true; 
                 this._isDictating = false;
-                this._planCompletedToday = true;
-                this.todayPlanWordIds = [];
-                this.todayPlanDate = getLocalDateStr(); // 保留今天的日期，第二天才能通过日期比较重置 _planCompletedToday
+                this.exitFullscreen();
+                if(this._sessionSource === 'todayPlan') {
+                    this._planCompletedToday = true;
+                    this.todayPlanWordIds = [];
+                    this.todayPlanDate = getLocalDateStr(); // 保留今天的日期，第二天才能通过日期比较重置 _planCompletedToday
+                }
                 this.saveDataImmediate();
             },
             exitFullscreen() {
                 try { document.exitFullscreen(); } catch(e) {}
+                try { if(document.webkitExitFullscreen) document.webkitExitFullscreen(); } catch(e) {}
+                try { if(document.mozCancelFullScreen) document.mozCancelFullScreen(); } catch(e) {}
+                try { if(document.msExitFullscreen) document.msExitFullscreen(); } catch(e) {}
             },
             finishAndGoHome() {
                 console.log('[退出诊断] finishAndGoHome被调用', new Error().stack);
