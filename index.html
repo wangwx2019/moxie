@@ -2051,11 +2051,14 @@
             // ---- IndexedDB 手写图存储（异步，不阻塞界面） ----
             _initHandwritingDB() {
                 return new Promise((resolve, reject) => {
-                    const req = indexedDB.open('HandwritingDB', 1);
+                    const req = indexedDB.open('HandwritingDB', 2);
                     req.onupgradeneeded = (e) => {
                         const db = e.target.result;
                         if(!db.objectStoreNames.contains('images')) {
                             db.createObjectStore('images', { keyPath: 'id' });
+                        }
+                        if(!db.objectStoreNames.contains('audio')) {
+                            db.createObjectStore('audio', { keyPath: 'id' });
                         }
                     };
                     req.onsuccess = (e) => { this._handwritingDB = e.target.result; resolve(); };
@@ -2090,6 +2093,29 @@
                     tx.oncomplete = () => resolve();
                     tx.onerror = () => reject(tx.error);
                 });
+            },
+            // ---- 百度语音本地缓存（同一句话只向百度要一次，之后读手机里的） ----
+            async getTtsAudio(key) {
+                try {
+                    if(!this._handwritingDB) await this._initHandwritingDB();
+                    return await new Promise((resolve) => {
+                        const tx = this._handwritingDB.transaction('audio', 'readonly');
+                        const req = tx.objectStore('audio').get(key);
+                        req.onsuccess = () => resolve(req.result?.data || null);
+                        req.onerror = () => resolve(null);
+                    });
+                } catch(e) { return null; } // 缓存读失败当未命中，走网络
+            },
+            async saveTtsAudio(key, blob) {
+                try {
+                    if(!this._handwritingDB) await this._initHandwritingDB();
+                    await new Promise((resolve) => {
+                        const tx = this._handwritingDB.transaction('audio', 'readwrite');
+                        tx.objectStore('audio').put({ id: key, data: blob });
+                        tx.oncomplete = () => resolve();
+                        tx.onerror = () => resolve();
+                    });
+                } catch(e) { /* 缓存写失败不影响播放 */ }
             },
             // 将透明背景的手写图合成到奶油色底色上，避免保存后显示为黑图
             _compositeOnCreamBG(dataURL) {
@@ -2853,12 +2879,17 @@
                     this.speakWithBaidu(text);
                 }
             },
-            // 百度语音合成
+            // 百度语音合成（带本地缓存：同一句话只向百度要一次，之后读手机里的）
             async speakWithBaidu(text) {
                 try {
                     // 停止上一次播放
                     if(this._currentTtsAudio) { this._currentTtsAudio.pause(); this._currentTtsAudio = null; }
                     if('speechSynthesis' in window) window.speechSynthesis.cancel();
+                    // 本地缓存优先：key 含声音ID和合成参数，换声音/调参数自动换新缓存
+                    // 注意：若下方URL调整spd/pit/vol参数，需同步修改此key
+                    const cacheKey = (this.ttsVoiceId || '0') + '|spd3pit5vol5|' + text;
+                    const cached = await this.getTtsAudio(cacheKey);
+                    if(cached) { this._playBlob(cached, text); return; }
                     let tok = this.ttsToken;
                     if(!tok) {
                         const acc = this.baiduAccounts[this.baiduActiveIdx];
@@ -2876,6 +2907,13 @@
                     if(!res.ok || ct.includes('json')) { console.warn('百度TTS失败:', ct, res.status); this.speakFallback(text); return; }
                     const blob = await res.blob();
                     if(blob.size < 200) { console.warn('百度TTS返回过小:', blob.size); this.speakFallback(text); return; }
+                    this.saveTtsAudio(cacheKey, blob); // 存本地，异步不阻塞播放
+                    this._playBlob(blob, text);
+                } catch(e) { console.error('百度语音失败:', e); this.speakFallback(text); }
+            },
+            // 播放音频 blob（缓存命中与网络共用），失败降级原生TTS
+            async _playBlob(blob, text) {
+                try {
                     const audioUrl = URL.createObjectURL(blob);
                     const audio = new Audio(audioUrl);
                     this._currentTtsAudio = audio;
@@ -2889,7 +2927,7 @@
                         setTimeout(resolve, 2000); // 兜底超时
                     });
                     await audio.play().catch(e => { console.warn('audio.play失败:', e); this.speakFallback(text); });
-                } catch(e) { console.error('百度语音失败:', e); this.speakFallback(text); }
+                } catch(e) { console.error('语音播放失败:', e); this.speakFallback(text); }
             },
             // 降级：浏览器原生 TTS
             speakFallback(text) {
